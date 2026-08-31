@@ -1,0 +1,14 @@
+node_modules/
+.preview-dist/
+.wrangler/
+.dev.vars
+.env
+*.log
+.DS_Store
+wrangler.domains.jsonc
+incoming/
+processed/
+
+artifacts/
+__pycache__/
+*.pyc

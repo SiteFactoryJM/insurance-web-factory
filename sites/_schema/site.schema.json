@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sitefactory.example/schemas/insurance-site.json",
+  "title": "Insurance Web Factory site configuration",
+  "type": "object",
+  "required": ["id", "status", "domains", "template", "headingFont", "agent", "hero", "intro", "specialties", "process", "career", "faqs", "contact", "sections", "seo", "compliance"],
+  "properties": {
+    "id": {"type":"string","pattern":"^[a-z0-9][a-z0-9-]{1,62}$"},
+    "status": {"enum":["draft","published"]},
+    "domains": {"type":"array","items":{"type":"string"},"uniqueItems":true},
+    "template": {"enum":["trust-blue","warm-care","premium-navy","clean-minimal","local-friendly"]},
+    "accentColor": {"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},
+    "headingFont": {"enum":["pretendard","noto-serif-kr"]},
+    "agent": {"type":"object"}, "hero": {"type":"object"}, "intro": {"type":"object"},
+    "specialties": {"type":"array","minItems":3}, "process": {"type":"array"}, "career": {"type":"array"}, "faqs": {"type":"array"},
+    "contact": {"type":"object"}, "sections": {"type":"object"}, "seo": {"type":"object"}, "compliance": {"type":"object"}
+  },
+  "additionalProperties": false
+}

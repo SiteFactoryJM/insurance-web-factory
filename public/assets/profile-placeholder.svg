@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 900" role="img" aria-labelledby="title desc">
+  <title id="title">보험설계사 예시 프로필 일러스트</title><desc id="desc">정장을 입고 정면을 바라보는 신뢰감 있는 인물 예시</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e8f1fa"/><stop offset="1" stop-color="#f8fbfe"/></linearGradient>
+    <linearGradient id="suit" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1a2d46"/><stop offset="1" stop-color="#0d1725"/></linearGradient>
+    <radialGradient id="skin"><stop stop-color="#f3d6c5"/><stop offset="1" stop-color="#ddb5a0"/></radialGradient>
+  </defs>
+  <rect width="720" height="900" fill="url(#bg)"/>
+  <circle cx="580" cy="155" r="160" fill="#d9e9f7" opacity=".75"/><circle cx="95" cy="720" r="190" fill="#f3e8dc" opacity=".75"/>
+  <ellipse cx="360" cy="884" rx="286" ry="48" fill="#b7c9da" opacity=".35"/>
+  <path d="M184 870c11-184 45-288 132-327h88c87 39 121 143 132 327z" fill="url(#suit)"/>
+  <path d="m316 548 44 67 44-67 55 28-48 294H309l-48-294z" fill="#f8fafc"/>
+  <path d="m348 611 12 4 12-4 17 128-29 59-29-59z" fill="#456b94"/>
+  <path d="M281 400c0-91 31-166 80-166 53 0 84 73 78 168-4 64-34 126-79 126-44 0-79-61-79-128z" fill="url(#skin)"/>
+  <path d="M278 389c-10-102 28-180 91-180 67 0 96 69 72 181-13-58-33-91-75-96-42-5-69 24-88 95z" fill="#27364a"/>
+  <path d="M292 333c18-86 69-116 130-73-33-18-66-16-91 1-22 15-32 38-39 72z" fill="#35475e"/>
+  <ellipse cx="323" cy="401" rx="6" ry="7" fill="#25313e"/><ellipse cx="397" cy="401" rx="6" ry="7" fill="#25313e"/>
+  <path d="M342 457c13 8 25 8 38 0" fill="none" stroke="#b77870" stroke-width="5" stroke-linecap="round"/>
+  <path d="M355 408c-5 21-4 32 8 35" fill="none" stroke="#ca9584" stroke-width="4" stroke-linecap="round"/>
+  <path d="M295 379c18-9 35-10 50-2M378 377c16-8 31-7 46 2" fill="none" stroke="#27364a" stroke-width="6" stroke-linecap="round"/>
+  <path d="M311 520c15 31 84 34 101 0l-8 41c-20 32-69 32-88 0z" fill="#d9af9b"/>
+  <path d="m316 548-53 28 49 78 48-39zM404 548l55 28-51 78-48-39z" fill="#e8edf3"/>
+  <path d="M184 870c11-184 45-288 132-327l44 72-51 255zM536 870c-11-184-45-288-132-327l-44 72 51 255z" fill="url(#suit)"/>
+  <path d="M250 633c-28 71-39 144-42 237M470 633c28 71 39 144 42 237" fill="none" stroke="#31445d" stroke-width="4" opacity=".6"/>
+</svg>

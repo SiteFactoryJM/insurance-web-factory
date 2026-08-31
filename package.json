@@ -1,0 +1,31 @@
+{
+  "name": "insurance-web-factory",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare Workers 기반 보험설계사 멀티사이트 팩토리",
+  "scripts": {
+    "generate": "node scripts/generate-registry.mjs",
+    "validate:sites": "node scripts/validate-sites.mjs",
+    "intake:import": "node scripts/import-intake.mjs",
+    "domains:generate": "node scripts/generate-wrangler-domains.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.mjs",
+    "check": "npm run generate && npm run validate:sites && npm run typecheck && npm test",
+    "build": "npm run check",
+    "dev": "wrangler dev",
+    "preview": "tsc -p tsconfig.preview.json && node scripts/local-preview.mjs",
+    "deploy": "npm run generate && npm run validate:sites && wrangler deploy",
+    "deploy:domains": "npm run domains:generate && wrangler deploy --config wrangler.domains.jsonc"
+  },
+  "dependencies": {
+    "exceljs": "4.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "wrangler": "^4.94.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
