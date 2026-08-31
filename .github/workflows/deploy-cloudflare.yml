@@ -6,11 +6,10 @@ on:
 permissions:
   contents: read
 
-environment: demo
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: demo
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
