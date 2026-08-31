@@ -1,16 +1,15 @@
 import type { SiteConfig } from "../../types.js";
-import { renderCleanMinimalHero } from "./clean-minimal.js";
-import { renderLocalFriendlyHero } from "./local-friendly.js";
-import { renderPremiumNavyHero } from "./premium-navy.js";
-import { renderTrustBlueHero } from "./trust-blue.js";
-import { renderWarmCareHero } from "./warm-care.js";
-
-export function renderHero(site: SiteConfig, actions: string, profile: string): string {
+import { renderCleanMinimalPage } from "./clean-minimal.js";
+import { renderLocalFriendlyPage } from "./local-friendly.js";
+import { renderPremiumNavyPage } from "./premium-navy.js";
+import { renderTrustBluePage } from "./trust-blue.js";
+import { renderWarmCarePage } from "./warm-care.js";
+export function renderThemePage(site: SiteConfig): string {
   switch (site.template) {
-    case "warm-care": return renderWarmCareHero(site, actions, profile);
-    case "premium-navy": return renderPremiumNavyHero(site, actions, profile);
-    case "clean-minimal": return renderCleanMinimalHero(site, actions, profile);
-    case "local-friendly": return renderLocalFriendlyHero(site, actions, profile);
-    default: return renderTrustBlueHero(site, actions, profile);
+    case "warm-care": return renderWarmCarePage(site);
+    case "premium-navy": return renderPremiumNavyPage(site);
+    case "clean-minimal": return renderCleanMinimalPage(site);
+    case "local-friendly": return renderLocalFriendlyPage(site);
+    default: return renderTrustBluePage(site);
   }
 }

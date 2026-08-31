@@ -7,125 +7,145 @@ export const siteConfigs = {
     "status": "published",
     "domains": [],
     "template": "trust-blue",
-    "accentColor": "#1E5AA8",
+    "accentColor": "#315778",
     "headingFont": "pretendard",
     "agent": {
-      "name": "김하늘",
+      "name": "이윤복",
       "title": "보험설계사",
-      "company": "JM 라이프컨설팅",
-      "branch": "대전중앙지점",
-      "registrationNumber": "예시 등록번호",
-      "careerYears": 8,
+      "company": "유퍼스트 해온지",
+      "branch": "",
+      "registrationNumber": "",
       "regions": [
-        "대전",
-        "세종",
-        "충남",
-        "전국 비대면"
+        "전국 비대면",
+        "대면 상담",
+        "사전 예약 상담"
       ],
-      "profileImage": "/assets/profile-placeholder.svg",
-      "logoImage": "/assets/logo-mark.svg"
+      "profileImage": "/sites/demo-agent/lee-yunbok-profile.webp",
+      "logoImage": ""
     },
     "hero": {
-      "eyebrow": "내 상황에 맞는 보험 상담",
-      "headline": "어려운 보험, 이해하기 쉽게 함께 살펴보겠습니다.",
-      "subheadline": "가입을 서두르기보다 지금 필요한 보장이 무엇인지 차분히 확인하고, 고객이 스스로 판단할 수 있도록 설명드리겠습니다.",
+      "eyebrow": "보험을 이해하는 시간",
+      "headline": "필요한 보장을, 이해할 수 있는 말로 설명드리겠습니다.",
+      "subheadline": "현재 상황과 가입 내용을 먼저 살펴보고, 선택에 필요한 정보를 차분하고 명확하게 안내합니다.",
       "primaryCtaLabel": "상담 문의하기",
       "secondaryCtaLabel": "전화로 상담하기",
-      "trustNote": "충분히 설명드린 뒤 고객이 직접 판단할 수 있도록 돕습니다."
+      "trustNote": "충분히 이해하고 비교한 뒤 스스로 결정하실 수 있도록 돕겠습니다."
     },
     "intro": {
-      "title": "고객의 생활을 먼저 듣는 상담을 지향합니다.",
-      "body": "보험은 한 번 가입하고 끝나는 상품이 아니라 삶의 변화에 맞춰 점검해야 하는 약속이라고 생각합니다.\n\n현재 보장 내용을 함께 살펴보고 필요한 부분과 불필요한 부분을 이해하기 쉽게 설명드리겠습니다.",
-      "philosophy": "듣기 → 분석 → 설명 → 선택의 순서로 상담합니다."
+      "title": "상품보다 먼저, 고객의 상황을 듣겠습니다.",
+      "body": "보험 상담은 무엇을 권할지보다 무엇이 필요한지 확인하는 과정에서 시작한다고 생각합니다. 현재 가입 내역과 생활 환경, 예산을 함께 살펴보고 복잡한 내용을 이해하기 쉽게 정리해 드립니다.\n\n상담 후 바로 결정하지 않아도 됩니다. 이해되지 않는 부분은 다시 설명드리고 충분히 비교한 뒤 판단할 수 있도록 돕겠습니다.",
+      "philosophy": "듣고, 확인하고, 이해할 수 있게 설명합니다."
     },
     "specialties": [
       {
-        "title": "기존 보험 점검",
-        "body": "가입 내역을 한눈에 정리하고 중복·공백 여부를 함께 확인합니다."
+        "title": "기존 가입 내용 점검",
+        "body": "현재 가입된 내용을 한눈에 정리하고 어떤 보장을 가지고 있는지 이해하기 쉽게 설명합니다."
       },
       {
-        "title": "생애주기 상담",
-        "body": "결혼, 출산, 자녀 성장과 같은 변화에 맞춰 필요한 내용을 점검합니다."
+        "title": "보장 공백과 중복 확인",
+        "body": "생활 환경과 예산을 기준으로 중복되거나 부족할 수 있는 부분을 함께 살펴봅니다."
       },
       {
-        "title": "건강·질병 보장",
-        "body": "현재 상황과 예산을 고려해 보장 내용을 이해하기 쉽게 비교 설명합니다."
+        "title": "생애 변화에 따른 상담",
+        "body": "결혼, 출산, 자녀 성장, 은퇴 준비와 같은 변화에 맞춰 점검 기준을 안내합니다."
       },
       {
-        "title": "전국 비대면 상담",
-        "body": "거리와 관계없이 전화와 온라인 방식으로 편하게 상담합니다."
+        "title": "대면·비대면 상담",
+        "body": "전화와 카카오톡으로 먼저 일정을 조율한 뒤 편한 방식으로 상담을 진행합니다."
       }
     ],
     "process": [
       {
-        "title": "상담 신청",
-        "body": "편한 연락 방법과 시간을 남겨주세요."
+        "title": "상담 일정 조율",
+        "body": "전화나 카카오톡으로 궁금한 내용과 가능한 시간을 알려주세요."
       },
       {
         "title": "현재 상황 확인",
-        "body": "고민과 기존 가입 내용을 차분히 확인합니다."
+        "body": "고민하고 있는 부분과 기존 가입 내용을 차분히 확인합니다."
       },
       {
-        "title": "분석 및 설명",
-        "body": "필요한 정보와 선택지를 이해하기 쉽게 설명합니다."
+        "title": "내용 정리와 설명",
+        "body": "확인한 내용을 바탕으로 선택에 필요한 정보를 이해하기 쉽게 설명합니다."
       },
       {
-        "title": "결정 및 관리",
-        "body": "충분히 검토한 뒤 결정하고 이후 변화도 함께 점검합니다."
+        "title": "검토와 결정",
+        "body": "충분히 비교하고 생각한 뒤 본인의 기준에 따라 결정할 수 있습니다."
       }
     ],
-    "career": [
-      "2020년 보험 상담 업무 시작 (예시)",
-      "보장 분석 및 생애주기 상담 교육 이수 (예시)",
-      "대전·세종 지역 대면 상담 (예시)",
-      "전국 비대면 상담 운영 (예시)"
+    "career": [],
+    "reviews": [
+      {
+        "quote": "어려운 용어를 일상적인 말로 풀어서 설명해 주어 현재 가입 내용을 이해하는 데 도움이 됐습니다.",
+        "author": "30대 직장인",
+        "context": "기존 가입 내용 점검",
+        "isExample": true
+      },
+      {
+        "quote": "바로 결정을 재촉하지 않고 비교할 시간을 충분히 주는 상담 방식이 편안했습니다.",
+        "author": "40대 고객",
+        "context": "보장 내용 상담",
+        "isExample": true
+      },
+      {
+        "quote": "카카오톡으로 먼저 일정을 맞추고 필요한 내용을 준비할 수 있어 상담 과정이 깔끔했습니다.",
+        "author": "비대면 상담 고객",
+        "context": "온라인 일정 상담",
+        "isExample": true
+      }
     ],
     "faqs": [
       {
         "question": "상담만 받아도 괜찮나요?",
-        "answer": "네. 현재 상황을 확인하고 설명을 들은 뒤 충분히 검토하실 수 있습니다."
+        "answer": "네. 현재 상황과 가입 내용을 확인하고 설명을 들은 뒤 충분히 검토할 수 있습니다. 상담 당일 바로 결정하지 않아도 됩니다."
       },
       {
-        "question": "기존 보험도 점검할 수 있나요?",
-        "answer": "가능합니다. 가입 내역을 기준으로 중복되거나 부족해 보이는 부분을 함께 살펴봅니다."
+        "question": "기존 보험도 함께 확인할 수 있나요?",
+        "answer": "가능합니다. 가입 내역을 기준으로 어떤 보장이 있는지 정리하고 중복되거나 부족할 수 있는 부분을 함께 살펴봅니다."
       },
       {
-        "question": "비대면 상담이 가능한가요?",
-        "answer": "전화나 온라인 방식으로 상담할 수 있습니다."
+        "question": "상담 전에 무엇을 준비하면 되나요?",
+        "answer": "현재 가입 내역과 궁금한 내용을 준비하면 상담이 수월합니다. 필요한 자료는 일정 조율 과정에서 다시 안내드립니다."
       },
       {
-        "question": "상담 시간은 얼마나 걸리나요?",
-        "answer": "상담 범위에 따라 다르며 일정을 조율해 안내드립니다."
+        "question": "비대면 상담도 가능한가요?",
+        "answer": "전화와 온라인 방식으로 일정 조율이 가능합니다. 상담 범위와 진행 방법은 사전에 안내드립니다."
+      },
+      {
+        "question": "상담 가능 시간은 언제인가요?",
+        "answer": "기본 상담 가능 시간은 오전 9시부터 오후 8시까지이며, 통화나 카카오톡으로 먼저 일정을 조율해 주세요."
       }
     ],
     "contact": {
-      "phone": "010-1234-5678",
-      "kakaoUrl": "",
-      "email": "hello@example.com",
-      "officeAddress": "대전광역시 서구 둔산로 00, 0층 (예시)",
+      "phone": "010-4187-7511",
+      "kakaoUrl": "https://open.kakao.com/o/sH6OIpKi",
+      "instagramUrl": "https://www.instagram.com/91ybok",
+      "email": "",
+      "formEmail": "",
+      "officeAddress": "",
       "mapUrl": "",
-      "availableHours": "평일 09:00~19:00 / 토요일 예약 상담"
+      "availableHours": "09:00–20:00"
     },
     "sections": {
-      "career": true,
+      "career": false,
       "process": true,
+      "reviews": true,
       "faq": true,
-      "location": true,
+      "location": false,
       "contactForm": true
     },
     "seo": {
-      "title": "김하늘 보험설계사 | 보험 상담 예시 페이지",
-      "description": "보험설계사 소개 홈페이지 제작 전 디자인과 모바일 사용성을 확인하는 예시 페이지입니다.",
-      "ogImage": "/assets/og-demo.svg",
+      "title": "이윤복 보험설계사 | 유퍼스트 해온지",
+      "description": "이윤복 보험설계사의 상담 원칙, 상담 분야, 진행 과정과 연락 방법을 확인할 수 있는 소개 페이지입니다.",
+      "ogImage": "/sites/demo-agent/lee-yunbok-profile.webp",
       "noIndex": true
     },
     "compliance": {
       "advertisingReviewStatus": "pending",
       "advertisingReviewNumber": "",
       "advertisingReviewExpiresAt": "",
-      "footerDisclaimer": "본 페이지의 인물·회사·경력·주소는 포트폴리오용 예시이며 실제 보험상품의 가입을 권유하지 않습니다. 실제 게시 전 소속 회사 또는 GA의 광고심의 및 준법 기준을 확인해야 합니다.",
-      "privacyOfficer": "사이트 운영자 / demo@example.com",
-      "privacyRetentionPeriod": "데모에서는 상담정보를 저장하지 않습니다.",
+      "footerDisclaimer": "본 페이지는 보험설계사 소개 및 상담 연락을 위한 데모 페이지입니다. 구체적인 상품 내용은 상담 과정에서 안내하며 계약 전 상품설명서와 약관을 확인하시기 바랍니다. 고객 후기 문구는 디자인 확인용 예시입니다.",
+      "privacyOfficer": "페이지 운영자",
+      "privacyRetentionPeriod": "데모 페이지에서는 상담정보를 저장하거나 발송하지 않습니다.",
       "contentTruthConfirmed": true,
       "photoUseConfirmed": true,
       "publicationConfirmed": true

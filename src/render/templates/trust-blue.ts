@@ -1,18 +1,19 @@
 import type { SiteConfig } from "../../types.js";
-import { escapeHtml } from "../../utils/html.js";
-import { icon } from "../../utils/icons.js";
-
-export function renderTrustBlueHero(site: SiteConfig, actions: string, profile: string): string {
-  return `<section class="hero hero-trust-blue" id="home">
-    <div class="container hero-grid">
-      <div class="hero-copy reveal">
-        ${site.hero.eyebrow ? `<p class="eyebrow">${icon("shield", 18)}${escapeHtml(site.hero.eyebrow)}</p>` : ""}
-        <h1>${escapeHtml(site.hero.headline)}</h1>
-        <p class="hero-lead">${escapeHtml(site.hero.subheadline)}</p>
-        ${actions}
-        ${site.hero.trustNote ? `<p class="trust-note">${icon("check", 18)}${escapeHtml(site.hero.trustNote)}</p>` : ""}
-      </div>
-      ${profile}
-    </div>
-  </section>`;
+import { escapeHtml, nl2br } from "../../utils/html.js";
+import { formatIndex, renderContactForm, renderReviewNotice, renderSocialLinks } from "../shared.js";
+export function renderTrustBluePage(site: SiteConfig): string {
+  const reviews = site.reviews ?? [];
+  const services = site.specialties.map((item,index)=>`<article class="advisory-service"><span>${formatIndex(index)}</span><div><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.body)}</p></div></article>`).join("");
+  const reviewRows = site.sections.reviews ? reviews.map((r,index)=>`<article class="evidence-review"><span class="review-seal">${formatIndex(index)}</span><blockquote>${escapeHtml(r.quote)}</blockquote><footer><strong>${escapeHtml(r.author)}</strong>${r.context?`<small>${escapeHtml(r.context)}</small>`:""}${r.isExample?`<em>예시 후기</em>`:""}</footer></article>`).join(""):"";
+  const process = site.sections.process ? site.process.map((item,index)=>`<li><span>${formatIndex(index)}</span><div><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.body)}</p></div></li>`).join(""):"";
+  const faqs = site.sections.faq ? site.faqs.map((item,index)=>`<details class="ledger-faq"${index===0?" open":""}><summary><span>${formatIndex(index)}</span><strong>${escapeHtml(item.question)}</strong><i aria-hidden="true"></i></summary><div><p>${escapeHtml(item.answer)}</p></div></details>`).join(""):"";
+  return `<main class="theme-page advisory-page">
+    <section class="advisory-hero" id="home"><div class="container advisory-hero-grid"><div class="advisory-hero-copy"><p class="theme-overline">INSTITUTIONAL ADVISORY · ${escapeHtml(site.agent.company)}</p><h1>${escapeHtml(site.hero.headline)}</h1><p class="hero-description">${escapeHtml(site.hero.subheadline)}</p>${site.hero.trustNote?`<p class="hero-assurance">${escapeHtml(site.hero.trustNote)}</p>`:""}${renderSocialLinks(site,"social-links advisory-social")}</div><figure class="advisory-portrait"><div class="portrait-frame"><img src="${escapeHtml(site.agent.profileImage)}" alt="${escapeHtml(site.agent.name)} ${escapeHtml(site.agent.title)} 프로필" width="1086" height="1448"></div><figcaption><span>PERSONAL INSURANCE ADVISER</span><strong>${escapeHtml(site.agent.name)}</strong><small>${escapeHtml(site.agent.title)} · ${escapeHtml(site.agent.company)}</small></figcaption></figure></div><div class="container advisory-facts"><div><span>01</span><small>상담 가능 시간</small><strong>${escapeHtml(site.contact.availableHours)}</strong></div><div><span>02</span><small>상담 방식</small><strong>전화 · 카카오톡 · 예약 상담</strong></div><div><span>03</span><small>상담 원칙</small><strong>설명 · 비교 · 충분한 검토</strong></div></div></section>
+    <section class="advisory-brief section-anchor" id="about"><div class="container advisory-brief-grid"><div class="section-index"><span>01</span><p>ADVISER BRIEF</p></div><div class="brief-title"><h2>${escapeHtml(site.intro.title)}</h2>${site.intro.philosophy?`<p>${escapeHtml(site.intro.philosophy)}</p>`:""}</div><div class="brief-body"><p>${nl2br(site.intro.body)}</p></div></div></section>
+    <section class="advisory-services section-anchor" id="specialties"><div class="container"><header class="advisory-section-head"><div><span>02</span><p>CONSULTING SCOPE</p></div><h2>현재 상황을 기준으로 필요한 항목부터 살펴봅니다.</h2><p>상품을 먼저 정하기보다 기존 내용과 생활 변화를 확인한 뒤 이해하기 쉬운 기준으로 정리합니다.</p></header><div class="advisory-service-table">${services}</div></div></section>
+    ${reviewRows?`<section class="advisory-reviews section-anchor" id="reviews"><div class="container evidence-grid"><header><p class="section-label">03 · CLIENT EVIDENCE</p><h2>상담의 신뢰는 설명 방식과 과정에서 확인됩니다.</h2><p>고객이 중요하게 느낀 지점을 기록 형식으로 정리했습니다.</p>${renderReviewNotice(site)}</header><div class="evidence-list">${reviewRows}</div></div></section>`:""}
+    ${process?`<section class="advisory-process"><div class="container process-ledger"><header><p class="section-label">04 · PROCESS LEDGER</p><h2>연락부터 검토까지, 진행 순서를 투명하게 안내합니다.</h2></header><ol>${process}</ol></div></section>`:""}
+    ${faqs?`<section class="advisory-faq section-anchor" id="faq"><div class="container faq-ledger-grid"><header><p class="section-label">05 · FAQ LEDGER</p><h2>상담 전에 자주 확인하는 질문</h2><p>질문을 열어 필요한 답변을 먼저 확인할 수 있습니다.</p></header><div class="ledger-faq-list">${faqs}</div></div></section>`:""}
+    <section class="advisory-contact section-anchor" id="contact"><div class="container advisory-contact-grid"><div class="contact-identity"><p class="section-label">06 · CONSULTATION REQUEST</p><h2>궁금한 내용을 남겨주시면 차분히 확인하겠습니다.</h2><p>${escapeHtml(site.agent.name)} ${escapeHtml(site.agent.title)} · ${escapeHtml(site.contact.availableHours)}</p>${renderSocialLinks(site,"social-links contact-social")}</div>${site.sections.contactForm?renderContactForm(site,"advisory-form"):""}</div></section>
+  </main>`;
 }

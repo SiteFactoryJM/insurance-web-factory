@@ -11,9 +11,32 @@
     "template": {"enum":["trust-blue","warm-care","premium-navy","clean-minimal","local-friendly"]},
     "accentColor": {"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},
     "headingFont": {"enum":["pretendard","noto-serif-kr"]},
-    "agent": {"type":"object"}, "hero": {"type":"object"}, "intro": {"type":"object"},
-    "specialties": {"type":"array","minItems":3}, "process": {"type":"array"}, "career": {"type":"array"}, "faqs": {"type":"array"},
-    "contact": {"type":"object"}, "sections": {"type":"object"}, "seo": {"type":"object"}, "compliance": {"type":"object"}
+    "agent": {"type":"object"},
+    "hero": {"type":"object"},
+    "intro": {"type":"object"},
+    "specialties": {"type":"array","minItems":3},
+    "process": {"type":"array"},
+    "career": {"type":"array"},
+    "reviews": {
+      "type":"array",
+      "items": {
+        "type":"object",
+        "required":["quote","author"],
+        "properties": {
+          "quote":{"type":"string"},
+          "author":{"type":"string"},
+          "context":{"type":"string"},
+          "isExample":{"type":"boolean"}
+        },
+        "additionalProperties":false
+      }
+    },
+    "faqs": {"type":"array"},
+    "contact": {"type":"object"},
+    "sections": {"type":"object"},
+    "seo": {"type":"object"},
+    "compliance": {"type":"object"},
+    "demo": {"type":"object"}
   },
   "additionalProperties": false
 }

@@ -7,6 +7,7 @@ const sitesDir = path.join(root, "sites");
 const templates = new Set(["trust-blue", "warm-care", "premium-navy", "clean-minimal", "local-friendly"]);
 const fonts = new Set(["pretendard", "noto-serif-kr"]);
 const statuses = new Set(["draft", "published"]);
+const submissionModes = new Set(["discard", "store", "mailto"]);
 const domainOwners = new Map();
 const seoTitles = new Map();
 const errors = [];
@@ -16,6 +17,7 @@ const isUrl = (value) => {
   if (!value) return true;
   try { const url = new URL(value); return ["http:", "https:"].includes(url.protocol); } catch { return false; }
 };
+const isEmail = (value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value));
 
 function required(value, label, siteId) {
   if (value === undefined || value === null || String(value).trim() === "") errors.push(`[${siteId}] 필수값 누락: ${label}`);
@@ -57,9 +59,21 @@ for (const entry of entries) {
 
   if ((site.specialties ?? []).length < 3) errors.push(`[${id}] specialties는 최소 3개가 필요합니다.`);
   if (site.sections?.process && (site.process ?? []).length < 3) errors.push(`[${id}] process 표시 시 최소 3개 단계가 필요합니다.`);
+  if (site.sections?.reviews && (site.reviews ?? []).length < 1) errors.push(`[${id}] 고객 후기 표시 시 reviews가 최소 1개 필요합니다.`);
   if (site.sections?.faq && (site.faqs ?? []).length < 2) errors.push(`[${id}] FAQ 표시 시 최소 2개가 필요합니다.`);
   if (!isUrl(site.contact?.kakaoUrl)) errors.push(`[${id}] kakaoUrl 형식이 올바르지 않습니다.`);
+  if (!isUrl(site.contact?.instagramUrl)) errors.push(`[${id}] instagramUrl 형식이 올바르지 않습니다.`);
   if (!isUrl(site.contact?.mapUrl)) errors.push(`[${id}] mapUrl 형식이 올바르지 않습니다.`);
+  if (!isEmail(site.contact?.email)) errors.push(`[${id}] email 형식이 올바르지 않습니다.`);
+  if (!isEmail(site.contact?.formEmail)) errors.push(`[${id}] formEmail 형식이 올바르지 않습니다.`);
+  if (site.demo?.submissionMode && !submissionModes.has(site.demo.submissionMode)) errors.push(`[${id}] demo.submissionMode 값이 올바르지 않습니다.`);
+  if (site.demo?.submissionMode === "mailto" && !site.contact?.formEmail && !site.contact?.email) errors.push(`[${id}] mailto 제출 방식에는 contact.formEmail 또는 contact.email이 필요합니다.`);
+
+  for (const [index, review] of (site.reviews ?? []).entries()) {
+    required(review?.quote, `reviews[${index}].quote`, id);
+    required(review?.author, `reviews[${index}].author`, id);
+    if (review?.isExample !== true && site.demo?.enabled) warnings.push(`[${id}] 데모 후기는 isExample: true 표기를 권장합니다.`);
+  }
 
   for (const domainValue of site.domains ?? []) {
     const domain = normalizeDomain(domainValue);

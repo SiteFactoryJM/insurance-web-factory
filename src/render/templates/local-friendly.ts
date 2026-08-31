@@ -1,20 +1,19 @@
 import type { SiteConfig } from "../../types.js";
-import { escapeHtml } from "../../utils/html.js";
-import { icon } from "../../utils/icons.js";
-
-export function renderLocalFriendlyHero(site: SiteConfig, actions: string, profile: string): string {
-  const region = site.agent.regions[0] ?? "우리 지역";
-  return `<section class="hero hero-local-friendly" id="home">
-    <div class="container hero-grid">
-      <div class="hero-copy reveal">
-        <div class="local-badge">${icon("map", 18)}${escapeHtml(region)}에서 가까이</div>
-        ${site.hero.eyebrow ? `<p class="eyebrow">${escapeHtml(site.hero.eyebrow)}</p>` : ""}
-        <h1>${escapeHtml(site.hero.headline)}</h1>
-        <p class="hero-lead">${escapeHtml(site.hero.subheadline)}</p>
-        ${actions}
-        ${site.hero.trustNote ? `<p class="trust-note">${icon("check", 18)}${escapeHtml(site.hero.trustNote)}</p>` : ""}
-      </div>
-      ${profile}
-    </div>
-  </section>`;
+import { escapeHtml, nl2br } from "../../utils/html.js";
+import { formatIndex, renderContactForm, renderReviewNotice, renderSocialLinks } from "../shared.js";
+export function renderLocalFriendlyPage(site: SiteConfig): string {
+  const reviews=site.reviews??[];
+  const services=site.specialties.map((item,index)=>`<article class="concierge-service"><span>${formatIndex(index)}</span><div><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.body)}</p></div></article>`).join("");
+  const steps=site.sections.process?site.process.map((item,index)=>`<li><span>${formatIndex(index)}</span><div><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.body)}</p></div></li>`).join(""):"";
+  const cases=site.sections.reviews?reviews.map((r,index)=>`<article class="concierge-case"><header><span>CASE ${formatIndex(index)}</span>${r.isExample?`<em>예시 후기</em>`:""}</header><blockquote>${escapeHtml(r.quote)}</blockquote><footer><strong>${escapeHtml(r.author)}</strong>${r.context?`<small>${escapeHtml(r.context)}</small>`:""}</footer></article>`).join(""):"";
+  const faqs=site.sections.faq?site.faqs.map((item,index)=>`<article class="concierge-faq-card"><span>${formatIndex(index)}</span><h3>${escapeHtml(item.question)}</h3><p>${escapeHtml(item.answer)}</p></article>`).join(""):"";
+  return `<main class="theme-page concierge-page">
+    <section class="concierge-hero" id="home"><div class="container concierge-hero-grid"><div class="concierge-copy"><p class="theme-overline">PERSONAL CONSULTATION DESK</p><h1>${escapeHtml(site.hero.headline)}</h1><p>${escapeHtml(site.hero.subheadline)}</p>${site.hero.trustNote?`<span class="concierge-assurance">${escapeHtml(site.hero.trustNote)}</span>`:""}${renderSocialLinks(site,"social-links concierge-social")}</div><aside class="concierge-profile"><div class="concierge-photo"><img src="${escapeHtml(site.agent.profileImage)}" alt="${escapeHtml(site.agent.name)} ${escapeHtml(site.agent.title)} 프로필" width="1086" height="1448"></div><div class="concierge-profile-copy"><small>${escapeHtml(site.agent.company)}</small><strong>${escapeHtml(site.agent.name)}</strong><span>${escapeHtml(site.agent.title)}</span><dl><div><dt>상담 가능 시간</dt><dd>${escapeHtml(site.contact.availableHours)}</dd></div><div><dt>빠른 연결</dt><dd>전화 · 카카오톡</dd></div></dl></div></aside></div></section>
+    <section class="concierge-summary section-anchor" id="about"><div class="container concierge-summary-grid"><div><span>01</span><p>ADVISER NOTE</p></div><h2>${escapeHtml(site.intro.title)}</h2><div><p>${nl2br(site.intro.body)}</p>${site.intro.philosophy?`<strong>${escapeHtml(site.intro.philosophy)}</strong>`:""}</div></div></section>
+    <section class="concierge-services section-anchor" id="specialties"><div class="container"><header class="concierge-section-head"><p>02 · CONSULTING MENU</p><h2>필요한 상담 항목을 선택해 시작할 수 있습니다.</h2><span>상담 범위는 고객 상황에 따라 조정됩니다.</span></header><div class="concierge-service-board">${services}</div></div></section>
+    ${steps?`<section class="concierge-process"><div class="container concierge-process-grid"><header><p>03 · HOW IT WORKS</p><h2>연락부터 검토까지 한 단계씩 안내합니다.</h2></header><ol>${steps}</ol></div></section>`:""}
+    ${cases?`<section class="concierge-reviews section-anchor" id="reviews"><div class="container"><header class="concierge-section-head"><p>04 · CONSULTATION CASES</p><h2>상담 과정에서 중요하게 느낀 부분</h2>${renderReviewNotice(site)}</header><div class="concierge-case-grid">${cases}</div></div></section>`:""}
+    ${faqs?`<section class="concierge-faq section-anchor" id="faq"><div class="container"><header class="concierge-section-head"><p>05 · QUICK ANSWERS</p><h2>자주 묻는 질문을 한눈에 확인하세요.</h2></header><div class="concierge-faq-grid">${faqs}</div></div></section>`:""}
+    <section class="concierge-contact section-anchor" id="contact"><div class="container concierge-contact-grid"><div class="concierge-contact-desk"><p>06 · CONTACT DESK</p><h2>편한 채널로 바로 연결하세요.</h2><span>상담 가능 시간 ${escapeHtml(site.contact.availableHours)}</span>${renderSocialLinks(site,"social-links contact-social")}</div>${site.sections.contactForm?renderContactForm(site,"concierge-form"):""}</div></section>
+  </main>`;
 }

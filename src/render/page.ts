@@ -1,102 +1,22 @@
-import { TEMPLATE_IDS, type SiteConfig, type TemplateId } from "../types.js";
-import { escapeHtml, jsonForHtml, safeHexColor } from "../utils/html.js";
+import { TEMPLATE_IDS, type HeadingFont, type SiteConfig, type TemplateId } from "../types.js";
+import { escapeHtml, jsonForHtml, safeHexColor, safeUrl } from "../utils/html.js";
 import { icon } from "../utils/icons.js";
 import { clientScript } from "./client-script.js";
-import {
-  renderActions,
-  renderCareer,
-  renderContact,
-  renderCustomizationBand,
-  renderDemoSwitcher,
-  renderFaq,
-  renderFooter,
-  renderHeader,
-  renderIntro,
-  renderLocation,
-  renderMobileCta,
-  renderProcess,
-  renderProfile,
-  renderSpecialties,
-} from "./shared.js";
+import { renderCustomizationBand, renderDemoSwitcher, renderFooter, renderHeader, renderMobileCta } from "./shared.js";
 import { styles } from "./styles.js";
-import { renderHero } from "./templates/index.js";
-
-const THEME_ACCENTS: Record<TemplateId, string> = {
-  "trust-blue": "#1E5AA8",
-  "warm-care": "#557A62",
-  "premium-navy": "#B6924E",
-  "clean-minimal": "#222222",
-  "local-friendly": "#158273",
+import { renderThemePage } from "./templates/index.js";
+interface ThemeMeta { accent:string; headingFont:HeadingFont; label:string; name:string; description:string; }
+const THEME_META: Record<TemplateId,ThemeMeta> = {
+  "trust-blue":{accent:"#315778",headingFont:"pretendard",label:"INSTITUTIONAL",name:"인스티튜셔널",description:"정제된 청람색과 서류형 정보 구조를 사용한 신뢰 중심의 기업형 레이아웃입니다."},
+  "warm-care":{accent:"#355846",headingFont:"noto-serif-kr",label:"HUMAN EDITORIAL",name:"휴먼 에디토리얼",description:"깊은 포레스트 그린과 따뜻한 종이 질감, 대화 중심의 편집형 구성을 사용합니다."},
+  "premium-navy":{accent:"#B79A63",headingFont:"noto-serif-kr",label:"PRIVATE CONSULTING",name:"프라이빗 컨설팅",description:"미드나이트 네이비와 절제된 브론즈를 사용해 전문성과 프리미엄 이미지를 강조합니다."},
+  "clean-minimal":{accent:"#6E2938",headingFont:"pretendard",label:"REPORT MINIMAL",name:"리포트 미니멀",description:"흑백 보고서처럼 정돈된 그리드와 선 중심의 구조로 내용과 사진을 명확히 보여줍니다."},
+  "local-friendly":{accent:"#205C60",headingFont:"pretendard",label:"MOBILE CONCIERGE",name:"모바일 컨시어지",description:"딥 틸과 스톤 컬러를 사용하고 연락 수단을 먼저 보여주는 모바일 상담 데스크형 레이아웃입니다."}
 };
-
-function cloneWithPreviewTheme(site: SiteConfig, request: Request): SiteConfig {
-  if (!site.demo?.allowTemplateSwitch) return site;
-  const requested = new URL(request.url).searchParams.get("theme");
-  if (!requested || !TEMPLATE_IDS.includes(requested as TemplateId)) return site;
-  const template = requested as TemplateId;
-  return { ...site, template, accentColor: THEME_ACCENTS[template] };
-}
-
-function renderHead(site: SiteConfig, request: Request): string {
-  const url = new URL(request.url);
-  const canonical = site.domains[0] ? `https://${site.domains[0]}/` : `${url.origin}/`;
-  const ogImage = site.seo.ogImage ? new URL(site.seo.ogImage, url.origin).toString() : "";
-  const robots = site.seo.noIndex || site.status !== "published" ? "noindex,nofollow" : "index,follow,max-image-preview:large";
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    name: site.agent.name,
-    jobTitle: site.agent.title,
-    worksFor: { "@type": "Organization", name: site.agent.company },
-    telephone: site.contact.phone,
-    email: site.contact.email || undefined,
-    areaServed: site.agent.regions,
-    url: canonical,
-  };
-  return `<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-    <title>${escapeHtml(site.seo.title)}</title>
-    <meta name="description" content="${escapeHtml(site.seo.description)}"><meta name="robots" content="${robots}">
-    <link rel="canonical" href="${escapeHtml(canonical)}"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-    <meta name="theme-color" content="${safeHexColor(site.accentColor, THEME_ACCENTS[site.template])}">
-    <meta property="og:type" content="website"><meta property="og:locale" content="ko_KR"><meta property="og:title" content="${escapeHtml(site.seo.title)}"><meta property="og:description" content="${escapeHtml(site.seo.description)}"><meta property="og:url" content="${escapeHtml(canonical)}">${ogImage ? `<meta property="og:image" content="${escapeHtml(ogImage)}">` : ""}
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&display=swap">
-    <script type="application/ld+json">${jsonForHtml(structuredData)}</script>`;
-}
-
-export function renderSitePage(rawSite: SiteConfig, request: Request): string {
-  const site = cloneWithPreviewTheme(rawSite, request);
-  const accent = safeHexColor(site.accentColor, THEME_ACCENTS[site.template]);
-  const fontClass = site.headingFont === "noto-serif-kr" ? "font-noto-serif-kr" : "font-pretendard";
-  return `<!doctype html><html lang="ko"><head>${renderHead(site, request)}<style>${styles}</style></head><body class="theme-${site.template} ${fontClass}" style="--accent:${accent}">
-    ${renderHeader(site)}
-    <main>${renderHero(site, renderActions(site), renderProfile(site))}${renderIntro(site)}${renderSpecialties(site)}${renderProcess(site)}${renderCareer(site)}${renderFaq(site)}${renderLocation(site)}${renderContact(site)}</main>
-    ${renderCustomizationBand(site)}${renderFooter(site)}${renderMobileCta(site)}${renderDemoSwitcher(site)}
-    <script>${clientScript}</script>
-  </body></html>`;
-}
-
-export function renderTemplateGallery(site: SiteConfig, request: Request): string {
-  const current = new URL(request.url);
-  const templates: Array<[TemplateId, string, string]> = [
-    ["trust-blue", "신뢰 블루", "정돈된 블루 톤과 프로필 중심 구성. 가장 범용적인 전문 상담형입니다."],
-    ["warm-care", "따뜻한 케어", "베이지와 그린을 사용한 부드럽고 친근한 상담 이미지입니다."],
-    ["premium-navy", "프리미엄 네이비", "네이비와 골드 포인트로 경력과 전문성을 강조합니다."],
-    ["clean-minimal", "클린 미니멀", "군더더기 없는 에디토리얼 구성이며 문구와 사진을 선명하게 보여줍니다."],
-    ["local-friendly", "지역 친화", "지역명과 쉬운 연락 방법을 앞세운 친근한 생활 밀착형입니다."],
-  ];
-  const cards = templates.map(([id, name, description]) => {
-    const preview = new URL("/", current.origin); preview.searchParams.set("theme", id);
-    return `<article class="template-tile"><div class="template-swatch ${id}" aria-hidden="true"></div><div><h2>${name}</h2><p>${description}</p></div><a href="${escapeHtml(preview.pathname + preview.search)}">이 디자인으로 보기 ${icon("arrow", 17)}</a></article>`;
-  }).join("");
-  return `<!doctype html><html lang="ko"><head>${renderHead(site, request)}<style>${styles}</style></head><body class="font-pretendard" style="--accent:${safeHexColor(site.accentColor, "#1E5AA8")}"><main class="template-page"><div class="container"><header class="simple-header"><a href="/">${icon("chevron", 18)} 예시 페이지로 돌아가기</a><h1>다섯 가지 디자인 중<br>목적에 맞게 선택하세요.</h1><p>사진·문구·색상·노출 영역은 모두 설계사별로 조정할 수 있습니다. 모바일에서도 상담 버튼과 핵심 정보가 먼저 보이도록 설계했습니다.</p></header><section class="template-gallery">${cards}</section></div></main></body></html>`;
-}
-
-export function renderPrivacyPage(site: SiteConfig, request: Request): string {
-  return `<!doctype html><html lang="ko"><head>${renderHead(site, request)}<style>${styles}</style></head><body class="font-pretendard" style="--accent:${safeHexColor(site.accentColor, "#1E5AA8")}"><main class="privacy-page"><div class="container"><header class="simple-header"><a href="/">${icon("chevron", 18)} 홈페이지로 돌아가기</a><h1>개인정보처리방침</h1><p>상담 신청 시 수집되는 정보와 이용 목적을 안내합니다.</p></header><article class="policy-card"><h2>1. 수집 항목</h2><p>이름, 연락처, 상담 희망 내용, 개인정보 수집·이용 동의 여부를 수집할 수 있습니다.</p><h2>2. 이용 목적</h2><p>상담 요청 확인, 연락, 일정 조율 및 상담 관련 안내에만 이용합니다.</p><h2>3. 보유 기간</h2><p>${escapeHtml(site.compliance.privacyRetentionPeriod)}</p><h2>4. 동의 거부 권리</h2><p>개인정보 제공에 동의하지 않을 수 있으나 상담 신청 기능 이용이 제한될 수 있습니다.</p><h2>5. 개인정보 담당</h2><p>${escapeHtml(site.compliance.privacyOfficer)}</p>${site.demo?.enabled ? "<h2>데모 안내</h2><p>현재 예시 페이지의 상담 신청 내용은 저장되지 않습니다.</p>" : ""}</article></div></main></body></html>`;
-}
-
-export function renderNotFoundPage(): string {
-  return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>사이트를 찾을 수 없습니다</title><style>${styles}</style></head><body><main class="not-found-page"><div class="container"><header class="simple-header"><h1>연결된 홈페이지를<br>찾을 수 없습니다.</h1><p>도메인 설정 또는 사이트 게시 상태를 확인해 주세요.</p></header></div></main></body></html>`;
-}
+function cloneWithPreviewTheme(site:SiteConfig, request:Request):SiteConfig { if(!site.demo?.allowTemplateSwitch)return site; const requested=new URL(request.url).searchParams.get("theme"); if(!requested||!TEMPLATE_IDS.includes(requested as TemplateId))return site; const template=requested as TemplateId; const meta=THEME_META[template]; return {...site,template,accentColor:meta.accent,headingFont:meta.headingFont}; }
+function renderHead(site:SiteConfig,request:Request):string { const url=new URL(request.url); const canonical=site.domains[0]?`https://${site.domains[0]}/`:`${url.origin}/`; const og=site.seo.ogImage?new URL(site.seo.ogImage,url.origin).toString():""; const robots=site.seo.noIndex||site.status!=="published"?"noindex,nofollow":"index,follow,max-image-preview:large"; const instagram=safeUrl(site.contact.instagramUrl); const data={"@context":"https://schema.org","@type":"Person",name:site.agent.name,jobTitle:site.agent.title,worksFor:{"@type":"Organization",name:site.agent.company},telephone:site.contact.phone,email:site.contact.email||undefined,sameAs:instagram?[instagram]:undefined,areaServed:site.agent.regions,url:canonical}; const meta=THEME_META[site.template]; const color=safeHexColor(site.accentColor,meta.accent); return `<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>${escapeHtml(site.seo.title)}</title><meta name="description" content="${escapeHtml(site.seo.description)}"><meta name="robots" content="${robots}"><link rel="canonical" href="${escapeHtml(canonical)}"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><meta name="theme-color" content="${color}"><meta property="og:type" content="website"><meta property="og:locale" content="ko_KR"><meta property="og:title" content="${escapeHtml(site.seo.title)}"><meta property="og:description" content="${escapeHtml(site.seo.description)}"><meta property="og:url" content="${escapeHtml(canonical)}">${og?`<meta property="og:image" content="${escapeHtml(og)}">`:""}<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&display=swap"><script type="application/ld+json">${jsonForHtml(data)}</script>`; }
+export function renderSitePage(rawSite:SiteConfig,request:Request):string { const site=cloneWithPreviewTheme(rawSite,request); const meta=THEME_META[site.template]; const accent=safeHexColor(site.accentColor,meta.accent); const font=site.headingFont==="noto-serif-kr"?"font-noto-serif-kr":"font-pretendard"; return `<!doctype html><html lang="ko"><head>${renderHead(site,request)}<style>${styles}</style></head><body class="theme-${site.template} ${font}" style="--user-accent:${accent}">${renderHeader(site)}${renderThemePage(site)}${renderCustomizationBand(site)}${renderFooter(site)}${renderMobileCta(site)}${renderDemoSwitcher(site)}<script>${clientScript}</script></body></html>`; }
+function renderTemplatePreview(id:TemplateId,site:SiteConfig):string { const photo=`<img src="${escapeHtml(site.agent.profileImage)}" alt="" loading="lazy">`; switch(id){case"warm-care":return`<div class="template-preview preview-human"><div class="mini-photo">${photo}</div><div class="mini-paper"><i></i><b></b><b></b><span></span></div></div>`;case"premium-navy":return`<div class="template-preview preview-private"><div class="mini-copy"><i></i><b></b><b></b></div><div class="mini-photo">${photo}</div><span></span></div>`;case"clean-minimal":return`<div class="template-preview preview-report"><small>01</small><div class="mini-photo">${photo}</div><div class="mini-copy"><i></i><b></b><b></b><span></span></div></div>`;case"local-friendly":return`<div class="template-preview preview-concierge"><div class="mini-copy"><i></i><b></b><b></b></div><div class="mini-card"><div class="mini-photo">${photo}</div><span></span><span></span></div></div>`;default:return`<div class="template-preview preview-advisory"><div class="mini-copy"><i></i><b></b><b></b><span></span></div><div class="mini-photo">${photo}</div><footer></footer></div>`;} }
+export function renderTemplateGallery(site:SiteConfig,request:Request):string { const current=new URL(request.url); const cards=(Object.entries(THEME_META) as Array<[TemplateId,ThemeMeta]>).map(([id,meta])=>{const preview=new URL("/",current.origin);preview.searchParams.set("theme",id);return`<article class="template-tile template-${id}">${renderTemplatePreview(id,site)}<div class="template-copy"><span>${meta.label}</span><h2>${meta.name}</h2><p>${meta.description}</p></div><a href="${escapeHtml(preview.pathname+preview.search)}">전체 페이지 보기 ${icon("arrow",17)}</a></article>`;}).join(""); return `<!doctype html><html lang="ko"><head>${renderHead(site,request)}<style>${styles}</style></head><body class="template-gallery-body font-pretendard"><main class="template-page"><div class="container"><header class="simple-header"><a href="/">${icon("chevron",18)} 예시 페이지로 돌아가기</a><p>FIVE DISTINCT DIRECTIONS</p><h1>색만 바꾼 테마가 아니라,<br>정보 구조부터 다른 다섯 가지 디자인입니다.</h1><span>모든 테마는 동일한 정보와 사진을 사용하지만 히어로 구성, 섹션 순서, 후기 표현, FAQ 방식과 상담 영역이 서로 다릅니다.</span></header><section class="template-gallery">${cards}</section></div></main></body></html>`; }
+export function renderPrivacyPage(site:SiteConfig,request:Request):string { return `<!doctype html><html lang="ko"><head>${renderHead(site,request)}<style>${styles}</style></head><body class="policy-body font-pretendard"><main class="privacy-page"><div class="container"><header class="simple-header"><a href="/">${icon("chevron",18)} 홈페이지로 돌아가기</a><p>PRIVACY POLICY</p><h1>개인정보처리방침</h1><span>상담 신청 시 수집되는 정보와 이용 목적을 안내합니다.</span></header><article class="policy-card"><h2>1. 수집 항목</h2><p>이름, 연락처, 상담 희망 내용, 개인정보 수집·이용 동의 여부를 수집할 수 있습니다.</p><h2>2. 이용 목적</h2><p>상담 요청 확인, 연락, 일정 조율 및 상담 관련 안내에만 이용합니다.</p><h2>3. 보유 기간</h2><p>${escapeHtml(site.compliance.privacyRetentionPeriod)}</p><h2>4. 동의 거부 권리</h2><p>개인정보 제공에 동의하지 않을 수 있으나 상담 신청 기능 이용이 제한될 수 있습니다.</p><h2>5. 개인정보 담당</h2><p>${escapeHtml(site.compliance.privacyOfficer)}</p>${site.demo?.enabled?"<h2>데모 안내</h2><p>현재 예시 페이지의 상담 신청 내용은 저장되지 않습니다.</p>":""}</article></div></main></body></html>`; }
+export function renderNotFoundPage():string { return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>사이트를 찾을 수 없습니다</title><style>${styles}</style></head><body class="policy-body"><main class="not-found-page"><div class="container"><header class="simple-header"><p>404</p><h1>연결된 홈페이지를<br>찾을 수 없습니다.</h1><span>도메인 설정 또는 사이트 게시 상태를 확인해 주세요.</span></header></div></main></body></html>`; }

@@ -1,20 +1,20 @@
 import type { SiteConfig } from "../../types.js";
-import { escapeHtml } from "../../utils/html.js";
-import { icon } from "../../utils/icons.js";
-
-export function renderWarmCareHero(site: SiteConfig, actions: string, profile: string): string {
-  return `<section class="hero hero-warm-care" id="home">
-    <div class="warm-orb warm-orb-one" aria-hidden="true"></div>
-    <div class="warm-orb warm-orb-two" aria-hidden="true"></div>
-    <div class="container hero-grid">
-      <div class="hero-copy reveal">
-        ${site.hero.eyebrow ? `<p class="eyebrow">${icon("spark", 18)}${escapeHtml(site.hero.eyebrow)}</p>` : ""}
-        <h1>${escapeHtml(site.hero.headline)}</h1>
-        <p class="hero-lead">${escapeHtml(site.hero.subheadline)}</p>
-        ${actions}
-        ${site.hero.trustNote ? `<p class="trust-note">${icon("check", 18)}${escapeHtml(site.hero.trustNote)}</p>` : ""}
-      </div>
-      ${profile}
-    </div>
-  </section>`;
+import { escapeHtml, nl2br } from "../../utils/html.js";
+import { formatIndex, renderContactForm, renderReviewNotice, renderSocialLinks } from "../shared.js";
+export function renderWarmCarePage(site: SiteConfig): string {
+  const reviews=site.reviews??[];
+  const services=site.specialties.map((item,index)=>`<article class="human-chapter"><span>CHAPTER ${formatIndex(index)}</span><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.body)}</p></article>`).join("");
+  const steps=site.sections.process?site.process.map((item,index)=>`<li><span>${formatIndex(index)}</span><div><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.body)}</p></div></li>`).join(""):"";
+  const featured=reviews[0]; const supporting=reviews.slice(1).map((r,index)=>`<article><span>${formatIndex(index+1)}</span><blockquote>${escapeHtml(r.quote)}</blockquote><footer><strong>${escapeHtml(r.author)}</strong>${r.context?`<small>${escapeHtml(r.context)}</small>`:""}${r.isExample?`<em>예시 후기</em>`:""}</footer></article>`).join("");
+  const tabs=site.sections.faq?site.faqs.map((item,index)=>`<button type="button" role="tab" id="human-faq-tab-${index}" aria-controls="human-faq-panel-${index}" aria-selected="${index===0}" tabindex="${index===0?0:-1}" data-faq-tab="${index}"><span>${formatIndex(index)}</span>${escapeHtml(item.question)}</button>`).join(""):"";
+  const panels=site.sections.faq?site.faqs.map((item,index)=>`<article role="tabpanel" id="human-faq-panel-${index}" aria-labelledby="human-faq-tab-${index}" data-faq-panel="${index}"${index===0?"":" hidden"}><span>ANSWER ${formatIndex(index)}</span><h3>${escapeHtml(item.question)}</h3><p>${escapeHtml(item.answer)}</p></article>`).join(""):"";
+  return `<main class="theme-page human-page">
+    <section class="human-hero" id="home"><div class="human-photo-panel"><img src="${escapeHtml(site.agent.profileImage)}" alt="${escapeHtml(site.agent.name)} ${escapeHtml(site.agent.title)} 프로필" width="1086" height="1448"><div class="human-photo-caption"><small>${escapeHtml(site.agent.company)}</small><strong>${escapeHtml(site.agent.name)}</strong><span>${escapeHtml(site.agent.title)}</span></div></div><div class="human-hero-copy"><p class="theme-overline">A CONVERSATION BEFORE A DECISION</p><h1>${escapeHtml(site.hero.headline)}</h1><p>${escapeHtml(site.hero.subheadline)}</p>${site.hero.trustNote?`<blockquote>${escapeHtml(site.hero.trustNote)}</blockquote>`:""}${renderSocialLinks(site,"social-links human-social")}<dl class="human-hours"><div><dt>상담 가능 시간</dt><dd>${escapeHtml(site.contact.availableHours)}</dd></div><div><dt>상담 방식</dt><dd>전화 · 카카오톡 · 예약 상담</dd></div></dl></div></section>
+    <section class="human-manifesto section-anchor" id="about"><div class="container human-manifesto-grid"><header><p>01 · PHILOSOPHY</p><h2>${escapeHtml(site.intro.title)}</h2></header><div><p>${nl2br(site.intro.body)}</p>${site.intro.philosophy?`<strong>${escapeHtml(site.intro.philosophy)}</strong>`:""}</div></div></section>
+    ${site.sections.reviews&&reviews.length?`<section class="human-reviews section-anchor" id="reviews"><div class="container"><header class="human-section-head"><p>02 · CLIENT VOICE</p><h2>상담의 인상은 설명 방식에서 남습니다.</h2>${renderReviewNotice(site)}</header><div class="human-review-layout">${featured?`<article class="human-featured-review"><span>FEATURED NOTE</span><blockquote>${escapeHtml(featured.quote)}</blockquote><footer><strong>${escapeHtml(featured.author)}</strong>${featured.context?`<small>${escapeHtml(featured.context)}</small>`:""}${featured.isExample?`<em>예시 후기</em>`:""}</footer></article>`:""}<div class="human-review-stack">${supporting}</div></div></div></section>`:""}
+    <section class="human-services section-anchor" id="specialties"><div class="container"><header class="human-section-head"><p>03 · CONSULTING CHAPTERS</p><h2>한 번에 권하지 않고, 필요한 주제부터 살펴봅니다.</h2></header><div class="human-chapters">${services}</div></div></section>
+    ${steps?`<section class="human-process"><div class="container human-process-grid"><header><p>04 · PROCESS</p><h2>대화에서 시작해 검토로 마무리합니다.</h2></header><ol>${steps}</ol></div></section>`:""}
+    ${tabs?`<section class="human-faq section-anchor" id="faq"><div class="container"><header class="human-section-head"><p>05 · FREQUENT QUESTIONS</p><h2>상담 전에 궁금한 내용을 먼저 확인하세요.</h2></header><div class="human-faq-board" data-faq-tabs><div class="human-faq-nav" role="tablist" aria-label="자주 묻는 질문">${tabs}</div><div class="human-faq-answer">${panels}</div></div></div></section>`:""}
+    <section class="human-contact section-anchor" id="contact"><div class="container human-contact-grid"><div class="human-contact-copy"><p>06 · CONTACT</p><h2>결정을 재촉하지 않는 상담을 원하신다면 연락해 주세요.</h2><span>상담 가능 시간 ${escapeHtml(site.contact.availableHours)}</span>${renderSocialLinks(site,"social-links contact-social")}</div>${site.sections.contactForm?renderContactForm(site,"human-form"):""}</div></section>
+  </main>`;
 }
