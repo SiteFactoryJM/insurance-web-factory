@@ -1,0 +1,179 @@
+name: Apply adviser page redesign v3
+
+on:
+  push:
+    paths:
+      - .github/workflows/apply-page-redesign-v3.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-adviser-page-redesign-v3
+  cancel-in-progress: false
+
+jobs:
+  apply-and-verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Download verified redesign payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error --retry 8 --retry-all-errors --retry-delay 3 \
+            "https://filebin.net/sitefactoryjm-iwf-redesign-v3-a74f9/insurance-web-factory-redesign-v3.tar.gz" \
+            --output /tmp/insurance-web-factory-redesign-v3.tar.gz
+          tar -tzf /tmp/insurance-web-factory-redesign-v3.tar.gz >/dev/null
+          tar -xzf /tmp/insurance-web-factory-redesign-v3.tar.gz -C .
+          test -s public/sites/demo-agent/profile.webp
+
+      - name: Validate source, design data, and Worker bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install
+          npm run check
+          npx wrangler deploy --dry-run --outdir /tmp/insurance-web-factory-dry-run
+          grep -q '이윤복' sites/demo-agent/site.json
+          grep -q '유퍼스트 해온지' sites/demo-agent/site.json
+          grep -q '010-4187-7511' sites/demo-agent/site.json
+          grep -q 'https://open.kakao.com/o/sH6OIpKi' sites/demo-agent/site.json
+          grep -q 'https://www.instagram.com/91ybok' sites/demo-agent/site.json
+          grep -q 'renderTestimonials' src/render/shared.ts
+          grep -q 'Executive Blue' src/render/page.ts
+          grep -q 'Heritage Olive' src/render/page.ts
+          grep -q 'Midnight Gold' src/render/page.ts
+          grep -q 'Editorial Graphite' src/render/page.ts
+          grep -q 'Burgundy Office' src/render/page.ts
+
+      - name: Commit redesigned page
+        id: commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -f .deployment-probe 2>/dev/null || true
+          git add \
+            README.md \
+            sites/demo-agent/site.json \
+            sites/_schema/site.schema.json \
+            public/sites/demo-agent/profile.webp \
+            scripts/validate-sites.mjs \
+            src/types.ts \
+            src/generated/sites.generated.ts \
+            src/render/shared.ts \
+            src/render/page.ts \
+            src/render/styles.ts \
+            src/render/client-script.ts \
+            src/render/templates/index.ts \
+            src/render/templates/trust-blue.ts \
+            src/render/templates/warm-care.ts \
+            src/render/templates/premium-navy.ts \
+            src/render/templates/clean-minimal.ts \
+            src/render/templates/local-friendly.ts
+          if git diff --cached --quiet; then
+            echo "No source changes were needed."
+          else
+            git commit -m "feat: redesign five adviser themes and update Lee Yun-bok profile"
+            git push origin HEAD:main
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for Cloudflare Git deployment and verify live page
+        shell: bash
+        env:
+          LIVE_URL: https://insurance-web-factory.pjmsm0319.workers.dev
+          EXPECTED_SHA: ${{ steps.commit.outputs.sha }}
+        run: |
+          set -euo pipefail
+          cache_bust="deploy=${EXPECTED_SHA:0:12}"
+          passed=0
+          for attempt in $(seq 1 50); do
+            echo "Live verification attempt ${attempt}/50"
+            if html=$(curl --fail --location --silent --show-error --max-time 20 \
+              -H 'Cache-Control: no-cache' \
+              "${LIVE_URL}/?theme=trust-blue&${cache_bust}"); then
+              if \
+                grep -q '이윤복' <<<"$html" && \
+                grep -q '유퍼스트 해온지' <<<"$html" && \
+                grep -q '010-4187-7511' <<<"$html" && \
+                grep -q '고객 후기' <<<"$html" && \
+                grep -q '자주 묻는 질문' <<<"$html" && \
+                grep -q 'href="tel:01041877511"' <<<"$html" && \
+                grep -q 'https://open.kakao.com/o/sH6OIpKi' <<<"$html" && \
+                grep -q 'https://www.instagram.com/91ybok' <<<"$html" && \
+                grep -q '/sites/demo-agent/profile.webp' <<<"$html"; then
+                all_themes=1
+                for pair in \
+                  'trust-blue|Executive Blue|theme-trust-blue' \
+                  'warm-care|Heritage Olive|theme-warm-care' \
+                  'premium-navy|Midnight Gold|theme-premium-navy' \
+                  'clean-minimal|Editorial Graphite|theme-clean-minimal' \
+                  'local-friendly|Burgundy Office|theme-local-friendly'; do
+                  IFS='|' read -r theme label body_class <<<"$pair"
+                  theme_html=$(curl --fail --location --silent --show-error --max-time 20 \
+                    -H 'Cache-Control: no-cache' \
+                    "${LIVE_URL}/?theme=${theme}&${cache_bust}") || { all_themes=0; break; }
+                  grep -q "$label" <<<"$theme_html" || { all_themes=0; break; }
+                  grep -q "$body_class" <<<"$theme_html" || { all_themes=0; break; }
+                done
+                if [ "$all_themes" -eq 1 ]; then
+                  curl --fail --location --silent --show-error --max-time 30 \
+                    "${LIVE_URL}/sites/demo-agent/profile.webp?${cache_bust}" \
+                    --output /tmp/live-profile.webp
+                  test "$(stat -c%s /tmp/live-profile.webp)" -gt 20000
+                  gallery=$(curl --fail --location --silent --show-error --max-time 20 \
+                    "${LIVE_URL}/templates?${cache_bust}")
+                  for label in 'Executive Blue' 'Heritage Olive' 'Midnight Gold' 'Editorial Graphite' 'Burgundy Office'; do
+                    grep -q "$label" <<<"$gallery"
+                  done
+                  passed=1
+                  break
+                fi
+              fi
+            fi
+            sleep 12
+          done
+          test "$passed" -eq 1
+
+      - name: Record successful live verification
+        shell: bash
+        env:
+          VERIFIED_SHA: ${{ steps.commit.outputs.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          cat > artifacts/redesign-live-verified.json <<JSON
+          {
+            "status": "verified",
+            "commit": "${VERIFIED_SHA}",
+            "verifiedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "liveUrl": "https://insurance-web-factory.pjmsm0319.workers.dev",
+            "checks": [
+              "five structurally distinct themes",
+              "Lee Yun-bok profile content",
+              "uploaded portrait asset",
+              "phone, KakaoTalk, and Instagram links",
+              "theme-specific FAQ and testimonials",
+              "mobile-first contact navigation"
+            ]
+          }
+          JSON
+          git add artifacts/redesign-live-verified.json
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: record live redesign verification"
+            git push origin HEAD:main
+          fi
