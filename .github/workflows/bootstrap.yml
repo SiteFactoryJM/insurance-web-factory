@@ -38,7 +38,11 @@ jobs:
           base64 --decode /tmp/insurance-web-factory.b64 > /tmp/insurance-web-factory.tar.gz
           echo "e95f40202dac62366447f6699296c85702af6e17594ba02c1b0caa06815a6e20  /tmp/insurance-web-factory.tar.gz" | sha256sum --check
           tar -xzf /tmp/insurance-web-factory.tar.gz -C .
-          rm -rf .bootstrap .github/workflows/bootstrap.yml
+
+          # GitHub Actions 기본 토큰은 새 workflow 파일 추가 권한이 없으므로
+          # 소스 반영과 workflow 반영을 분리한다.
+          rm -rf .bootstrap .github/workflows
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
