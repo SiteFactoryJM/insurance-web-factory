@@ -22,8 +22,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat .bootstrap/chunk_* > /tmp/insurance-web-factory.b64
+          cat \
+            .bootstrap/chunk_00 \
+            .bootstrap/chunk_01 \
+            .bootstrap/chunk_02 \
+            .bootstrap/chunk_03 \
+            .bootstrap/chunk_04 \
+            .bootstrap/chunk_05 \
+            .bootstrap/chunk_06a \
+            .bootstrap/chunk_06b \
+            .bootstrap/chunk_06c \
+            .bootstrap/chunk_07 \
+            > /tmp/insurance-web-factory.b64
+          echo "8edcef5e2bd311ad10319789311a9d705f762c8cd1e78a61531bac666b1bb2fb  /tmp/insurance-web-factory.b64" | sha256sum --check
           base64 --decode /tmp/insurance-web-factory.b64 > /tmp/insurance-web-factory.tar.gz
+          echo "e95f40202dac62366447f6699296c85702af6e17594ba02c1b0caa06815a6e20  /tmp/insurance-web-factory.tar.gz" | sha256sum --check
           tar -xzf /tmp/insurance-web-factory.tar.gz -C .
           rm -rf .bootstrap .github/workflows/bootstrap.yml
           git config user.name "github-actions[bot]"
