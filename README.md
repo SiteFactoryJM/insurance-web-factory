@@ -10,13 +10,13 @@
 
 | 주소 | 샘플 |
 | --- | --- |
-| `/?theme=trust-blue` | 차분한 신뢰 · 기본 추천 |
-| `/?theme=warm-care` | 따뜻한 동행 · 대화 중심 |
-| `/?theme=premium-navy` | 꼼꼼한 준비 · 가입 준비 |
-| `/?theme=clean-minimal` | 한눈에 정리 · 정보 최소 |
-| `/?theme=local-friendly` | 가까운 상담 · 모바일 우선 |
+| `/?theme=trust-blue` | 신뢰의 기준 · 기업형 |
+| `/?theme=warm-care` | 사람과 대화 · 소개 중심형 |
+| `/?theme=premium-navy` | 선택의 기준 · 가입 점검형 |
+| `/?theme=clean-minimal` | 한 장의 정리 · 리포트형 |
+| `/?theme=local-friendly` | 바로 묻는 상담 · 상담 메뉴형 |
 
-기존 5개 URL은 유지하지만 오래된 개별 템플릿 구현은 공통 마스터로 교체했습니다. 본문·입력·버튼은 기본 18px, 보조 글씨·고지는 최소 16px입니다. `글자 크게` 버튼과 브라우저 글자 확대를 지원합니다.
+기존 5개 URL을 유지하면서 5개 배치 구조와 6개 팔레트를 독립적으로 조합하는 30가지 샘플을 제공합니다. 본문·입력·버튼은 기본 18px, 보조 글씨·고지는 최소 16px입니다. 글자 크게 버튼은 제거하고 브라우저 글자 확대를 지원합니다. 모든 푸터는 어두운 계열입니다.
 
 ## 상담 신청은 현재 샘플입니다
 
@@ -56,7 +56,7 @@ npm run test:e2e
 
 설정 검증, TypeScript, 단위/렌더/API 회귀 테스트와 Playwright/axe 자동 검사를 제공합니다. 반응형 검사는 320·360·390·768·1440px, 200% 글자 확대, 신청 단계, 미전송, 모바일 CTA, 키보드와 자바스크립트 비활성화 상태를 포함합니다. 테스트용 정보만 사용합니다.
 
-PR과 main 푸시에서 CI가 실행되고 브라우저 보고서를 Actions artifact로 남깁니다. 연결된 Cloudflare Workers Builds는 main 변경을 배포합니다. main CI의 live verification은 실제 데모 주소에서 새 페이지 식별자와 5개 테마를 확인합니다. 별도 수동 배포 워크플로는 기존 Cloudflare secrets가 설정된 환경에서 사용합니다.
+PR과 main 푸시에서 CI가 실행되고 브라우저 보고서를 Actions artifact로 남깁니다. 연결된 Cloudflare Workers Builds는 main 변경을 배포합니다. main CI의 live verification은 실제 데모 주소에서 새 페이지 식별자와 30개 배치·색상 조합를 확인합니다. 별도 수동 배포 워크플로는 기존 Cloudflare secrets가 설정된 환경에서 사용합니다.
 
 ## 문서와 코드
 

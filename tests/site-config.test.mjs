@@ -7,7 +7,7 @@ const site = JSON.parse(fs.readFileSync(new URL('../sites/demo-agent/site.json',
 test('demo profile uses the supplied adviser information', () => {
   assert.equal(site.agent.name, '이윤복');
   assert.equal(site.agent.title, '보험설계사');
-  assert.equal(site.agent.company, '유퍼스트 해온지');
+  assert.equal(site.agent.company, '유퍼스트 해온지사');
   assert.equal(site.contact.phone, '010-4187-7511');
   assert.equal(site.contact.kakaoUrl, 'https://open.kakao.com/o/sH6OIpKi');
   assert.equal(site.contact.instagramUrl, 'https://www.instagram.com/91ybok');
