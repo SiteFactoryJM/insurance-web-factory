@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 const themes=['trust-blue','warm-care','premium-navy','clean-minimal','local-friendly'];
 const widths=[320,360,390,768,1440];
 const noOverflow=async page => {
-  const issues=await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>{const r=el.getBoundingClientRect();return r.height>0&&r.width>0&&!el.classList.contains('skip-link')&&(r.right>innerWidth+1||r.left < -1);}).map(el=>`${el.tagName}.${el.className}`));
+  const issues=await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>{const r=el.getBoundingClientRect();return r.height>0&&r.width>0&&!el.classList.contains('skip-link')&&(r.right>innerWidth+1||r.left < -1);}).map(el=>({tag:el.tagName,class:el.className,parent:el.parentElement?.className,text:el.textContent.trim().slice(0,60),left:el.getBoundingClientRect().left,right:el.getBoundingClientRect().right})));
   expect(issues).toEqual([]);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(await page.evaluate(()=>innerWidth));
 };
