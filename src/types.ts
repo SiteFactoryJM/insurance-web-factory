@@ -12,6 +12,7 @@ export interface SiteConfig {
   hero: { eyebrow?: string; headline: string; subheadline: string; primaryCtaLabel: string; secondaryCtaLabel: string; trustNote?: string; };
   intro: { title: string; body: string; philosophy?: string; };
   specialties: ContentCard[]; process: ContentCard[]; career: string[]; reviews?: ReviewItem[]; faqs: FaqItem[];
+  consultation?: { topics: string[] };
   contact: { phone: string; kakaoUrl?: string; instagramUrl?: string; email?: string; formEmail?: string; officeAddress?: string; mapUrl?: string; availableHours: string; };
   sections: { career: boolean; process: boolean; reviews?: boolean; faq: boolean; location: boolean; contactForm: boolean; };
   seo: { title: string; description: string; ogImage?: string; noIndex?: boolean; };

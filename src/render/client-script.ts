@@ -1,48 +1,114 @@
+/** Demo-only interaction. Intentionally contains no fetch, mailto, SDK or browser storage. */
 export const clientScript = String.raw`
 (() => {
-  const navToggle = document.querySelector('[data-nav-toggle]');
-  const nav = document.querySelector('[data-nav]');
-  const closeNav = () => { if (!nav || !navToggle) return; nav.classList.remove('is-open'); navToggle.setAttribute('aria-expanded','false'); document.body.classList.remove('nav-open'); };
-  navToggle?.addEventListener('click', () => { const open = nav?.classList.toggle('is-open') ?? false; navToggle.setAttribute('aria-expanded', String(open)); document.body.classList.toggle('nav-open', open); });
-  nav?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeNav));
-  window.addEventListener('resize', () => { if (window.innerWidth >= 860) closeNav(); });
-
-  document.querySelectorAll('[data-faq-tabs]').forEach((tabset) => {
-    const tabs = Array.from(tabset.querySelectorAll('[data-faq-tab]'));
-    const panels = Array.from(tabset.querySelectorAll('[data-faq-panel]'));
-    const activate = (index, focus = false) => {
-      tabs.forEach((tab, i) => { const selected = i === index; tab.setAttribute('aria-selected', String(selected)); tab.setAttribute('tabindex', selected ? '0' : '-1'); if (selected && focus) tab.focus(); });
-      panels.forEach((panel, i) => { panel.hidden = i !== index; });
-    };
-    tabs.forEach((tab, index) => {
-      tab.addEventListener('click', () => activate(index));
-      tab.addEventListener('keydown', (event) => { if (!['ArrowDown','ArrowRight','ArrowUp','ArrowLeft','Home','End'].includes(event.key)) return; event.preventDefault(); let next = index; if (event.key === 'ArrowDown' || event.key === 'ArrowRight') next = (index + 1) % tabs.length; if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length; if (event.key === 'Home') next = 0; if (event.key === 'End') next = tabs.length - 1; activate(next, true); });
-    });
+  const reading = document.querySelector('[data-reading-toggle]');
+  reading?.addEventListener('click', () => {
+    const large = reading.getAttribute('aria-pressed') !== 'true';
+    document.documentElement.dataset.reading = large ? 'large' : 'normal';
+    reading.setAttribute('aria-pressed', String(large));
+    reading.textContent = large ? '기본 글자' : '글자 크게';
   });
-
-  const phone = document.querySelector('input[name="phone"]');
-  phone?.addEventListener('input', (event) => { const input = event.currentTarget; if (!(input instanceof HTMLInputElement)) return; const digits = input.value.replace(/\D/g,'').slice(0,11); if (digits.length <= 3) input.value = digits; else if (digits.length <= 7) input.value = digits.replace(/(\d{3})(\d+)/,'$1-$2'); else input.value = digits.replace(/(\d{3})(\d{4})(\d+)/,'$1-$2-$3'); });
+  const menu = document.querySelector('.mobile-menu');
+  menu?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => menu.open = false));
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && menu?.open) { menu.open = false; menu.querySelector('summary')?.focus(); }
+  });
+  document.querySelector('[data-template-select]')?.addEventListener('change', event => {
+    const url = new URL(window.location.href); url.pathname = '/'; url.searchParams.set('theme',event.target.value); url.hash = ''; window.location.assign(url);
+  });
+  document.querySelectorAll('img').forEach(img => img.addEventListener('error', () => {
+    if (!img.src.endsWith('/assets/profile-placeholder.svg')) img.src = '/assets/profile-placeholder.svg';
+  }, { once: true }));
 
   const form = document.querySelector('[data-contact-form]');
-  form?.addEventListener('submit', async (event) => {
-    event.preventDefault(); if (!(form instanceof HTMLFormElement) || !form.reportValidity()) return;
-    const status = form.querySelector('[data-form-status]'); const button = form.querySelector('button[type="submit"]');
-    const payload = Object.fromEntries(new FormData(form).entries()); const mode = form.dataset.submissionMode || 'store'; const recipient = form.dataset.formEmail || '';
-    if (mode === 'mailto' && recipient) {
-      const subject = '[홈페이지 상담 문의] ' + String(payload.name || '고객');
-      const body = ['이름: ' + String(payload.name || ''), '연락처: ' + String(payload.phone || ''), '', '상담 희망 내용', String(payload.message || '(작성 내용 없음)')].join('\n');
-      window.location.href = 'mailto:' + encodeURIComponent(recipient) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-      if (status) { status.textContent = '이메일 앱을 열었습니다. 내용을 확인한 뒤 전송해 주세요.'; status.className = 'form-status is-success'; } return;
-    }
-    if (button instanceof HTMLButtonElement) button.disabled = true;
-    if (status) { status.textContent = '신청 내용을 확인하고 있습니다.'; status.className = 'form-status'; }
-    try { const response = await fetch('/api/consultations',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)}); const result = await response.json(); if (!response.ok) throw new Error(result.message || '신청을 처리하지 못했습니다.'); if (status) { status.textContent = result.message; status.className = 'form-status is-success'; } form.reset(); }
-    catch (error) { if (status) { status.textContent = error instanceof Error ? error.message : '잠시 후 다시 시도해 주세요.'; status.className = 'form-status is-error'; } }
-    finally { if (button instanceof HTMLButtonElement) button.disabled = false; }
-  });
-
-  const templateSelect = document.querySelector('[data-template-select]');
-  templateSelect?.addEventListener('change', (event) => { const select = event.currentTarget; if (!(select instanceof HTMLSelectElement)) return; const url = new URL(window.location.href); url.pathname='/'; url.searchParams.set('theme',select.value); window.location.href=url.toString(); });
-  document.querySelector('[data-switcher-close]')?.addEventListener('click', () => document.querySelector('[data-demo-switcher]')?.remove());
+  if (form instanceof HTMLFormElement) {
+    const steps = [...form.querySelectorAll('[data-step]')];
+    const indicators = [...form.querySelectorAll('[data-step-indicator]')];
+    const previous = form.querySelector('[data-prev]');
+    const next = form.querySelector('[data-next]');
+    const submit = form.querySelector('[data-submit]');
+    const actions = form.querySelector('[data-form-actions]');
+    const error = form.querySelector('[data-form-error]');
+    const result = form.querySelector('[data-demo-result]');
+    const review = form.querySelector('[data-review-summary]');
+    const progress = form.querySelector('[data-step-status]');
+    const phone = form.elements.namedItem('phone');
+    const message = form.elements.namedItem('message');
+    const labels = ['분야 선택','상황 작성','연락 정보','최종 확인'];
+    let current = 0;
+    let complete = false;
+    const value = name => String(form.elements.namedItem(name)?.value || '').trim();
+    const clearError = () => { error.textContent = ''; form.querySelectorAll('[aria-invalid]').forEach(el => { el.removeAttribute('aria-invalid'); el.removeAttribute('aria-errormessage'); }); };
+    const invalid = (text, field) => { error.textContent = text; if(field){field.setAttribute('aria-invalid','true');field.setAttribute('aria-errormessage','consult-error');field.focus();}else error.focus();return false; };
+    error.id = 'consult-error';
+    const validate = () => {
+      clearError();
+      if(current === 0 && !value('topic')) return invalid('상담 분야를 하나 선택해 주세요.', form.querySelector('[name="topic"]'));
+      if(current === 2 && !/^01[016789][0-9]{7,8}$/.test(value('phone').replace(/\D/g,''))) return invalid('휴대전화 번호를 확인해 주세요. 예: 010-0000-0000', phone);
+      if(current === 3 && !form.elements.namedItem('privacyConsent').checked) return invalid('샘플 개인정보 안내 확인에 체크해 주세요.', form.elements.namedItem('privacyConsent'));
+      return true;
+    };
+    const buildReview = () => {
+      review.replaceChildren();
+      const digits = value('phone').replace(/\D/g,'');
+      const maskedPhone = digits ? digits.slice(0,3) + '-****-' + digits.slice(-4) : '';
+      [['상담 분야',value('topic')],['궁금한 내용',value('message') || '상담 때 말씀드릴게요'],['이름 / 호칭',value('name') || '작성하지 않음'],['연락처',maskedPhone],['연락 방법',value('contactMethod')],['희망 시간',value('contactTime')]].forEach(([key,text]) => {
+        const row = document.createElement('div'); const dt = document.createElement('dt'); const dd = document.createElement('dd'); dt.textContent = key; dd.textContent = text; row.append(dt,dd); review.append(row);
+      });
+    };
+    const show = (step, focus = true) => {
+      current = step; clearError(); complete = false;
+      steps.forEach((el,i) => {el.hidden = i !== step; el.disabled = i !== step;});
+      indicators.forEach((el,i) => {if(i===step)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current');});
+      progress.textContent = (step + 1) + ' / 4단계 · ' + labels[step];
+      previous.hidden = step === 0; next.hidden = step === 3; submit.hidden = step !== 3;
+      next.disabled = false; submit.disabled = false; actions.hidden = false; result.hidden = true;
+      if(step === 3) buildReview();
+      if(focus) steps[step].querySelector('[data-step-title]')?.focus();
+    };
+    const count = () => { form.querySelector('[data-character-count]').textContent = message.value.length + ' / 300자'; };
+    message.addEventListener('input', count);
+    // Format on blur, never move the caret while someone edits the middle of a number.
+    phone.addEventListener('blur', () => {
+      const digits = phone.value.replace(/\D/g,'');
+      if(/^01[016789][0-9]{7,8}$/.test(digits)) phone.value = digits.slice(0,3) + '-' + digits.slice(3,-4) + '-' + digits.slice(-4);
+    });
+    next.addEventListener('click', () => {if(validate())show(Math.min(current + 1,3));});
+    previous.addEventListener('click', () => show(Math.max(current - 1,0)));
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      if(complete || !validate()) return;
+      if(current < 3){show(current + 1);return;}
+      // Local state transition only. Never POST the demo, even to a discard endpoint.
+      complete = true; form.reset(); review.replaceChildren(); count();
+      steps.forEach(el => {el.hidden = true;el.disabled = true;}); actions.hidden = true;
+      progress.textContent = '화면 체험 완료 · 실제 접수 아님'; result.hidden = false;
+      form.querySelector('#result-title').focus();
+    });
+    const reset = (focus = false) => {form.reset();review.replaceChildren();count();show(0,focus);};
+    form.querySelector('[data-restart]').addEventListener('click', () => reset(true));
+    document.querySelectorAll('[data-start-topic]').forEach(link => link.addEventListener('click', () => {
+      show(0,false); const choice = [...form.querySelectorAll('[name="topic"]')].find(el => el.value === link.dataset.startTopic); if(choice)choice.checked = true;
+    }));
+    window.addEventListener('pagehide', () => reset(false));
+    window.addEventListener('pageshow', event => {if(event.persisted)reset(false);});
+    show(0,false);
+  }
+  const cta = document.querySelector('[data-mobile-cta]');
+  const hero = document.querySelector('.hero');
+  const contact = document.querySelector('#contact');
+  const footer = document.querySelector('.site-footer');
+  if(cta && hero && contact && footer && 'IntersectionObserver' in window) {
+    const visible = new Map([[hero,true],[contact,false],[footer,false]]);
+    const refresh = () => {
+      const editing = document.activeElement?.matches('input,textarea,select');
+      const keyboard = window.visualViewport && window.innerHeight - window.visualViewport.height > 120;
+      cta.hidden = Boolean(visible.get(hero) || visible.get(contact) || visible.get(footer) || editing || keyboard);
+    };
+    const observer = new IntersectionObserver(entries => {entries.forEach(entry => visible.set(entry.target,entry.isIntersecting));refresh();}, {threshold:0});
+    [hero,contact,footer].forEach(el => observer.observe(el));
+    document.addEventListener('focusin',refresh); document.addEventListener('focusout', () => setTimeout(refresh,0));
+    window.visualViewport?.addEventListener('resize',refresh);
+  }
 })();
 `;

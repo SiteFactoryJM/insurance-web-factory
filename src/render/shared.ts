@@ -1,78 +1,53 @@
 import type { SiteConfig, TemplateId } from "../types.js";
-import { escapeHtml, phoneHref, safeUrl } from "../utils/html.js";
-import { icon } from "../utils/icons.js";
+import { escapeHtml as e, phoneHref, safeUrl } from "../utils/html.js";
+import { TEMPLATE_META, DEFAULT_TOPICS } from "./design-system.js";
 
-const THEME_LABELS: Record<TemplateId, string> = {
-  "trust-blue": "인스티튜셔널",
-  "warm-care": "휴먼 에디토리얼",
-  "premium-navy": "프라이빗 컨설팅",
-  "clean-minimal": "리포트 미니멀",
-  "local-friendly": "모바일 컨시어지",
-};
-
-function instagramHandle(value: string | undefined): string {
-  const url = safeUrl(value);
-  if (!url) return "인스타그램 보기";
-  try { const handle = new URL(url).pathname.split("/").filter(Boolean)[0]; return handle ? `@${handle}` : "인스타그램 보기"; }
-  catch { return "인스타그램 보기"; }
-}
-
+export const arrow = '<span aria-hidden="true">↗</span>';
 export function renderHeader(site: SiteConfig): string {
-  return `<header class="site-header" data-header><div class="container header-inner">
-    <a class="brand" href="#home" aria-label="홈으로 이동">${site.agent.logoImage ? `<img src="${escapeHtml(site.agent.logoImage)}" alt="" width="34" height="34">` : `<span class="brand-mark">${escapeHtml(site.agent.name.slice(0, 1))}</span>`}<span class="brand-copy"><strong>${escapeHtml(site.agent.name)}</strong><small>${escapeHtml(site.agent.title)} · ${escapeHtml(site.agent.company)}</small></span></a>
-    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav" data-nav-toggle><span class="sr-only">메뉴 열기</span>${icon("menu")}</button>
-    <nav class="main-nav" id="main-nav" aria-label="주요 메뉴" data-nav><a href="#about">소개</a><a href="#specialties">상담 분야</a>${site.sections.reviews ? '<a href="#reviews">고객 후기</a>' : ""}${site.sections.faq ? '<a href="#faq">자주 묻는 질문</a>' : ""}<a class="nav-cta" href="#contact">상담 문의</a></nav>
+  const links = `<a href="#about">설계사 소개</a><a href="#specialties">상담 분야</a>${site.sections.faq ? '<a href="#faq">자주 묻는 질문</a>' : ''}<a class="button button-small" href="#contact">상담 요청하기 ${arrow}</a>`;
+  return `<a class="skip-link" href="#main">본문으로 바로가기</a>
+  <header class="site-header"><div class="container header-inner">
+    <a class="brand" href="/" aria-label="${e(site.agent.name)} 보험상담 홈"><span class="brand-mark" aria-hidden="true">${e(site.agent.name.slice(0,1))}</span><span><strong>${e(site.agent.name)} 보험상담</strong><span class="brand-sub">${e(site.agent.company)}</span></span></a>
+    <nav class="desktop-nav" aria-label="주요 메뉴">${links}</nav>
+    <div class="header-tools"><button type="button" class="reading-toggle" data-reading-toggle aria-pressed="false">글자 크게</button><details class="mobile-menu"><summary>메뉴</summary><nav aria-label="모바일 메뉴">${links}</nav></details></div>
   </div></header>`;
 }
-
-export function renderSocialLinks(site: SiteConfig, className = "social-links"): string {
-  const kakaoUrl = safeUrl(site.contact.kakaoUrl);
-  const instagramUrl = safeUrl(site.contact.instagramUrl);
-  return `<div class="${escapeHtml(className)}" aria-label="빠른 상담 연결">
-    <a class="social-link social-phone" href="${phoneHref(site.contact.phone)}"><span class="social-emoji" aria-hidden="true">📞</span><span><small>전화 상담</small><strong>${escapeHtml(site.contact.phone)}</strong></span></a>
-    ${kakaoUrl ? `<a class="social-link social-kakao" href="${escapeHtml(kakaoUrl)}" target="_blank" rel="noopener noreferrer"><span class="social-emoji" aria-hidden="true">💬</span><span><small>카카오톡</small><strong>오픈채팅 연결</strong></span></a>` : ""}
-    ${instagramUrl ? `<a class="social-link social-instagram" href="${escapeHtml(instagramUrl)}" target="_blank" rel="noopener noreferrer"><span class="social-emoji" aria-hidden="true">📷</span><span><small>인스타그램</small><strong>${escapeHtml(instagramHandle(instagramUrl))}</strong></span></a>` : ""}
-  </div>`;
-}
-
-export function renderContactForm(site: SiteConfig, modifier = ""): string {
-  const formEmail = site.contact.formEmail || site.contact.email || "";
-  const requestedMode = site.demo?.submissionMode ?? "store";
-  const submissionMode = requestedMode === "mailto" && !formEmail ? "discard" : requestedMode;
-  return `<form class="contact-form ${escapeHtml(modifier)}" data-contact-form data-form-email="${escapeHtml(formEmail)}" data-submission-mode="${escapeHtml(submissionMode)}" novalidate>
-    <div class="form-heading"><p>CONSULTATION NOTE</p><h3>상담 내용을 남겨주세요.</h3><span>확인 후 편한 연락 방법으로 안내드립니다.</span></div>
-    <input type="hidden" name="siteId" value="${escapeHtml(site.id)}"><label class="honeypot" aria-hidden="true">회사명<input name="companyWebsite" tabindex="-1" autocomplete="off"></label>
-    <div class="form-row"><label><span>이름</span><input type="text" name="name" autocomplete="name" required maxlength="30" placeholder="성함을 입력해 주세요"></label><label><span>연락처</span><input type="tel" name="phone" autocomplete="tel" inputmode="tel" required maxlength="15" placeholder="010-0000-0000"></label></div>
-    <label><span>상담 희망 내용</span><textarea name="message" rows="5" maxlength="500" placeholder="현재 궁금한 점과 편한 연락 시간을 적어 주세요."></textarea></label>
-    <label class="consent"><input type="checkbox" name="privacyConsent" value="true" required><span>개인정보 수집·이용에 동의합니다. <a href="/privacy" target="_blank">내용 보기</a></span></label>
-    <button class="form-submit" type="submit"><span>${submissionMode === "mailto" ? "이메일로 상담 내용 보내기" : "상담 내용 보내기"}</span>${icon("arrow", 19)}</button>
-    <p class="form-status" role="status" aria-live="polite" data-form-status>${site.demo?.enabled ? "예시 페이지에서는 입력 내용이 저장되지 않습니다. 담당 이메일이 등록되면 작성 내용을 이메일 앱으로 넘길 수 있습니다." : ""}</p>
-  </form>`;
-}
-
-export function renderReviewNotice(site: SiteConfig): string {
-  const hasExamples = (site.reviews ?? []).some((review) => review.isExample);
-  return hasExamples ? `<p class="review-notice">현재 후기는 디자인 확인을 위한 예시 문구입니다. 실제 공개 시 고객 동의와 사실 확인을 거친 후기만 게시합니다.</p>` : "";
-}
-
-export function renderCustomizationBand(site: SiteConfig): string {
-  if (!site.demo?.enabled) return "";
-  return `<aside class="customization-band"><div class="container"><div><span>DEMO</span><strong>레이아웃·문구·사진·노출 항목은 설계사별로 변경할 수 있습니다.</strong></div><a href="/templates">5가지 레이아웃 비교 ${icon("arrow", 18)}</a></div></aside>`;
-}
-
-export function renderFooter(site: SiteConfig): string {
-  const instagramUrl = safeUrl(site.contact.instagramUrl); const kakaoUrl = safeUrl(site.contact.kakaoUrl);
-  return `<footer class="site-footer"><div class="container footer-main"><div class="footer-brand"><strong>${escapeHtml(site.agent.name)}</strong><span>${escapeHtml(site.agent.title)} · ${escapeHtml(site.agent.company)}</span></div><div class="footer-links"><a href="/privacy">개인정보처리방침</a><a href="${phoneHref(site.contact.phone)}">전화 상담</a>${kakaoUrl ? `<a href="${escapeHtml(kakaoUrl)}" target="_blank" rel="noopener noreferrer">카카오톡</a>` : ""}${instagramUrl ? `<a href="${escapeHtml(instagramUrl)}" target="_blank" rel="noopener noreferrer">인스타그램</a>` : ""}</div></div><div class="container footer-legal"><p>${escapeHtml(site.compliance.footerDisclaimer)}</p>${site.compliance.advertisingReviewNumber ? `<p>${escapeHtml(site.compliance.advertisingReviewNumber)}${site.compliance.advertisingReviewExpiresAt ? ` · 유효기간 ${escapeHtml(site.compliance.advertisingReviewExpiresAt)}` : ""}</p>` : ""}<p>© ${new Date().getUTCFullYear()} ${escapeHtml(site.agent.name)}. All rights reserved.</p></div></footer>`;
-}
-
-export function renderMobileCta(site: SiteConfig): string {
-  const kakaoUrl = safeUrl(site.contact.kakaoUrl); const instagramUrl = safeUrl(site.contact.instagramUrl);
-  return `<nav class="mobile-cta" aria-label="모바일 빠른 연락"><a href="${phoneHref(site.contact.phone)}"><span aria-hidden="true">📞</span><strong>전화</strong></a>${kakaoUrl ? `<a href="${escapeHtml(kakaoUrl)}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">💬</span><strong>카카오톡</strong></a>` : ""}${instagramUrl ? `<a href="${escapeHtml(instagramUrl)}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">📷</span><strong>인스타그램</strong></a>` : ""}</nav>`;
-}
-
 export function renderDemoSwitcher(site: SiteConfig): string {
   if (!site.demo?.enabled || !site.demo.allowTemplateSwitch) return "";
-  const options = (Object.entries(THEME_LABELS) as Array<[TemplateId, string]>).map(([id, label]) => `<option value="${id}"${site.template === id ? " selected" : ""}>${label}</option>`).join("");
-  return `<aside class="demo-switcher" data-demo-switcher><div><small>레이아웃 미리보기</small><select aria-label="테마 선택" data-template-select>${options}</select></div><button type="button" aria-label="미리보기 선택기 닫기" data-switcher-close>${icon("close", 17)}</button></aside>`;
+  return `<aside class="sample-bar" aria-label="제안용 샘플 선택"><div class="container sample-inner"><p><span class="badge">디자인 샘플</span> 실제 상담은 접수되지 않습니다.</p><div><label for="sample-theme">샘플 선택</label><select id="sample-theme" data-template-select>${(Object.entries(TEMPLATE_META) as [TemplateId, typeof TEMPLATE_META[TemplateId]][]).map(([id,m])=>`<option value="${id}"${site.template===id?' selected':''}>${e(m.name)}</option>`).join('')}</select><a href="/templates">전체 비교 ${arrow}</a></div></div></aside>`;
 }
-export function formatIndex(index: number): string { return String(index + 1).padStart(2, "0"); }
+export function renderSocialLinks(site: SiteConfig): string {
+  if (site.demo?.enabled) return `<p class="support-note">전화·카카오톡 연결은 실제 운영 단계에서 활성화합니다.</p>`;
+  const kakao = safeUrl(site.contact.kakaoUrl);
+  return `<div class="secondary-links"><a href="${phoneHref(site.contact.phone)}">전화 ${e(site.contact.phone)}</a>${kakao?`<a href="${e(kakao)}" target="_blank" rel="noopener noreferrer">카카오톡 상담 (새 창)</a>`:''}</div>`;
+}
+export function renderContactForm(site: SiteConfig): string {
+  const topics = site.consultation?.topics?.length ? site.consultation.topics : DEFAULT_TOPICS;
+  return `<form class="consultation-form" data-contact-form data-submission-mode="discard" method="post" action="/#contact" novalidate autocomplete="off">
+    <div class="form-intro"><span class="badge">미리보기 전용</span><p>실제 개인정보 대신 예시 정보를 입력해 주세요.<br>입력 내용은 저장하거나 전송하지 않습니다.</p></div>
+    <ol class="stepper" aria-label="상담 신청 단계">${['분야 선택','상황 작성','연락 정보','최종 확인'].map((s,i)=>`<li data-step-indicator${i===0?' aria-current="step"':''}><span aria-hidden="true">${i+1}</span><span>${s}</span></li>`).join('')}</ol>
+    <p class="step-status" data-step-status aria-live="polite">1 / 4단계 · 분야 선택</p>
+    <fieldset data-step="0" disabled><legend><span tabindex="-1" data-step-title>어떤 상담이 필요하신가요?</span></legend><p class="field-help">가장 가까운 분야 하나를 선택해 주세요.</p><div class="topic-grid">${topics.map((topic,i)=>`<label class="topic-option"><input type="radio" name="topic" value="${e(topic)}"${i===0?' required':''}><span>${e(topic)}</span></label>`).join('')}</div></fieldset>
+    <fieldset data-step="1" hidden disabled><legend><span tabindex="-1" data-step-title>궁금한 점을 알려주세요.</span></legend><p class="field-help" id="message-help">선택 항목입니다. 잘 모르겠다면 건너뛰어도 괜찮습니다.<br>주민등록번호, 병력 등 민감한 정보는 적지 마세요.</p><label for="consult-message">상담하고 싶은 내용 <span class="optional">(선택)</span></label><textarea id="consult-message" name="message" rows="4" maxlength="300" aria-describedby="message-help" placeholder="예: 가입한 보험의 보장 내용을 쉽게 설명받고 싶어요."></textarea><p class="character-count" data-character-count>0 / 300자</p></fieldset>
+    <fieldset data-step="2" hidden disabled><legend><span tabindex="-1" data-step-title>어떻게 연락드리면 될까요?</span></legend><p class="field-help">화면 확인용입니다. 실제 연락은 드리지 않습니다.</p><div class="form-row"><div><label for="consult-name">이름 또는 호칭 <span class="optional">(선택)</span></label><input id="consult-name" name="name" type="text" maxlength="30" placeholder="예: 홍길동"></div><div><label for="consult-phone">휴대전화 번호 <span class="required">(필수)</span></label><input id="consult-phone" name="phone" type="tel" inputmode="tel" maxlength="13" required aria-describedby="phone-help" placeholder="010-0000-0000"><p id="phone-help" class="field-help">숫자만 입력해도 됩니다.</p></div></div>
+      <fieldset class="nested-fieldset"><legend>희망 연락 방법</legend><div class="choice-row">${['전화','문자','카카오톡'].map((v,i)=>`<label><input type="radio" name="contactMethod" value="${v}"${i===0?' checked':''}><span>${v}</span></label>`).join('')}</div><p class="field-help">카카오톡 전송은 추후 연동 예정입니다.</p></fieldset>
+      <label for="consult-time">희망 연락 시간 <span class="optional">(선택)</span></label><select id="consult-time" name="contactTime"><option value="일정 조율 후 결정">일정 조율 후 결정</option><option>오전</option><option>오후</option><option>저녁</option></select><p class="field-help">상담 가능 시간: ${e(site.contact.availableHours)} · 예약 확정이 아닙니다.</p>
+    </fieldset>
+    <fieldset data-step="3" hidden disabled><legend><span tabindex="-1" data-step-title>신청 내용을 확인해 주세요.</span></legend><p class="field-help">담당자: <strong>${e(site.agent.name)}</strong> · ${e(site.agent.company)}</p><dl class="review-summary" data-review-summary></dl><details class="privacy-disclosure"><summary>개인정보 안내 확인하기</summary><p>이 화면은 시연용으로 개인정보를 수집·저장·전송하지 않습니다. 입력값은 현재 화면에서만 사용되며 완료 또는 페이지 이탈 시 지웁니다.</p><p>실제 운영 시에는 처리 주체, 수집 목적과 항목, 보유기간, 동의 거부에 따른 영향을 확정한 후 별도로 안내해야 합니다.</p><a href="/privacy" target="_blank" rel="noopener noreferrer">개인정보 안내 자세히 보기 (새 창)</a></details><label class="consent"><input type="checkbox" name="privacyConsent" required><span>개인정보 안내를 확인했습니다. <strong>샘플 확인용이며 실제 동의·접수가 아닙니다.</strong></span></label></fieldset>
+    <p class="form-error" data-form-error role="alert" tabindex="-1"></p>
+    <div class="form-actions" data-form-actions><button class="button button-secondary" type="button" data-prev hidden>이전</button><button class="button" type="button" data-next disabled>다음 단계 <span aria-hidden="true">→</span></button><button class="button" type="submit" data-submit hidden disabled>상담 신청 미리보기 ${arrow}</button></div>
+    <section class="demo-result" data-demo-result hidden aria-labelledby="result-title"><span class="result-mark" aria-hidden="true">✓</span><h3 id="result-title" tabindex="-1">신청 화면 체험을 마쳤습니다.</h3><p><strong>실제 상담은 접수되지 않았습니다.</strong><br>입력 정보는 저장·전송되지 않았으며,<br>전화나 카카오톡도 발송되지 않습니다.</p><button type="button" class="button button-secondary" data-restart>처음부터 다시 보기</button></section>
+    <noscript><p class="form-error">이 신청 화면은 자바스크립트가 필요한 샘플입니다. 입력과 전송은 비활성화되어 있습니다.</p></noscript>
+  </form>`;
+}
+export function renderCustomizationBand(site: SiteConfig): string {
+  return site.demo?.enabled ? `<aside class="customization-band container"><div><p class="eyebrow">하나의 기준, 다양한 상담자</p><h2>사람이 달라도,<br>신뢰의 기준은 같도록.</h2><p>사진·소개·상담 분야를 바꾸어 여러 설계사에게 적용할 수 있습니다.</p></div><a class="button button-secondary" href="/templates">5가지 샘플 비교 ${arrow}</a></aside>` : '';
+}
+export function renderFooter(site: SiteConfig): string {
+  return `<footer class="site-footer"><div class="container"><div class="footer-top"><div><strong>${e(site.agent.name)} 보험설계사</strong><p>${e(site.agent.company)}</p></div><a href="/privacy">개인정보처리방침</a></div><div class="footer-legal"><p>${e(site.compliance.footerDisclaimer)}</p>${site.compliance.advertisingReviewNumber?`<p>${e(site.compliance.advertisingReviewNumber)}${site.compliance.advertisingReviewExpiresAt?` · 유효기간 ${e(site.compliance.advertisingReviewExpiresAt)}`:''}</p>`:''}<p>상담 요청은 보험 가입 신청이 아닙니다. 계약 전 상품설명서와 약관을 확인해 주세요.</p><p>© ${new Date().getUTCFullYear()} ${e(site.agent.name)} · ${site.demo?.enabled?'디자인 검토용 / 검색 비노출':'보험 상담 안내'}</p></div></div></footer>`;
+}
+export function renderMobileCta(site: SiteConfig): string {
+  return `<div class="mobile-cta" data-mobile-cta hidden><a class="button" href="#contact">${site.sections.contactForm?'상담 요청하기':'상담 방법 확인'} ${arrow}</a></div>`;
+}
+export function formatIndex(index: number): string { return String(index + 1).padStart(2, '0'); }
+export function renderReviewNotice(): string { return '<p class="review-notice">아래 문구는 디자인 확인용 예시이며 실제 고객 후기가 아닙니다.</p>'; }

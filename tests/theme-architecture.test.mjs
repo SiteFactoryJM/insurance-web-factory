@@ -1,45 +1,56 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { renderSitePage, renderTemplateGallery } from '../.preview-dist/render/page.js';
+import { TEMPLATE_IDS } from '../.preview-dist/types.js';
+import { clientScript } from '../.preview-dist/render/client-script.js';
+import { handleConsultation } from '../.preview-dist/routes/consultation.js';
+const site = JSON.parse(fs.readFileSync(new URL('../sites/demo-agent/site.json', import.meta.url), 'utf8'));
+const page = (config = site, theme = 'trust-blue') => renderSitePage(config, new Request(`https://example.test/?theme=${theme}`));
 
-const base = new URL('../src/render/templates/', import.meta.url);
-const sources = {
-  'trust-blue': fs.readFileSync(new URL('trust-blue.ts', base), 'utf8'),
-  'warm-care': fs.readFileSync(new URL('warm-care.ts', base), 'utf8'),
-  'premium-navy': fs.readFileSync(new URL('premium-navy.ts', base), 'utf8'),
-  'clean-minimal': fs.readFileSync(new URL('clean-minimal.ts', base), 'utf8'),
-  'local-friendly': fs.readFileSync(new URL('local-friendly.ts', base), 'utf8'),
-};
-
-test('five templates use five distinct page architectures', () => {
-  const signatures = {
-    'trust-blue': ['advisory-hero', 'advisory-service-table', 'ledger-faq'],
-    'warm-care': ['human-photo-panel', 'human-faq-board', 'human-featured-review'],
-    'premium-navy': ['private-portrait', 'private-identity', 'private-review-track'],
-    'clean-minimal': ['report-hero-index', 'report-service-table', 'report-review-list'],
-    'local-friendly': ['concierge-profile', 'concierge-service-board', 'concierge-faq-grid'],
-  };
-  for (const [id, markers] of Object.entries(signatures)) {
-    for (const marker of markers) assert.match(sources[id], new RegExp(marker), `${id} missing ${marker}`);
-  }
+for (const id of TEMPLATE_IDS) test(`${id}: one accessible master with a distinct variant and safe wizard`, () => {
+  const html = page(site,id);
+  assert.match(html,new RegExp(`theme-${id}`));
+  assert.equal((html.match(/<h1\b/g)||[]).length,1);
+  assert.equal((html.match(/data-contact-form/g)||[]).length >= 1,true);
+  assert.match(html,/data-submission-mode="discard"/);
+  assert.match(html,/name="robots" content="noindex,nofollow"/);
+  assert.match(html,/data-step="0" disabled/);
+  assert.match(html,/data-step="3" hidden disabled/);
+  assert.match(html,/실제 상담은 접수되지 않았습니다/);
+  assert.match(html,/data-reading-toggle aria-pressed="false"/);
+  assert.doesNotMatch(html,/<a[^>]+href="(?:mailto:|tel:|https:\/\/open.kakao)/);
 });
 
-test('FAQ presentation differs by template', () => {
-  assert.match(sources['trust-blue'], /<details class="ledger-faq/);
-  assert.match(sources['warm-care'], /role="tab"/);
-  assert.match(sources['premium-navy'], /<details class="private-faq/);
-  assert.match(sources['clean-minimal'], /<details class="report-faq/);
-  assert.match(sources['local-friendly'], /<article class="concierge-faq-card/);
+test('shared system preserves five IDs while changing content emphasis', () => {
+  const warm=page(site,'warm-care');assert.ok(warm.indexOf('id="about"') < warm.indexOf('id="specialties"'));
+  const standard=page();assert.ok(standard.indexOf('id="specialties"') < standard.indexOf('id="about"'));
+  assert.match(page(site,'premium-navy'),/새 보험을 준비할 때/);
+  assert.match(page(site,'local-friendly'),/data-start-topic/);
+  assert.doesNotMatch(page(site,'clean-minimal'),/id="reviews"/);
+  const gallery=renderTemplateGallery(site,new Request('https://example.test/templates'));
+  for(const id of TEMPLATE_IDS)assert.match(gallery,new RegExp(`href="/\\?theme=${id}"`));
 });
 
-test('only contact actions use emoji', () => {
-  const renderRoot = new URL('../src/render/', import.meta.url);
-  const files = [
-    'shared.ts', 'page.ts', 'client-script.ts', 'styles.ts',
-    'templates/trust-blue.ts', 'templates/warm-care.ts', 'templates/premium-navy.ts',
-    'templates/clean-minimal.ts', 'templates/local-friendly.ts', 'templates/index.ts',
-  ];
-  const combined = files.map((file) => fs.readFileSync(new URL(file, renderRoot), 'utf8')).join('\n');
-  const emoji = [...combined.matchAll(/[📞📷💬😀-🙏🌀-🫿]/gu)].map((match) => match[0]);
-  assert.deepEqual([...new Set(emoji)].sort(), ['📞', '📷', '💬'].sort());
+test('untrusted content is escaped and absent content does not invent proof', () => {
+  const modified=structuredClone(site);modified.agent.name='<script>alert(1)</script>';modified.career=[];modified.reviews=[];modified.agent.registrationNumber='';modified.agent.profileImage='';
+  const html=page(modified);assert.doesNotMatch(html,/<script>alert\(1\)<\/script>/);assert.match(html,/&lt;script&gt;/);assert.match(html,/\/assets\/profile-placeholder.svg/);assert.doesNotMatch(html,/id="reviews"/);
+});
+
+test('hidden optional sections and production example filtering work', () => {
+  const modified=structuredClone(site);modified.sections.contactForm=false;modified.sections.faq=false;modified.sections.process=false;modified.demo.enabled=false;
+  const html=page(modified);assert.doesNotMatch(html,/<form class="consultation-form"/);assert.doesNotMatch(html,/id="faq"/);assert.doesNotMatch(html,/id="process"/);assert.doesNotMatch(html,/id="reviews"/);
+});
+
+test('demo client contains no submission, SDK, tracking or persistence code', () => {
+  assert.doesNotMatch(clientScript,/\bfetch\s*\(|XMLHttpRequest|sendBeacon|localStorage|sessionStorage|indexedDB|mailto:|Kakao\./);
+  assert.match(clientScript,/event\.preventDefault\(\)/);assert.match(clientScript,/form\.reset\(\)/);assert.match(clientScript,/pagehide/);assert.match(clientScript,/dd\.textContent = text/);
+});
+
+test('demo API never parses or stores even with a misconfigured store flag', async () => {
+  const modified=structuredClone(site);modified.demo.submissionMode='store';
+  const request={method:'POST',json(){throw new Error('MUST NOT PARSE');}};
+  const env={DB:{prepare(){throw new Error('MUST NOT STORE');}},CONSULTATION_WEBHOOK_URL:'https://must-not-send.invalid'};
+  const response=await handleConsultation(request,env,modified);const body=await response.json();assert.equal(body.demo,true);assert.match(body.message,/실제 상담은 접수되지 않았습니다/);
+  const wrongMethod=await handleConsultation({method:'GET'},env,modified);assert.equal(wrongMethod.status,405);
 });
