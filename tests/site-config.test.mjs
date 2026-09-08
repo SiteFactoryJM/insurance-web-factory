@@ -29,7 +29,7 @@ test('demo includes FAQ and clearly labelled example reviews', () => {
   assert.ok(site.reviews.every((review) => review.isExample === true));
 });
 
-test('demo is noindex and discards form submissions until an email is configured', () => {
+test('demo is noindex and keeps submissions disabled', () => {
   assert.equal(site.seo.noIndex, true);
   assert.equal(site.demo.enabled, true);
   assert.equal(site.demo.submissionMode, 'discard');

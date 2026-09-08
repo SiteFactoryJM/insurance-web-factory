@@ -69,6 +69,11 @@ for (const entry of entries) {
   if (site.demo?.submissionMode && !submissionModes.has(site.demo.submissionMode)) errors.push(`[${id}] demo.submissionMode 값이 올바르지 않습니다.`);
   if (site.demo?.submissionMode === "mailto" && !site.contact?.formEmail && !site.contact?.email) errors.push(`[${id}] mailto 제출 방식에는 contact.formEmail 또는 contact.email이 필요합니다.`);
 
+  if (site.consultation?.topics !== undefined) {
+    const topics = site.consultation.topics;
+    if (!Array.isArray(topics) || topics.length < 1 || topics.length > 12 || topics.some(value => typeof value !== "string" || !value.trim() || value.length > 60) || new Set(topics).size !== topics.length) errors.push(`[${id}] consultation.topics는 중복 없는 1~12개의 짧은 문자열이어야 합니다.`);
+  }
+
   for (const [index, review] of (site.reviews ?? []).entries()) {
     required(review?.quote, `reviews[${index}].quote`, id);
     required(review?.author, `reviews[${index}].author`, id);

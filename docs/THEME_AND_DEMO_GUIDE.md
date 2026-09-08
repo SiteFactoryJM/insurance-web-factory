@@ -1,56 +1,27 @@
-# 테마와 데모 수정 가이드
+# 5개 샘플과 제안 방법
 
-## 기본 테마 변경
+기존 5개 샘플의 장식과 개별 구현은 교체했다. 실제 프로필, 설계사별 설정, 도메인 구조, 기존 URL 식별자는 유지했다. 이전 구현은 Git 이력에서 복구할 수 있다.
 
-`sites/demo-agent/site.json`의 `template`과 `accentColor`, `headingFont`를 수정합니다.
+| URL ID | 새 이름 | 역할 |
+| --- | --- | --- |
+| trust-blue | 차분한 신뢰 | 기본 추천. 담당자·분야·신청의 균형 |
+| warm-care | 따뜻한 동행 | 사진과 소개를 앞세운 대화 중심 구성 |
+| premium-navy | 꼼꼼한 준비 | 가입 준비 중심. 네이비 강조는 첫 화면에 제한 |
+| clean-minimal | 한눈에 정리 | 경력 수치·후기 없이도 성립하는 정보 최소형 |
+| local-friendly | 가까운 상담 | 큰 주제 선택 영역을 앞세운 모바일형 |
 
-```json
-"template": "premium-navy",
-"accentColor": "#B79A63",
-"headingFont": "noto-serif-kr"
-```
+`/templates`에서 전체 비교, `/?theme=<ID>`에서 각 페이지를 확인한다. 실제 운영에서는 테마 전환이 `demo.allowTemplateSwitch`에 의해 제한된다.
 
-## 실시간 비교
+## 참고 페이지 반영
 
-```text
-/?theme=trust-blue
-/?theme=warm-care
-/?theme=premium-navy
-/?theme=clean-minimal
-/?theme=local-friendly
-/templates
-```
+의뢰팀이 제공한 https://effortless-crepe-81a1fd.netlify.app/ 의 HTML을 2026-09-08에 확인했다. 대표 제목인 “보험, 가입보다 제대로 아는 게 먼저입니다.”와 상담 분야 선택 → 상황 입력 → 연락 정보 → 최종 확인의 구조를 반영했다. 기존 보험 점검, 가입 이후의 설명과 관계를 중시하는 방향은 현재 설계사 소개 문장과 통합했다.
 
-쿼리스트링으로 보는 테마는 미리보기이며 원본 설정을 변경하지 않습니다.
+무료 상담 신청의 7개 분야(생명, 실손·건강, 암·질병, 자동차, 연금·저축, 어린이·태아, 기타)를 샘플 선택지로 사용했다. 실제 취급 목록은 `consultation.topics`에서 제한해야 한다. 상황과 이름은 초기 정보 최소화를 위해 선택 항목으로 바꿨다. 희망 연락 방법과 시간을 추가했고, 최종 확인·이전 이동·오류 안내·완료 화면을 구현했다.
 
-## 프로필 사진 변경
+출처 페이지의 임시 경력/상담 건수, 제휴 보험사 수, 절감·청구 성과, 확인되지 않은 자격과 후기는 가져오지 않았다. 자유게시판, 관리자 로그인, 사진 업로드, 기존 페이지의 서버 요청 코드도 복제하지 않았다.
 
-1. `public/sites/<site-id>/`에 WebP 또는 JPG를 올립니다.
-2. `site.json`의 `agent.profileImage`를 바꿉니다.
-3. 3:4 세로 사진, 1080×1440px 전후, 1MB 이하를 권장합니다.
+## 샘플의 의미
 
-## 연락 링크
+4단계 UI의 클릭과 입력은 동작하지만 실제 접수, 저장, 이메일 및 카카오톡 발송은 없다. 완료 문구도 실제 접수로 오해하지 않게 분리했다. 데모 후기에는 실제 후기가 아니라는 표시를 붙였고, 정보 최소형은 후기 영역 자체를 숨긴다.
 
-```json
-"contact": {
-  "phone": "010-0000-0000",
-  "kakaoUrl": "https://open.kakao.com/o/...",
-  "instagramUrl": "https://www.instagram.com/...",
-  "availableHours": "09:00–20:00"
-}
-```
-
-전화 링크는 숫자만 정리해 `tel:` 주소로 생성됩니다.
-
-## 상담 카드 이메일 모드
-
-```json
-"contact": {
-  "formEmail": "manager@example.com"
-},
-"demo": {
-  "submissionMode": "mailto"
-}
-```
-
-이메일 주소가 없는 상태에서 `mailto`를 선택하면 검증이 실패합니다. 실제 서버 저장은 `store`, 데모 비저장은 `discard`를 사용합니다.
+무료 여부, 실제 취급 범위, 등록 정보 및 광고·개인정보 안내는 실제 운영 전 확정할 사항이다. 자세한 기준은 `DESIGN_SYSTEM.md`, 미래 연동은 `KAKAO_INTEGRATION.md`를 참고한다.

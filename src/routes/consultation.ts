@@ -27,6 +27,9 @@ function normalizePhone(value: unknown): string {
 export async function handleConsultation(request: Request, env: Env, site: SiteConfig): Promise<Response> {
   if (request.method !== "POST") return json({ message: "허용되지 않은 요청입니다." }, 405);
 
+  // Reject demo bodies before parsing. A misconfigured store mode must never persist demo PII.
+  if (site.demo?.enabled) return json({ ok: true, demo: true, message: "샘플 화면입니다. 실제 상담은 접수되지 않았습니다." });
+
   let payload: ConsultationPayload;
   try {
     payload = await request.json() as ConsultationPayload;
@@ -47,10 +50,6 @@ export async function handleConsultation(request: Request, env: Env, site: SiteC
   if (name.length < 2) return json({ message: "이름을 두 글자 이상 입력해 주세요." }, 400);
   if (phone.length < 9 || phone.length > 13) return json({ message: "연락처를 확인해 주세요." }, 400);
   if (!consent) return json({ message: "개인정보 수집·이용 동의가 필요합니다." }, 400);
-
-  if (site.demo?.enabled && site.demo.submissionMode !== "store") {
-    return json({ ok: true, demo: true, message: "예시 페이지입니다. 입력 내용은 저장되지 않았습니다." });
-  }
 
   const createdAt = new Date().toISOString();
   const requestId = crypto.randomUUID();

@@ -12,3 +12,7 @@ processed/
 artifacts/
 __pycache__/
 *.pyc
+
+playwright-report/
+test-results/
+review/
