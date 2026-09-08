@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { validateContentLengths } from '../scripts/validate-sites.mjs';
 
 const site = JSON.parse(fs.readFileSync(new URL('../sites/demo-agent/site.json', import.meta.url), 'utf8'));
 
@@ -34,4 +35,29 @@ test('demo is noindex and keeps submissions disabled', () => {
   assert.equal(site.demo.enabled, true);
   assert.equal(site.demo.submissionMode, 'discard');
   assert.equal(site.contact.formEmail, '');
+});
+
+test('all demo layouts provide concise mobile copy within editing limits', () => {
+  assert.deepEqual(validateContentLengths(site), []);
+  assert.ok(site.hero.mobileHeadline && site.hero.mobileSubheadline);
+  assert.ok(site.intro.mobileTitle && site.intro.mobileBody);
+  for (const content of [site, ...Object.values(site.templateContent)]) {
+    for (const key of ['specialties', 'process', 'focus']) assert.ok((content[key] ?? []).every(item => item.mobileBody));
+    assert.ok((content.faqs ?? []).every(item => item.mobileAnswer));
+  }
+});
+
+test('site validation rejects overlong nested mobile text and accepts legacy content', () => {
+  const minimal = { hero: { headline: '가'.repeat(40), mobileHeadline: '😀'.repeat(24) }, templateContent: { 'trust-blue': { focus: [{ body: '기존 설명', mobileBody: '가'.repeat(48) }], faqs: [{ answer: '기존 답변', mobileAnswer: '가'.repeat(80) }] } } };
+  assert.deepEqual(validateContentLengths(minimal), []);
+  minimal.templateContent['trust-blue'].focus[0].mobileBody += '나';
+  minimal.templateContent['trust-blue'].faqs[0].mobileAnswer += '나';
+  minimal.hero.headline += '나';
+  const issues = validateContentLengths(minimal);
+  assert.equal(issues.length, 3);
+  assert.match(issues.join('\n'), /hero.headline.*40자/);
+  assert.match(issues.join('\n'), /focus\[0\].mobileBody.*48자/);
+  assert.match(issues.join('\n'), /faqs\[0\].mobileAnswer.*80자/);
+  assert.deepEqual(validateContentLengths({ hero: { headline: '기존 제목' }, intro: { body: '기존 소개' } }), []);
+  assert.match(validateContentLengths({ hero: { mobileHeadline: ' ' } })[0], /비어 있지 않은 문자열/);
 });

@@ -31,6 +31,45 @@ export const styles = `
   .report-identity .portrait,.concierge-person .portrait{grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr)}
   .report-identity .portrait figcaption,.concierge-person .portrait figcaption{padding:.75rem}
 }
+/* Studio controls are outside the adviser site and use their own neutral palette. */
+.sample-bar{background:#202832;color:#fff;border-bottom:4px solid #D8BC88}
+.sample-inner{padding-block:1.2rem;gap:1.5rem;align-items:center}
+.studio-label{flex:1 1 17rem}.studio-label .badge{color:#F0D5A2;letter-spacing:.045em;margin:0}
+.studio-label p{color:#fff;font-size:1rem;margin-top:.2rem}.studio-notice{display:block;color:#D6DEE8;font-size:1rem}
+.design-controls{margin-left:auto}.design-controls label{color:#D6DEE8;margin-bottom:.3rem}
+.design-controls .button{background:#F1D5A2;color:#202832}.design-controls .button:hover{background:#FFE6BB}
+.sample-bar :focus-visible{outline-color:#F1D5A2}.sample-bar select:focus-visible{outline-color:#fff}
+.site-header{background:#fff}.desktop-nav{margin-left:auto;justify-content:flex-end}.header-tools{display:none}
+.brand-logo{width:2.75rem;height:2.75rem;object-fit:contain}.brand strong{font-size:1.4rem;letter-spacing:-.035em}.brand-service{font-size:1rem;font-weight:500;margin-left:.3rem}
+.copy-mobile{display:none}
+.section-band{border-bottom:1px solid var(--line)}.band-white{background:#fff}.band-tint{background:var(--tint)}.band-dark{background:var(--dark);color:white}
+.section-band .about-section,.section-band .contact-section{background:transparent;color:inherit}
+.section-band .about-section p,.section-band .about-section dt{color:var(--muted)}
+.section-band .about-section .eyebrow,.section-band .about-section .philosophy{color:var(--accent)}
+.section-band .about-section .agent-facts>div{border-color:var(--line)}
+.band-dark .eyebrow{color:var(--detail)}.band-dark .review-notice{color:#E0E6EC}
+.review-card{background:white;color:var(--ink);border-top:3px solid var(--detail);padding:1.75rem}
+.review-card .badge{color:var(--accent);border-bottom:1px solid var(--line);padding-bottom:1rem;display:block}
+.review-card blockquote{font-size:1.125rem}.review-card figcaption{color:var(--muted)}
+.faq-list details{background:#fff;padding-inline:1.5rem}.faq-list summary{align-items:start}
+.faq-list summary>.faq-question{display:flex;gap:1rem;flex:1 1 auto;min-width:0;transform:none}
+.faq-number{font-size:1rem;font-weight:400;color:var(--muted);padding-top:.12rem;flex-shrink:0}
+.faq-list summary>span:last-child{flex:0 0 auto}.faq-list details[open]{background:var(--paper)}
+.faq-list details[open] summary>.faq-question{transform:none}.faq-list details>p{padding-left:2.25rem}
+.consultation-form{border-top:3px solid var(--accent)}.topic-grid+label{margin-top:1.25rem}
+@media(max-width:900px){.header-tools{display:block;margin-left:auto;flex-shrink:0}.sample-inner{display:flex}.design-controls{margin-left:0}.studio-label{flex-basis:100%}}
+@media(max-width:650px){
+ .copy-desktop{display:none}.copy-mobile{display:inline}.sample-inner{padding-block:1rem;gap:.65rem}.studio-label{flex-basis:100%}.studio-label p{display:none}
+ .design-controls{width:100%;margin-top:0;gap:.55rem}.design-controls label{margin-bottom:.15rem}.design-controls select{font-size:1rem;padding:.6rem .35rem;min-height:3rem}.design-controls .button{min-height:3rem;padding:.5rem}
+ .brand strong{font-size:1.25rem}.brand-service{font-size:1rem;display:inline-block}.header-inner{min-height:5rem}
+ .hero-description{margin-top:1.25rem;line-height:1.7}.hero-actions{margin-top:1.5rem}.hero-quote,.profile-caption{display:none}
+ .section,.theme-clean-minimal .section{padding-block:3rem}.section-heading{margin-bottom:1.5rem}.section-heading>p{margin-top:.75rem}
+ .review-card{padding:1.25rem}.review-grid{gap:1rem}.review-card blockquote{font-size:1.125rem}.review-card figcaption{margin-top:1rem}
+ .faq-list details{padding-inline:1rem}.faq-list summary{gap:.7rem;padding-block:1.25rem}.faq-list summary>.faq-question{gap:.6rem}.faq-list details>p{padding-left:0}
+ .contact-copy>p{margin-top:1rem}.contact-person{margin-block:1rem}.trust-strip{grid-template-columns:1fr;gap:.5rem}
+ .stepper{padding-block:1rem}.form-intro p{margin-top:.5rem}.consultation-form{padding:1rem}
+ main{scroll-padding-bottom:7rem}.section-band .section{scroll-margin-bottom:7rem}
+}
 .mobile-menu:not([open]) nav{display:none}
 @media(prefers-reduced-motion:reduce){:root{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
 @media(forced-colors:active){.button,.topic-option,.palette-choice{border:1px solid ButtonText}.site-footer{border-top:1px solid CanvasText}}

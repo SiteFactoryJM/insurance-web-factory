@@ -62,17 +62,67 @@
       "type": "object"
     },
     "hero": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "headline": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "subheadline": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "mobileHeadline": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 24
+        },
+        "mobileSubheadline": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        }
+      }
     },
     "intro": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "body": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "mobileTitle": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 24
+        },
+        "mobileBody": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        }
+      }
     },
     "specialties": {
       "type": "array",
-      "minItems": 3
+      "minItems": 3,
+      "items": {
+        "$ref": "#/$defs/contentCard"
+      }
     },
     "process": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/contentCard"
+      }
     },
     "career": {
       "type": "array"
@@ -103,7 +153,10 @@
       }
     },
     "faqs": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/faqItem"
+      }
     },
     "contact": {
       "type": "object"
@@ -167,6 +220,27 @@
         }
       },
       "additionalProperties": false
+    },
+    "contentBrief": {
+      "type": "object",
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "targetAudience": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "primaryAction": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false,
@@ -176,11 +250,13 @@
       "properties": {
         "headline": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "maxLength": 40
         },
         "subheadline": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "maxLength": 120
         },
         "eyebrow": {
           "type": "string",
@@ -195,22 +271,7 @@
           "minItems": 3,
           "maxItems": 12,
           "items": {
-            "type": "object",
-            "required": [
-              "title",
-              "body"
-            ],
-            "properties": {
-              "title": {
-                "type": "string",
-                "minLength": 1
-              },
-              "body": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "additionalProperties": false
+            "$ref": "#/$defs/contentCard"
           }
         },
         "process": {
@@ -218,22 +279,7 @@
           "minItems": 3,
           "maxItems": 12,
           "items": {
-            "type": "object",
-            "required": [
-              "title",
-              "body"
-            ],
-            "properties": {
-              "title": {
-                "type": "string",
-                "minLength": 1
-              },
-              "body": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "additionalProperties": false
+            "$ref": "#/$defs/contentCard"
           }
         },
         "focus": {
@@ -241,22 +287,7 @@
           "minItems": 1,
           "maxItems": 12,
           "items": {
-            "type": "object",
-            "required": [
-              "title",
-              "body"
-            ],
-            "properties": {
-              "title": {
-                "type": "string",
-                "minLength": 1
-              },
-              "body": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "additionalProperties": false
+            "$ref": "#/$defs/contentCard"
           }
         },
         "faqs": {
@@ -264,23 +295,66 @@
           "minItems": 2,
           "maxItems": 12,
           "items": {
-            "type": "object",
-            "required": [
-              "question",
-              "answer"
-            ],
-            "properties": {
-              "question": {
-                "type": "string",
-                "minLength": 1
-              },
-              "answer": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "additionalProperties": false
+            "$ref": "#/$defs/faqItem"
           }
+        },
+        "mobileHeadline": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 24
+        },
+        "mobileSubheadline": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        }
+      },
+      "additionalProperties": false
+    },
+    "contentCard": {
+      "type": "object",
+      "required": [
+        "title",
+        "body"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "body": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "mobileBody": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48
+        }
+      },
+      "additionalProperties": false
+    },
+    "faqItem": {
+      "type": "object",
+      "required": [
+        "question",
+        "answer"
+      ],
+      "properties": {
+        "question": {
+          "type": "string",
+          "minLength": 1
+        },
+        "answer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "mobileAnswer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
         }
       },
       "additionalProperties": false

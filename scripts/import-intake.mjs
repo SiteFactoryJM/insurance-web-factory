@@ -42,7 +42,8 @@ function collectPairs(values, titlePrefix, bodyPrefix, count) {
   for (let index = 1; index <= count; index += 1) {
     const title = stringValue(values[`${titlePrefix}_${index}_title`]);
     const body = stringValue(values[`${bodyPrefix}_${index}_body`]);
-    if (title && body) result.push({ title, body });
+    const mobileBody = stringValue(values[`${bodyPrefix}_${index}_mobile_body`]);
+    if (title && body) result.push({ title, body, ...(mobileBody ? { mobileBody } : {}) });
   }
   return result;
 }
@@ -52,12 +53,13 @@ function collectFaqs(values, count) {
   for (let index = 1; index <= count; index += 1) {
     const question = stringValue(values[`faq_${index}_question`]);
     const answer = stringValue(values[`faq_${index}_answer`]);
-    if (question && answer) result.push({ question, answer });
+    const mobileAnswer = stringValue(values[`faq_${index}_mobile_answer`]);
+    if (question && answer) result.push({ question, answer, ...(mobileAnswer ? { mobileAnswer } : {}) });
   }
   return result;
 }
 
-async function readWorkbook(filePath) {
+export async function readWorkbook(filePath) {
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.readFile(filePath);
   const sheet = workbook.getWorksheet(fieldSpec.sheetName);
@@ -74,11 +76,21 @@ async function readWorkbook(filePath) {
   return values;
 }
 
-function validateInput(values, sourceName) {
+export function validateInput(values, sourceName) {
   const errors = [];
   for (const field of fieldSpec.fields) {
     if (field.required && !stringValue(values[field.key])) errors.push(`${field.label} 값이 비어 있습니다.`);
     if (field.options && stringValue(values[field.key]) && !field.options.includes(stringValue(values[field.key]))) errors.push(`${field.label} 선택값이 올바르지 않습니다: ${values[field.key]}`);
+    const length = Array.from(stringValue(values[field.key])).length;
+    if (field.maxLength && length > field.maxLength) errors.push(`${field.label}: 공백 포함 ${field.maxLength}자 이내로 작성하세요. 현재 ${length}자입니다.`);
+  }
+  for (const prefix of ["specialty", "process", "faq"]) {
+    for (let index = 1; index <= 4; index += 1) {
+      const titleKey = `${prefix}_${index}_${prefix === "faq" ? "question" : "title"}`;
+      const bodyKey = `${prefix}_${index}_${prefix === "faq" ? "answer" : "body"}`;
+      const mobileKey = `${prefix}_${index}_mobile_${prefix === "faq" ? "answer" : "body"}`;
+      if ([titleKey, bodyKey, mobileKey].some(key => stringValue(values[key])) && (!stringValue(values[titleKey]) || !stringValue(values[bodyKey]))) errors.push(`${fieldByKey.get(titleKey).label}과 PC 설명을 함께 작성하세요. 모바일 문구만 가져올 수 없습니다.`);
+    }
   }
   if (!allowedTemplates.has(values.template)) errors.push(`템플릿 값이 올바르지 않습니다: ${values.template}`);
   if (values.publish_status === "published") {
@@ -89,7 +101,7 @@ function validateInput(values, sourceName) {
   if (errors.length) throw new Error(`${sourceName}\n- ${errors.join("\n- ")}`);
 }
 
-function toSiteConfig(values, assetPaths) {
+export function toSiteConfig(values, assetPaths = {}) {
   const id = stringValue(values.site_id) || slugifyKoreanName(values.agent_name);
   const domains = [normalizeDomain(values.primary_domain), ...splitValues(values.additional_domains).map(normalizeDomain)].filter(Boolean);
   const career = Array.from({ length: 5 }, (_, index) => stringValue(values[`career_${index + 1}`])).filter(Boolean);
@@ -101,6 +113,11 @@ function toSiteConfig(values, assetPaths) {
     template: values.template,
     accentColor: values.accent_color || "#1E5AA8",
     headingFont: values.heading_font || "pretendard",
+    contentBrief: {
+      purpose: stringValue(values.site_purpose) || undefined,
+      targetAudience: stringValue(values.target_audience) || undefined,
+      primaryAction: stringValue(values.desired_action) || undefined,
+    },
     agent: {
       name: values.agent_name,
       title: values.agent_title,
@@ -116,11 +133,18 @@ function toSiteConfig(values, assetPaths) {
       eyebrow: values.eyebrow,
       headline: values.headline,
       subheadline: values.subheadline,
+      mobileHeadline: stringValue(values.mobile_headline) || undefined,
+      mobileSubheadline: stringValue(values.mobile_subheadline) || undefined,
       primaryCtaLabel: values.primary_cta_label,
       secondaryCtaLabel: values.secondary_cta_label,
       trustNote: values.trust_note,
     },
-    intro: { title: values.intro_title, body: values.intro_body, philosophy: values.consultation_philosophy },
+    intro: {
+      title: values.intro_title, body: values.intro_body,
+      mobileTitle: stringValue(values.intro_mobile_title) || undefined,
+      mobileBody: stringValue(values.intro_mobile_body) || undefined,
+      philosophy: values.consultation_philosophy,
+    },
     specialties: collectPairs(values, "specialty", "specialty", 4),
     process: collectPairs(values, "process", "process", 4),
     career,
@@ -189,6 +213,7 @@ async function importOne(filePath, args) {
 
 async function accessExisting(filePath) { await stat(filePath); }
 
+async function main() {
 const args = parseArgs(process.argv.slice(2));
 let files = [];
 if (args.file) files = [args.file];
@@ -202,3 +227,6 @@ if (!args.dryRun) {
   const result = spawnSync(process.execPath, [path.join(root, "scripts", "generate-registry.mjs")], { stdio: "inherit" });
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();

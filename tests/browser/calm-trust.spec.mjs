@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import fs from 'node:fs';
+const site=JSON.parse(fs.readFileSync(new URL('../../sites/demo-agent/site.json',import.meta.url),'utf8'));
 const themes=['trust-blue','warm-care','premium-navy','clean-minimal','local-friendly'];
 const widths=[320,360,390,768,1440];
 const noOverflow=async page => {
@@ -43,10 +45,17 @@ test('four-step demo validates, preserves back edits, escapes input and sends no
   const requests=[];page.on('request',r=>{if(['fetch','xhr','ping'].includes(r.resourceType())||r.method()==='POST')requests.push(r.url());});
   await page.locator('[data-next]').click();await expect(page.locator('[data-form-error]')).toContainText('상담 분야');
   await page.getByLabel('실손·건강보험',{exact:true}).check();await page.locator('[data-next]').click();
+  await expect(page.getByLabel('상담하며 정할게요',{exact:true})).toBeChecked();
+  await page.getByLabel('현재 보험 점검',{exact:true}).check();
+  await page.locator('[name="message"]').fill('가😀');await expect(page.locator('[data-character-count]')).toHaveText('2 / 200자');
+  await expect(page.locator('[name="message"]')).toHaveAttribute('data-max-characters','200');
+  await page.locator('[name="message"]').fill('가'.repeat(201));await page.locator('[data-next]').click();
+  await expect(page.locator('[data-form-error]')).toContainText('200자 이내');
   await page.locator('[name="message"]').fill('<img src=x onerror=alert(1)> 화면 확인용');
   await page.locator('[data-next]').click();await page.locator('[data-next]').click();await expect(page.locator('[data-form-error]')).toContainText('휴대전화 번호');
   await page.locator('[name="name"]').fill('테스트');await page.locator('[name="phone"]').fill('01000000000');await page.getByLabel('카카오톡',{exact:true}).check();
   await page.locator('[data-next]').click();await expect(page.locator('[data-review-summary]')).toContainText('010-****-0000');await expect(page.locator('[data-review-summary] img')).toHaveCount(0);
+  await expect(page.locator('[data-review-summary]')).toContainText('현재 보험 점검');
   await page.locator('[data-prev]').click();await expect(page.locator('[name="name"]')).toHaveValue('테스트');await page.locator('[data-next]').click();
   await page.locator('[data-submit]').click();await expect(page.locator('[data-form-error]')).toContainText('개인정보');
   await page.locator('[name="privacyConsent"]').check();await noOverflow(page);
@@ -96,4 +105,30 @@ test('palette and layout controls round-trip independently, including the galler
   await page.goto('/templates');await page.getByRole('button',{name:'포레스트 그린',exact:true}).click();
   await expect(page.locator('.template-tile')).toHaveCount(5);
   for(const theme of themes)await expect(page.locator(`.template-tile[data-layout="${theme}"] a`)).toHaveAttribute('href',`/?theme=${theme}&palette=forest`);
+});
+
+test('studio boundary, right-aligned navigation and responsive copy are visible',async({page})=>{
+  await page.setViewportSize({width:1440,height:1000});await page.goto('/');
+  const bounds=await page.evaluate(()=>{
+    const box=s=>document.querySelector(s).getBoundingClientRect();
+    return {studioBottom:box('.sample-bar').bottom,headerTop:box('.site-header').top,navRight:box('.desktop-nav').right,containerRight:box('.header-inner').right};
+  });
+  expect(bounds.studioBottom).toBeLessThanOrEqual(bounds.headerTop);
+  expect(Math.abs(bounds.navRight-bounds.containerRight)).toBeLessThan(2);
+  await expect(page.locator('.brand-mark')).toHaveCount(0);
+  const expected=site.templateContent['trust-blue'];
+  await expect(page.locator('h1 .copy-desktop')).toBeVisible();
+  await expect(page.locator('h1 .copy-mobile')).toBeHidden();
+  await expect(page.locator('h1 .copy-desktop')).toHaveText(expected.headline.replaceAll('\n',''));
+  for(const width of [320,360,390]){
+    await page.setViewportSize({width,height:900});
+    await expect(page.locator('h1 .copy-mobile')).toBeVisible();
+    await expect(page.locator('h1 .copy-mobile')).toHaveText(expected.mobileHeadline.replaceAll('\n',''));
+    await expect(page.locator('h1 .copy-desktop')).toBeHidden();
+    await noOverflow(page);
+  }
+  const surfaces=await page.evaluate(()=>['#reviews','#faq'].map(s=>getComputedStyle(document.querySelector(s).parentElement).backgroundColor));
+  expect(surfaces[0]).not.toBe(surfaces[1]);
+  await page.locator('.faq-list summary').first().click();
+  await expect(page.locator('.faq-list .copy-mobile').first()).toBeVisible();
 });

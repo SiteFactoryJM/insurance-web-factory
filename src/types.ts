@@ -5,11 +5,11 @@ export type PaletteId = (typeof PALETTE_IDS)[number];
 export type HeadingFont = "pretendard" | "noto-serif-kr";
 export type PublishStatus = "draft" | "published";
 export type AdvertisingReviewStatus = "pending" | "approved" | "not-required";
-export interface ContentCard { title: string; body: string; }
-export interface FaqItem { question: string; answer: string; }
+export interface ContentCard { title: string; body: string; mobileBody?: string; }
+export interface FaqItem { question: string; answer: string; mobileAnswer?: string; }
 export interface ReviewItem { quote: string; author: string; context?: string; isExample?: boolean; }
 export interface TemplateContent {
-  headline?: string; subheadline?: string; eyebrow?: string;
+  headline?: string; subheadline?: string; mobileHeadline?: string; mobileSubheadline?: string; eyebrow?: string;
   specialties?: ContentCard[]; process?: ContentCard[]; faqs?: FaqItem[];
   focusTitle?: string; focus?: ContentCard[];
 }
@@ -17,9 +17,10 @@ export interface SiteConfig {
   id: string; status: PublishStatus; domains: string[]; template: TemplateId; accentColor?: string; headingFont: HeadingFont;
   palette?: PaletteId;
   templateContent?: Partial<Record<TemplateId, TemplateContent>>;
+  contentBrief?: { purpose?: string; targetAudience?: string; primaryAction?: string; };
   agent: { name: string; title: string; company: string; branch?: string; registrationNumber?: string; careerYears?: number; regions: string[]; profileImage: string; logoImage?: string; };
-  hero: { eyebrow?: string; headline: string; subheadline: string; primaryCtaLabel: string; secondaryCtaLabel: string; trustNote?: string; };
-  intro: { title: string; body: string; philosophy?: string; };
+  hero: { eyebrow?: string; headline: string; subheadline: string; mobileHeadline?: string; mobileSubheadline?: string; primaryCtaLabel: string; secondaryCtaLabel: string; trustNote?: string; };
+  intro: { title: string; body: string; mobileTitle?: string; mobileBody?: string; philosophy?: string; };
   specialties: ContentCard[]; process: ContentCard[]; career: string[]; reviews?: ReviewItem[]; faqs: FaqItem[];
   consultation?: { topics: string[] };
   contact: { phone: string; kakaoUrl?: string; instagramUrl?: string; email?: string; formEmail?: string; officeAddress?: string; mapUrl?: string; availableHours: string; };

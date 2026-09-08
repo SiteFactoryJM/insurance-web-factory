@@ -24,6 +24,44 @@ function required(value, label, siteId) {
   if (value === undefined || value === null || String(value).trim() === "") errors.push(`[${siteId}] 필수값 누락: ${label}`);
 }
 
+// Lengths count Unicode code points, including spaces and line breaks.
+// Optional mobile copy falls back to the PC original in the renderer.
+export function validateContentLengths(site) {
+  const issues = [];
+  const check = (value, label, maxLength) => {
+    if (value === undefined) return;
+    if (typeof value !== "string" || !value.trim()) {
+      issues.push(`${label}는 비어 있지 않은 문자열이어야 합니다.`);
+      return;
+    }
+    const length = Array.from(value).length;
+    if (length > maxLength) issues.push(`${label}: 공백 포함 ${maxLength}자 이내여야 합니다. 현재 ${length}자입니다.`);
+  };
+  const checkObject = (object, prefix, limits) => {
+    for (const [key, limit] of Object.entries(limits)) check(object?.[key], `${prefix}.${key}`, limit);
+  };
+  const headlineLimits = { headline: 40, subheadline: 120, mobileHeadline: 24, mobileSubheadline: 60 };
+  const cards = (items, prefix) => {
+    if (Array.isArray(items)) items.forEach((item, index) => checkObject(item, `${prefix}[${index}]`, { body: 120, mobileBody: 48 }));
+  };
+  const faqs = (items, prefix) => {
+    if (Array.isArray(items)) items.forEach((item, index) => checkObject(item, `${prefix}[${index}]`, { answer: 240, mobileAnswer: 80 }));
+  };
+  checkObject(site.hero, "hero", headlineLimits);
+  checkObject(site.intro, "intro", { title: 40, body: 400, mobileTitle: 24, mobileBody: 100 });
+  checkObject(site.contentBrief, "contentBrief", { purpose: 100, targetAudience: 80, primaryAction: 60 });
+  cards(site.specialties, "specialties");
+  cards(site.process, "process");
+  faqs(site.faqs, "faqs");
+  for (const [template, content] of Object.entries(site.templateContent ?? {})) {
+    checkObject(content, `templateContent.${template}`, headlineLimits);
+    for (const key of ["specialties", "process", "focus"]) cards(content?.[key], `templateContent.${template}.${key}`);
+    faqs(content?.faqs, `templateContent.${template}.faqs`);
+  }
+  return issues;
+}
+
+async function main() {
 const entries = await readdir(sitesDir, { withFileTypes: true });
 let count = 0;
 for (const entry of entries) {
@@ -35,6 +73,7 @@ for (const entry of entries) {
   catch (error) { errors.push(`[${entry.name}] JSON 오류: ${error instanceof Error ? error.message : error}`); continue; }
 
   const id = String(site.id ?? entry.name);
+  errors.push(...validateContentLengths(site).map(message => `[${id}] ${message}`));
   if (id !== entry.name) errors.push(`[${id}] 폴더명과 site.id가 다릅니다: ${entry.name}`);
   if (!/^[a-z0-9][a-z0-9-]{1,62}$/.test(id)) errors.push(`[${id}] site.id는 영문 소문자·숫자·하이픈만 사용할 수 있습니다.`);
   if (!statuses.has(site.status)) errors.push(`[${id}] status는 draft 또는 published여야 합니다.`);
@@ -48,7 +87,7 @@ for (const entry of entries) {
     else for (const [template, content] of Object.entries(site.templateContent)) {
       if (!templates.has(template)) errors.push(`[${id}] 알 수 없는 templateContent 키: ${template}`);
       if (!content || typeof content !== "object" || Array.isArray(content)) { errors.push(`[${id}] ${template} 설정은 객체여야 합니다.`); continue; }
-      const textFields = ["headline", "subheadline", "eyebrow", "focusTitle"];
+      const textFields = ["headline", "subheadline", "mobileHeadline", "mobileSubheadline", "eyebrow", "focusTitle"];
       const arrayFields = ["specialties", "process", "faqs", "focus"];
       for (const key of Object.keys(content)) if (![...textFields, ...arrayFields].includes(key)) errors.push(`[${id}] 알 수 없는 ${template} 필드: ${key}`);
       for (const key of textFields) if (content[key] !== undefined && (typeof content[key] !== "string" || !content[key].trim())) errors.push(`[${id}] ${template}.${key}는 비어 있지 않은 문자열이어야 합니다.`);
@@ -131,3 +170,6 @@ for (const warning of warnings) console.warn(`WARN ${warning}`);
 for (const error of errors) console.error(`ERROR ${error}`);
 console.log(`Validated ${count} site(s): ${errors.length} error(s), ${warnings.length} warning(s)`);
 if (errors.length) process.exit(1);
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();

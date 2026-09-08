@@ -1,6 +1,6 @@
 import { PALETTE_IDS, TEMPLATE_IDS, type PaletteId, type SiteConfig, type TemplateId } from "../types.js";
 
-export const DESIGN_VERSION = "calm-trust-v5";
+export const DESIGN_VERSION = "calm-trust-v6";
 export const TEMPLATE_META: Record<TemplateId, { name: string; purpose: string; description: string; palette: PaletteId }> = {
   "trust-blue": { name: "신뢰의 기준", purpose: "기업형", description: "담당자와 상담 분야를 먼저 확인합니다. 정돈된 항목과 설명으로 필요한 정보를 차례로 살펴봅니다.", palette: "navy" },
   "warm-care": { name: "사람과 대화", purpose: "소개 중심형", description: "사진과 상담 원칙에서 시작합니다. 상담 철학과 준비할 내용을 깊이 있게 전달합니다.", palette: "forest" },
@@ -34,7 +34,7 @@ export function resolveDesign(raw: SiteConfig, request: Request): SiteConfig {
     : template !== raw.template ? TEMPLATE_META[template].palette : paletteId(raw);
   const content = raw.templateContent?.[template];
   return { ...raw, template, palette,
-    hero: { ...raw.hero, ...(content?.headline ? { headline: content.headline } : {}), ...(content?.subheadline ? { subheadline: content.subheadline } : {}), ...(content?.eyebrow ? { eyebrow: content.eyebrow } : {}) },
+    hero: { ...raw.hero, ...(content?.headline ? { headline: content.headline } : {}), ...(content?.subheadline ? { subheadline: content.subheadline } : {}), ...(content?.eyebrow ? { eyebrow: content.eyebrow } : {}), ...(content?.mobileHeadline || content?.headline ? { mobileHeadline: content.mobileHeadline } : {}), ...(content?.mobileSubheadline || content?.subheadline ? { mobileSubheadline: content.mobileSubheadline } : {}) },
     specialties: content?.specialties ?? raw.specialties,
     process: content?.process ?? raw.process,
     faqs: content?.faqs ?? raw.faqs,
