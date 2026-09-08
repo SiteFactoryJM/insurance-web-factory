@@ -59,11 +59,15 @@
       ]
     },
     "agent": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "businessNumber": { "type": "string", "maxLength": 80 }
+      }
     },
     "hero": {
       "type": "object",
       "properties": {
+        "image": { "type": "string", "description": "Optional decorative JPG, PNG, or WebP image." },
         "headline": {
           "type": "string",
           "minLength": 1,
@@ -183,6 +187,30 @@
         "stone"
       ]
     },
+    "design": {
+      "type": "object",
+      "properties": {
+        "hero": { "enum": ["portrait", "editorial", "statement"] },
+        "services": { "enum": ["cards", "list", "split"] },
+        "about": { "enum": ["editorial", "profile", "quote"] },
+        "process": { "enum": ["steps", "timeline"] },
+        "faq": { "enum": ["accordion", "columns"] },
+        "footer": { "enum": ["classic", "columns", "minimal"] },
+        "ornament": { "enum": ["line", "grid", "none"] },
+        "density": { "enum": ["airy", "compact"] },
+        "sectionOrder": { "$ref": "#/$defs/designSections" },
+        "hiddenSections": { "$ref": "#/$defs/designSections" }
+      },
+      "additionalProperties": false
+    },
+    "footer": {
+      "type": "object",
+      "properties": {
+        "heading": { "type": "string", "maxLength": 80 },
+        "note": { "type": "string", "maxLength": 400 }
+      },
+      "additionalProperties": false
+    },
     "templateContent": {
       "type": "object",
       "properties": {
@@ -245,6 +273,12 @@
   },
   "additionalProperties": false,
   "$defs": {
+    "designSections": {
+      "type": "array",
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": { "enum": ["services", "about", "process", "reviews", "faq", "contact"] }
+    },
     "templateContent": {
       "type": "object",
       "properties": {

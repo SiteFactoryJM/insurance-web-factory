@@ -1,10 +1,12 @@
-# Insurance Web Factory · Calm Trust
+# Insurance Web Factory · ATELIER
 
-여러 보험설계사 홈페이지를 한 코드베이스와 설계사별 JSON으로 운영하는 Cloudflare Workers 프로젝트입니다. 2026년 개편은 **큰 글씨, 모바일 가독성, 확인 가능한 담당자 정보, 전송 없는 상담 신청 샘플**에 집중합니다.
+여러 보험설계사 홈페이지를 한 코드베이스와 설계사별 JSON으로 운영하는 Cloudflare Workers 프로젝트입니다. ATELIER는 **프리미엄 상담 페이지 예시와 직접 구성하는 DIY 제작 도구**를 제공합니다. 차분한 명조 제목, 중립색 바탕과 깊은 그린, 다양한 섹션 패턴을 기본으로 합니다.
 
 ## 미리보기
 
 기본 주소: https://insurance-web-factory.pjmsm0319.workers.dev
+
+직접 만들기: `/studio` · [DIY 사용·저장·제작 가이드](docs/DIY_STUDIO_GUIDE.md)
 
 전체 비교: `/templates`
 
@@ -16,7 +18,7 @@
 | `/?theme=clean-minimal` | 한 장의 정리 · 리포트형 |
 | `/?theme=local-friendly` | 바로 묻는 상담 · 상담 메뉴형 |
 
-기존 5개 URL을 유지하면서 5개 배치 구조와 6개 팔레트를 독립적으로 조합하는 30가지 샘플을 제공합니다. 본문·입력·버튼은 기본 18px, 보조 글씨·고지는 최소 16px입니다. 글자 크게 버튼은 제거하고 브라우저 글자 확대를 지원합니다. 모든 푸터는 어두운 계열입니다.
+기존 5개 샘플 URL과 6개 팔레트를 유지합니다. DIY에서는 첫 화면·분야·소개·과정·FAQ·푸터를 각각 고르고 순서와 표시 여부를 바꿉니다. 본문·입력·버튼은 기본 18px, 보조 글씨·고지는 최소 16px입니다. 글자 크게 버튼은 제거하고 브라우저 글자 확대를 지원합니다. 모든 푸터는 어두운 계열입니다.
 
 ## 상담 신청은 현재 샘플입니다
 
@@ -32,7 +34,7 @@
 
 자료수집 엑셀에는 홈페이지 목적·주요 고객·원하는 방문자 행동과 PC·모바일 원고를 각각 적습니다. `npm run intake:build`로 양식을 갱신합니다. [작성 가이드](docs/EXCEL_INTAKE_GUIDE.md) · [2026 레퍼런스 조사](docs/DESIGN_REFERENCE_RESEARCH_2026.md)
 
-시안 조합 도구는 사이트 헤더 위에만 표시하고, 후기·FAQ는 서로 다른 배경으로 구분합니다.
+대표 페이지 최상단에는 예시 표시와 DIY 진입을 두고, 편집은 별도 화면에서 합니다. 섹션은 여백·가는 선·배열과 미세한 배경 명도로 구분합니다.
 
 ## 설계사별 원본
 
@@ -68,13 +70,17 @@ PR과 main 푸시에서 CI가 실행되고 브라우저 보고서를 Actions art
 
 ## 문서와 코드
 
+- [프리미엄 레퍼런스 분석](docs/PREMIUM_DIY_DESIGN_RESEARCH.md)
+- [DIY 제작과 JSON·PDF 저장](docs/DIY_STUDIO_GUIDE.md)
 - [디자인 시스템](docs/DESIGN_SYSTEM.md)
 - [5개 샘플과 참고 페이지 반영 범위](docs/THEME_AND_DEMO_GUIDE.md)
 - [카카오톡 연동 계획](docs/KAKAO_INTEGRATION.md)
 - [아키텍처](docs/ARCHITECTURE.md)
 - `src/render/calm-page.ts`: 마스터와 목적별 구성
 - `src/render/shared.ts`: 공통 신청·헤더·고지
-- `src/render/styles.ts`: 큰 글씨와 반응형 토큰
+- `src/render/premium-styles.ts`: 프리미엄 패턴과 반응형 스타일
+- `src/render/studio-page.ts`, `src/studio/editor.ts`: DIY 편집·실시간 미리보기·파일/PDF
+- `src/studio/project.ts`: 제작 파일 검증과 변환
 - `src/render/client-script.ts`: 브라우저 내 데모 동작
 
 실제 게시 전 소속 조직의 준법/광고심의, 무료 상담 조건, 실제 취급 범위, 등록 정보, 사진 사용권, 개인정보 처리 구조를 확정해야 합니다. 샘플은 noindex이며 실제 고객 후기로 오인할 수 있는 임시 수치나 성과 주장을 추가하지 않습니다.

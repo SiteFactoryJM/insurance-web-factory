@@ -1,21 +1,17 @@
 import type { SiteConfig, TemplateId, PaletteId } from "../types.js";
 import { escapeHtml as e, phoneHref, safeUrl } from "../utils/html.js";
-import { TEMPLATE_META, DEFAULT_TOPICS, PALETTES, paletteId } from "./design-system.js";
+import { TEMPLATE_META, DEFAULT_TOPICS, PALETTES, paletteId, getDesign } from "./design-system.js";
 import { responsiveCopy } from "./copy.js";
 
 export const arrow = '<span aria-hidden="true">↗</span>';
 export function renderHeader(site: SiteConfig): string {
-  const links = `<a href="#about">설계사 소개</a><a href="#specialties">상담 분야</a>${site.sections.faq ? '<a href="#faq">자주 묻는 질문</a>' : ''}<a class="button button-small" href="#contact">상담 요청하기 ${arrow}</a>`;
-  return `<a class="skip-link" href="#main">본문으로 바로가기</a>
-  <header class="site-header"><div class="container header-inner">
-    <a class="brand" href="/" aria-label="${e(site.agent.name)} 보험상담 홈">${site.agent.logoImage?`<img class="brand-logo" src="${e(site.agent.logoImage)}" alt="${e(site.agent.company)} 로고" width="44" height="44">`:''}<span><strong>${e(site.agent.name)} <span class="brand-service">보험상담</span></strong><span class="brand-sub">${e(site.agent.company)}</span></span></a>
-    <nav class="desktop-nav" aria-label="주요 메뉴">${links}</nav>
-    <div class="header-tools"><details class="mobile-menu"><summary>메뉴</summary><nav aria-label="모바일 메뉴">${links}</nav></details></div>
-  </div></header>`;
+  const hidden = getDesign(site).hiddenSections;
+  const links = `${!hidden.includes('about')?'<a href="#about">상담자 소개</a>':''}${!hidden.includes('services')?'<a href="#specialties">상담 분야</a>':''}${site.sections.faq && !hidden.includes('faq')?'<a href="#faq">자주 묻는 질문</a>':''}<a class="button button-small" href="${hidden.includes('contact')?'#footer':'#contact'}">상담 요청하기 ${arrow}</a>`;
+  return `<a class="skip-link" href="#main">본문으로 바로가기</a><header class="site-header"><div class="container header-inner"><a class="brand" href="/" aria-label="${e(site.agent.name)} 보험상담 홈">${site.agent.logoImage?`<img class="brand-logo" src="${e(site.agent.logoImage)}" alt="${e(site.agent.company)} 로고" width="44" height="44">`:''}<span><strong>${e(site.agent.name || '설계사 이름')} <span class="brand-service">보험상담</span></strong><span class="brand-sub">${e(site.agent.company)}</span></span></a><nav class="desktop-nav" aria-label="주요 메뉴">${links}</nav><div class="header-tools"><details class="mobile-menu"><summary>메뉴</summary><nav aria-label="모바일 메뉴">${links}</nav></details></div></div></header>`;
 }
 export function renderDemoSwitcher(site: SiteConfig): string {
-  if (!site.demo?.enabled || !site.demo.allowTemplateSwitch) return "";
-  return `<aside class="sample-bar" aria-label="배치와 색상 조합"><div class="container sample-inner"><div class="studio-label"><span class="badge">DESIGN STUDIO · 시안 조합 도구</span><p>배치와 색상을 선택해 비교하세요.</p><span class="studio-notice">아래는 예시 사이트 · 실제 접수 없음</span></div><form class="design-controls" action="/" method="get" data-design-controls><div><label for="sample-theme">01 배치</label><select id="sample-theme" name="theme">${(Object.entries(TEMPLATE_META) as [TemplateId, typeof TEMPLATE_META[TemplateId]][]).map(([id,m])=>`<option value="${id}"${site.template===id?' selected':''}>${e(m.name)} · ${e(m.purpose)}</option>`).join('')}</select></div><div><label for="sample-palette">02 색상</label><select id="sample-palette" name="palette">${(Object.entries(PALETTES) as [PaletteId, typeof PALETTES[PaletteId]][]).map(([id,p])=>`<option value="${id}"${paletteId(site)===id?' selected':''}>${e(p.name)}</option>`).join('')}</select></div><button class="button button-small" type="submit">조합 보기</button><a href="/templates">전체 비교 ${arrow}</a></form></div></aside>`;
+  if (!site.demo?.enabled || !site.demo.allowTemplateSwitch) return '';
+  return `<aside class="sample-bar" aria-label="디자인 샘플 도구"><div class="container sample-inner"><a class="studio-wordmark" href="/studio">ATELIER <span>상담 페이지 스튜디오</span></a><span class="sample-label">예시 페이지 · 실제 접수 없음</span><div class="sample-actions"><details class="sample-settings"><summary>다른 샘플 보기</summary><form class="design-controls" action="/" method="get" data-design-controls><div><label for="sample-theme">대표 구성</label><select id="sample-theme" name="theme">${(Object.entries(TEMPLATE_META) as [TemplateId, typeof TEMPLATE_META[TemplateId]][]).map(([id,m])=>`<option value="${id}"${site.template===id?' selected':''}>${e(m.name)}</option>`).join('')}</select></div><div><label for="sample-palette">색감</label><select id="sample-palette" name="palette">${(Object.entries(PALETTES) as [PaletteId,typeof PALETTES[PaletteId]][]).map(([id,p])=>`<option value="${id}"${paletteId(site)===id?' selected':''}>${e(p.name)}</option>`).join('')}</select></div><button class="button button-small" type="submit">조합 보기</button><a href="/templates">전체 비교 ${arrow}</a></form></details><a class="studio-start" href="/studio">내 페이지 만들기 ${arrow}</a></div></div></aside>`;
 }
 export function renderSocialLinks(site: SiteConfig): string {
   if (site.demo?.enabled) return `<p class="support-note">전화·카카오톡 연결은 실제 운영 단계에서 활성화합니다.</p>`;
@@ -43,9 +39,14 @@ export function renderContactForm(site: SiteConfig): string {
   </form>`;
 }
 export function renderFooter(site: SiteConfig): string {
-  return `<footer class="site-footer"><div class="container"><div class="footer-top"><div><strong>${e(site.agent.name)} 보험설계사</strong><p>${e(site.agent.company)}</p></div><a href="/privacy">개인정보처리방침</a></div><div class="footer-legal"><p>${e(site.compliance.footerDisclaimer)}</p>${site.compliance.advertisingReviewNumber?`<p>${e(site.compliance.advertisingReviewNumber)}${site.compliance.advertisingReviewExpiresAt?` · 유효기간 ${e(site.compliance.advertisingReviewExpiresAt)}`:''}</p>`:''}<p>상담 요청은 보험 가입 신청이 아닙니다. 계약 전 상품설명서와 약관을 확인해 주세요.</p><p>© ${new Date().getUTCFullYear()} ${e(site.agent.name)} · ${site.demo?.enabled?'디자인 검토용 / 검색 비노출':'보험 상담 안내'}</p></div></div></footer>`;
+  const pattern = getDesign(site).footer;
+  const contactLink = (label: string, value: string, href?: string) => value ? `<div><dt>${label}</dt><dd>${href && !site.demo?.enabled ? `<a href="${e(href)}">${e(value)}</a>` : e(value)}</dd></div>` : '';
+  const business = `<p>${e(site.agent.company || '[소속 GA/대리점명]')}${site.agent.branch ? ` · ${e(site.agent.branch)}` : ''}${site.agent.businessNumber ? ` · 사업자등록번호 ${e(site.agent.businessNumber)}` : ''}</p>${site.agent.registrationNumber ? `<p>설계사 등록번호 ${e(site.agent.registrationNumber)}</p>` : ''}${site.contact.officeAddress ? `<p>${e(site.contact.officeAddress)}</p>` : ''}`;
+  const note = site.footer?.note ? `<p class="footer-note">${e(site.footer.note)}</p>` : '';
+  return `<footer class="site-footer footer-${pattern}" id="footer" data-pattern="footer-${pattern}"><div class="container"><div class="footer-top"><div class="footer-identity"><h2>${e(site.footer?.heading || `${site.agent.name || '설계사 이름'} 보험상담`)}</h2>${pattern === 'columns' ? note : business + note}</div>${pattern === 'columns' ? `<div class="footer-business">${business}</div>` : ''}<dl class="footer-contact">${contactLink('전화',site.contact.phone,phoneHref(site.contact.phone))}${contactLink('이메일',site.contact.email || '',site.contact.email ? `mailto:${site.contact.email}` : undefined)}${contactLink('상담시간',site.contact.availableHours)}</dl></div><div class="footer-legal"><p>${e(site.compliance.footerDisclaimer)}</p>${site.compliance.advertisingReviewNumber ? `<p>${e(site.compliance.advertisingReviewNumber)}${site.compliance.advertisingReviewExpiresAt ? ` · 유효기간 ${e(site.compliance.advertisingReviewExpiresAt)}` : ''}</p>` : ''}<p>상담 요청은 보험 가입 신청이 아닙니다. 계약 전 상품설명서와 약관을 확인해 주세요.</p><div class="footer-bottom"><p>© ${new Date().getUTCFullYear()} ${e(site.agent.name)} · ${site.demo?.enabled ? '디자인 검토용 / 검색 비노출' : '보험 상담 안내'}</p><a href="/privacy">개인정보처리방침</a></div></div></div></footer>`;
 }
 export function renderMobileCta(site: SiteConfig): string {
+  if(getDesign(site).hiddenSections.includes("contact")) return "";
   return `<div class="mobile-cta" data-mobile-cta hidden><a class="button" href="#contact">${site.sections.contactForm?'상담 요청하기':'상담 방법 확인'} ${arrow}</a></div>`;
 }
 export function formatIndex(index: number): string { return String(index + 1).padStart(2, '0'); }

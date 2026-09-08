@@ -1,3 +1,4 @@
+import { renderStudioPage } from "./render/studio-page.js";
 import { renderNotFoundPage, renderPrivacyPage, renderSitePage, renderTemplateGallery } from "./render/page.js";
 import { handleConsultation } from "./routes/consultation.js";
 import { renderRobots, renderSitemap } from "./routes/seo.js";
@@ -64,6 +65,7 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
 
   switch (url.pathname) {
     case "/": return html(renderSitePage(site, request));
+    case "/studio": return site.demo?.enabled ? html(renderStudioPage(site, request), 200, "no-store") : html(renderNotFoundPage(), 404, "no-store");
     case "/templates": return html(renderTemplateGallery(site, request), 200, "public, max-age=60");
     case "/privacy": return html(renderPrivacyPage(site, request));
     case "/robots.txt": return text(renderRobots(site, url.origin), "text/plain; charset=utf-8");

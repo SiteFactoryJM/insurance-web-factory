@@ -98,8 +98,10 @@ for(const theme of themes) for(const palette of palettes) test(`${theme} + ${pal
 });
 test('palette and layout controls round-trip independently, including the gallery',async({page})=>{
   await page.goto('/?theme=warm-care&palette=forest');
+  await page.locator('.sample-settings summary').click();
   await page.locator('#sample-palette').selectOption('stone');await page.getByRole('button',{name:'조합 보기',exact:true}).click();
   await expect(page).toHaveURL(/theme=warm-care&palette=stone/);
+  await page.locator('.sample-settings summary').click();
   await page.locator('#sample-theme').selectOption('clean-minimal');await page.getByRole('button',{name:'조합 보기',exact:true}).click();
   await expect(page).toHaveURL(/theme=clean-minimal&palette=stone/);
   await page.goto('/templates');await page.getByRole('button',{name:'포레스트 그린',exact:true}).click();
@@ -127,7 +129,7 @@ test('studio boundary, right-aligned navigation and responsive copy are visible'
     await expect(page.locator('h1 .copy-desktop')).toBeHidden();
     await noOverflow(page);
   }
-  const surfaces=await page.evaluate(()=>['#reviews','#faq'].map(s=>getComputedStyle(document.querySelector(s).parentElement).backgroundColor));
+  const surfaces=await page.evaluate(()=>['#reviews','#faq'].map(s=>getComputedStyle(document.querySelector(s)).backgroundColor));
   expect(surfaces[0]).not.toBe(surfaces[1]);
   await page.locator('.faq-list summary').first().click();
   await expect(page.locator('.faq-list .copy-mobile').first()).toBeVisible();

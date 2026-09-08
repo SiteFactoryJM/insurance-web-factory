@@ -5,6 +5,20 @@ export type PaletteId = (typeof PALETTE_IDS)[number];
 export type HeadingFont = "pretendard" | "noto-serif-kr";
 export type PublishStatus = "draft" | "published";
 export type AdvertisingReviewStatus = "pending" | "approved" | "not-required";
+export const DESIGN_SECTION_IDS = ["services", "about", "process", "reviews", "faq", "contact"] as const;
+export type DesignSectionId = (typeof DESIGN_SECTION_IDS)[number];
+export interface SiteDesign {
+  hero?: "portrait" | "editorial" | "statement";
+  services?: "cards" | "list" | "split";
+  about?: "editorial" | "profile" | "quote";
+  process?: "steps" | "timeline";
+  faq?: "accordion" | "columns";
+  footer?: "classic" | "columns" | "minimal";
+  ornament?: "line" | "grid" | "none";
+  density?: "airy" | "compact";
+  sectionOrder?: DesignSectionId[];
+  hiddenSections?: DesignSectionId[];
+}
 export interface ContentCard { title: string; body: string; mobileBody?: string; }
 export interface FaqItem { question: string; answer: string; mobileAnswer?: string; }
 export interface ReviewItem { quote: string; author: string; context?: string; isExample?: boolean; }
@@ -16,10 +30,12 @@ export interface TemplateContent {
 export interface SiteConfig {
   id: string; status: PublishStatus; domains: string[]; template: TemplateId; accentColor?: string; headingFont: HeadingFont;
   palette?: PaletteId;
+  design?: SiteDesign;
+  footer?: { heading?: string; note?: string; };
   templateContent?: Partial<Record<TemplateId, TemplateContent>>;
   contentBrief?: { purpose?: string; targetAudience?: string; primaryAction?: string; };
-  agent: { name: string; title: string; company: string; branch?: string; registrationNumber?: string; careerYears?: number; regions: string[]; profileImage: string; logoImage?: string; };
-  hero: { eyebrow?: string; headline: string; subheadline: string; mobileHeadline?: string; mobileSubheadline?: string; primaryCtaLabel: string; secondaryCtaLabel: string; trustNote?: string; };
+  agent: { name: string; title: string; company: string; branch?: string; registrationNumber?: string; businessNumber?: string; careerYears?: number; regions: string[]; profileImage: string; logoImage?: string; };
+  hero: { eyebrow?: string; headline: string; subheadline: string; mobileHeadline?: string; mobileSubheadline?: string; primaryCtaLabel: string; secondaryCtaLabel: string; trustNote?: string; image?: string; };
   intro: { title: string; body: string; mobileTitle?: string; mobileBody?: string; philosophy?: string; };
   specialties: ContentCard[]; process: ContentCard[]; career: string[]; reviews?: ReviewItem[]; faqs: FaqItem[];
   consultation?: { topics: string[] };

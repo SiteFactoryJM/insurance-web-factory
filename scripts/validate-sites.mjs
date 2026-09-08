@@ -20,6 +20,34 @@ const isUrl = (value) => {
 };
 const isEmail = (value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value));
 
+export function validateDesignConfiguration(site) {
+  const issues = [];
+  const options = {
+    hero: ["portrait", "editorial", "statement"], services: ["cards", "list", "split"], about: ["editorial", "profile", "quote"],
+    process: ["steps", "timeline"], faq: ["accordion", "columns"], footer: ["classic", "columns", "minimal"],
+    ornament: ["line", "grid", "none"], density: ["airy", "compact"],
+  };
+  const sectionIds = ["services", "about", "process", "reviews", "faq", "contact"];
+  if (site.design !== undefined) {
+    if (!site.design || typeof site.design !== "object" || Array.isArray(site.design)) issues.push("design은 패턴 설정 객체여야 합니다.");
+    else for (const [key, value] of Object.entries(site.design)) {
+      if (["sectionOrder", "hiddenSections"].includes(key)) {
+        if (!Array.isArray(value) || value.length > 6 || value.some(item => !sectionIds.includes(item)) || new Set(value).size !== value.length) issues.push(`design.${key}: 중복 없는 유효한 섹션 목록이 필요합니다.`);
+      } else if (!Object.hasOwn(options, key) || !options[key].includes(value)) issues.push(`design.${key}: 지원하지 않는 패턴입니다.`);
+    }
+  }
+  if (site.footer !== undefined) {
+    if (!site.footer || typeof site.footer !== "object" || Array.isArray(site.footer)) issues.push("footer는 푸터 설정 객체여야 합니다.");
+    else for (const [key, value] of Object.entries(site.footer)) {
+      const limit = key === "heading" ? 80 : key === "note" ? 400 : 0;
+      if (!limit || typeof value !== "string" || Array.from(value).length > limit) issues.push(`footer.${key}: ${limit || "지원되는"}자 이내의 문구를 입력하세요.`);
+    }
+  }
+  if (site.agent?.businessNumber !== undefined && (typeof site.agent.businessNumber !== "string" || Array.from(site.agent.businessNumber).length > 80)) issues.push("agent.businessNumber는 80자 이내여야 합니다.");
+  if (site.hero?.image !== undefined && typeof site.hero.image !== "string") issues.push("hero.image는 이미지 경로 문자열이어야 합니다.");
+  return issues;
+}
+
 function required(value, label, siteId) {
   if (value === undefined || value === null || String(value).trim() === "") errors.push(`[${siteId}] 필수값 누락: ${label}`);
 }
@@ -73,6 +101,7 @@ for (const entry of entries) {
   catch (error) { errors.push(`[${entry.name}] JSON 오류: ${error instanceof Error ? error.message : error}`); continue; }
 
   const id = String(site.id ?? entry.name);
+  errors.push(...validateDesignConfiguration(site).map(message => `[${id}] ${message}`));
   errors.push(...validateContentLengths(site).map(message => `[${id}] ${message}`));
   if (id !== entry.name) errors.push(`[${id}] 폴더명과 site.id가 다릅니다: ${entry.name}`);
   if (!/^[a-z0-9][a-z0-9-]{1,62}$/.test(id)) errors.push(`[${id}] site.id는 영문 소문자·숫자·하이픈만 사용할 수 있습니다.`);
@@ -159,7 +188,7 @@ for (const entry of entries) {
     else seoTitles.set(site.seo.title, id);
   }
 
-  for (const asset of [site.agent?.profileImage, site.agent?.logoImage, site.seo?.ogImage].filter(Boolean)) {
+  for (const asset of [site.agent?.profileImage, site.agent?.logoImage, site.hero?.image, site.seo?.ogImage].filter(Boolean)) {
     if (!String(asset).startsWith("/")) { warnings.push(`[${id}] 내부 이미지 경로는 /로 시작하는 것을 권장합니다: ${asset}`); continue; }
     try { await access(path.join(root, "public", String(asset).replace(/^\//, ""))); }
     catch { errors.push(`[${id}] 이미지 파일을 찾을 수 없습니다: ${asset}`); }
