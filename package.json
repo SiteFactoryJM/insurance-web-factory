@@ -12,22 +12,25 @@
     "domains:generate": "node scripts/generate-wrangler-domains.mjs",
     "typecheck": "tsc --noEmit",
     "test": "tsc -p tsconfig.preview.json && node --test tests/*.test.mjs",
-    "check": "npm run generate && npm run validate:sites && npm run typecheck && npm test",
+    "check": "npm run generate && npm run build:studio && npm run validate:sites && npm run typecheck && npm test",
     "build": "npm run check",
-    "dev": "wrangler dev",
-    "preview": "tsc -p tsconfig.preview.json && node scripts/local-preview.mjs",
-    "deploy": "npm run generate && npm run validate:sites && wrangler deploy",
-    "deploy:domains": "npm run domains:generate && wrangler deploy --config wrangler.domains.jsonc",
-    "test:e2e": "playwright test"
+    "dev": "npm run build:studio && wrangler dev",
+    "preview": "npm run build:studio && tsc -p tsconfig.preview.json && node scripts/local-preview.mjs",
+    "deploy": "npm run generate && npm run build:studio && npm run validate:sites && wrangler deploy",
+    "deploy:domains": "npm run domains:generate && npm run build:studio && wrangler deploy --config wrangler.domains.jsonc",
+    "test:e2e": "playwright test",
+    "build:studio": "node scripts/build-studio.mjs",
+    "studio:import": "tsc -p tsconfig.preview.json && node scripts/import-studio.mjs"
   },
   "dependencies": {
     "exceljs": "4.4.0"
   },
   "devDependencies": {
-    "typescript": "^5.8.3",
-    "wrangler": "^4.94.0",
+    "@axe-core/playwright": "4.10.2",
     "@playwright/test": "1.56.1",
-    "@axe-core/playwright": "4.10.2"
+    "esbuild": "0.28.1",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.94.0"
   },
   "engines": {
     "node": ">=22"

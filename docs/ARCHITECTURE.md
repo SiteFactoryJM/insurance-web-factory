@@ -61,3 +61,15 @@ Worker 1개 ── Host 헤더 확인 ── domainIndex
 ## 반응형 콘텐츠 (v6)
 
 PC 원문 필드와 선택형 모바일 원문 필드를 같은 site.json에 관리한다. 자료수집 설문 → 가져오기 → 문자 수 검증 → generate → responsiveCopy 렌더링의 순서다. 650px 이하에서 모바일 문구만 노출하고, 미작성 시 PC 원문을 사용한다. 문구를 임의로 잘라내지 않는다.
+
+## DIY 제작 도구 (v7)
+
+`/`는 대표 예시, `/studio`는 데모 사이트에서만 제공하는 검색 비공개 편집기다. `studio-page.ts`가 초기 예시 데이터를 안전한 JSON script로 전달한다. `src/studio/editor.ts`는 esbuild로 `public/assets/studio.js`에 묶이며, 이 생성 번들은 git에 추가하지 않는다. check·preview·deploy가 번들을 먼저 생성한다.
+
+편집기는 서버 API와 저장소 없이 메모리에서 원고·사진·스타일을 관리한다. 공유 `renderSitePage(...,{studioPreview:true})`를 iframe srcdoc로 렌더링하므로 실제 사이트와 같은 패턴과 반응형 문구를 쓴다. PC 1440px/모바일 390px 캔버스를 작업 공간에 맞게 축소한다. 출력 미리보기에는 샘플 도구막대를 넣지 않는다.
+
+`design`은 섹션별 패턴·순서·숨김·장식·밀도, `footer`는 사용자 푸터 원고를 담는다. 기존 JSON에 이 필드가 없으면 템플릿별 기본 패턴을 적용한다. 사이트 원본은 계속 `sites/<id>/site.json`이며 레거시 templateContent 예시를 DIY로 가져올 때 기본 원고에 해소하고 override를 제거한다.
+
+명시적 저장 시 `project.ts`가 필드·한도·열거형·URL·이미지 서명을 검증한 JSON v1 파일을 만든다. 불러오기에도 같은 검증을 적용하며 실패하면 기존 편집값을 유지한다. `scripts/import-studio.mjs`는 이 계약을 사용해 사이트 JSON과 업로드 이미지를 추출한다. 파일 가져오기는 draft/noindex/미전송 설정을 강제하고 게시 권한·도메인을 초기화한다.
+
+PDF는 별도 인쇄 iframe에서 선택사항과 전체 원고를 제작 의뢰서로 구성해 브라우저 인쇄를 호출한다. 상담 체험 데이터와 DIY 제작 데이터는 서로 참조하지 않는다.
