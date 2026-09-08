@@ -3,40 +3,287 @@
   "$id": "https://sitefactory.example/schemas/insurance-site.json",
   "title": "Insurance Web Factory site configuration",
   "type": "object",
-  "required": ["id", "status", "domains", "template", "headingFont", "agent", "hero", "intro", "specialties", "process", "career", "faqs", "contact", "sections", "seo", "compliance"],
+  "required": [
+    "id",
+    "status",
+    "domains",
+    "template",
+    "headingFont",
+    "agent",
+    "hero",
+    "intro",
+    "specialties",
+    "process",
+    "career",
+    "faqs",
+    "contact",
+    "sections",
+    "seo",
+    "compliance"
+  ],
   "properties": {
-    "id": {"type":"string","pattern":"^[a-z0-9][a-z0-9-]{1,62}$"},
-    "status": {"enum":["draft","published"]},
-    "domains": {"type":"array","items":{"type":"string"},"uniqueItems":true},
-    "template": {"enum":["trust-blue","warm-care","premium-navy","clean-minimal","local-friendly"]},
-    "accentColor": {"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},
-    "headingFont": {"enum":["pretendard","noto-serif-kr"]},
-    "agent": {"type":"object"},
-    "hero": {"type":"object"},
-    "intro": {"type":"object"},
-    "specialties": {"type":"array","minItems":3},
-    "process": {"type":"array"},
-    "career": {"type":"array"},
-    "reviews": {
-      "type":"array",
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "published"
+      ]
+    },
+    "domains": {
+      "type": "array",
       "items": {
-        "type":"object",
-        "required":["quote","author"],
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "template": {
+      "enum": [
+        "trust-blue",
+        "warm-care",
+        "premium-navy",
+        "clean-minimal",
+        "local-friendly"
+      ]
+    },
+    "accentColor": {
+      "type": "string",
+      "pattern": "^#[0-9A-Fa-f]{6}$"
+    },
+    "headingFont": {
+      "enum": [
+        "pretendard",
+        "noto-serif-kr"
+      ]
+    },
+    "agent": {
+      "type": "object"
+    },
+    "hero": {
+      "type": "object"
+    },
+    "intro": {
+      "type": "object"
+    },
+    "specialties": {
+      "type": "array",
+      "minItems": 3
+    },
+    "process": {
+      "type": "array"
+    },
+    "career": {
+      "type": "array"
+    },
+    "reviews": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "quote",
+          "author"
+        ],
         "properties": {
-          "quote":{"type":"string"},
-          "author":{"type":"string"},
-          "context":{"type":"string"},
-          "isExample":{"type":"boolean"}
+          "quote": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "context": {
+            "type": "string"
+          },
+          "isExample": {
+            "type": "boolean"
+          }
         },
-        "additionalProperties":false
+        "additionalProperties": false
       }
     },
-    "faqs": {"type":"array"},
-    "contact": {"type":"object"},
-    "sections": {"type":"object"},
-    "seo": {"type":"object"},
-    "compliance": {"type":"object"},
-    "demo": {"type":"object"}
+    "faqs": {
+      "type": "array"
+    },
+    "contact": {
+      "type": "object"
+    },
+    "sections": {
+      "type": "object"
+    },
+    "seo": {
+      "type": "object"
+    },
+    "compliance": {
+      "type": "object"
+    },
+    "demo": {
+      "type": "object"
+    },
+    "palette": {
+      "enum": [
+        "navy",
+        "forest",
+        "slate",
+        "charcoal",
+        "teal",
+        "stone"
+      ]
+    },
+    "templateContent": {
+      "type": "object",
+      "properties": {
+        "trust-blue": {
+          "$ref": "#/$defs/templateContent"
+        },
+        "warm-care": {
+          "$ref": "#/$defs/templateContent"
+        },
+        "premium-navy": {
+          "$ref": "#/$defs/templateContent"
+        },
+        "clean-minimal": {
+          "$ref": "#/$defs/templateContent"
+        },
+        "local-friendly": {
+          "$ref": "#/$defs/templateContent"
+        }
+      },
+      "additionalProperties": false
+    },
+    "consultation": {
+      "type": "object",
+      "properties": {
+        "topics": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          }
+        }
+      },
+      "additionalProperties": false
+    }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "templateContent": {
+      "type": "object",
+      "properties": {
+        "headline": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subheadline": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eyebrow": {
+          "type": "string",
+          "minLength": 1
+        },
+        "focusTitle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "specialties": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "body"
+            ],
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "body": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "process": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "body"
+            ],
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "body": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "focus": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "body"
+            ],
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "body": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "faqs": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "required": [
+              "question",
+              "answer"
+            ],
+            "properties": {
+              "question": {
+                "type": "string",
+                "minLength": 1
+              },
+              "answer": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
 }

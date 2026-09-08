@@ -1,6 +1,6 @@
-import type { SiteConfig, TemplateId } from "../types.js";
+import type { SiteConfig, TemplateId, PaletteId } from "../types.js";
 import { escapeHtml as e, phoneHref, safeUrl } from "../utils/html.js";
-import { TEMPLATE_META, DEFAULT_TOPICS } from "./design-system.js";
+import { TEMPLATE_META, DEFAULT_TOPICS, PALETTES, paletteId } from "./design-system.js";
 
 export const arrow = '<span aria-hidden="true">↗</span>';
 export function renderHeader(site: SiteConfig): string {
@@ -9,12 +9,12 @@ export function renderHeader(site: SiteConfig): string {
   <header class="site-header"><div class="container header-inner">
     <a class="brand" href="/" aria-label="${e(site.agent.name)} 보험상담 홈"><span class="brand-mark" aria-hidden="true">${e(site.agent.name.slice(0,1))}</span><span><strong>${e(site.agent.name)} 보험상담</strong><span class="brand-sub">${e(site.agent.company)}</span></span></a>
     <nav class="desktop-nav" aria-label="주요 메뉴">${links}</nav>
-    <div class="header-tools"><button type="button" class="reading-toggle" data-reading-toggle aria-pressed="false">글자 크게</button><details class="mobile-menu"><summary>메뉴</summary><nav aria-label="모바일 메뉴">${links}</nav></details></div>
+    <div class="header-tools"><details class="mobile-menu"><summary>메뉴</summary><nav aria-label="모바일 메뉴">${links}</nav></details></div>
   </div></header>`;
 }
 export function renderDemoSwitcher(site: SiteConfig): string {
   if (!site.demo?.enabled || !site.demo.allowTemplateSwitch) return "";
-  return `<aside class="sample-bar" aria-label="제안용 샘플 선택"><div class="container sample-inner"><p><span class="badge">디자인 샘플</span> 실제 상담은 접수되지 않습니다.</p><div><label for="sample-theme">샘플 선택</label><select id="sample-theme" data-template-select>${(Object.entries(TEMPLATE_META) as [TemplateId, typeof TEMPLATE_META[TemplateId]][]).map(([id,m])=>`<option value="${id}"${site.template===id?' selected':''}>${e(m.name)}</option>`).join('')}</select><a href="/templates">전체 비교 ${arrow}</a></div></div></aside>`;
+  return `<aside class="sample-bar" aria-label="배치와 색상 조합"><div class="container sample-inner"><p><span class="badge">디자인 샘플</span> 실제 상담은 접수되지 않습니다.</p><form class="design-controls" action="/" method="get" data-design-controls><div><label for="sample-theme">배치</label><select id="sample-theme" name="theme">${(Object.entries(TEMPLATE_META) as [TemplateId, typeof TEMPLATE_META[TemplateId]][]).map(([id,m])=>`<option value="${id}"${site.template===id?' selected':''}>${e(m.name)} · ${e(m.purpose)}</option>`).join('')}</select></div><div><label for="sample-palette">색상</label><select id="sample-palette" name="palette">${(Object.entries(PALETTES) as [PaletteId, typeof PALETTES[PaletteId]][]).map(([id,p])=>`<option value="${id}"${paletteId(site)===id?' selected':''}>${e(p.name)}</option>`).join('')}</select></div><button class="button button-small" type="submit">조합 보기</button><a href="/templates">전체 비교 ${arrow}</a></form></div></aside>`;
 }
 export function renderSocialLinks(site: SiteConfig): string {
   if (site.demo?.enabled) return `<p class="support-note">전화·카카오톡 연결은 실제 운영 단계에서 활성화합니다.</p>`;
@@ -41,7 +41,7 @@ export function renderContactForm(site: SiteConfig): string {
   </form>`;
 }
 export function renderCustomizationBand(site: SiteConfig): string {
-  return site.demo?.enabled ? `<aside class="customization-band container"><div><p class="eyebrow">하나의 기준, 다양한 상담자</p><h2>사람이 달라도,<br>신뢰의 기준은 같도록.</h2><p>사진·소개·상담 분야를 바꾸어 여러 설계사에게 적용할 수 있습니다.</p></div><a class="button button-secondary" href="/templates">5가지 샘플 비교 ${arrow}</a></aside>` : '';
+  return site.demo?.enabled ? `<aside class="customization-band container"><div><p class="eyebrow">나에게 맞는 상담 페이지</p><h2>배치와 색상,<br>원하는 조합으로.</h2><p>다섯 가지 배치와 여섯 가지 색상을 자유롭게 조합해 보세요.</p></div><a class="button button-secondary" href="/templates">배치·색상 조합하기 ${arrow}</a></aside>` : '';
 }
 export function renderFooter(site: SiteConfig): string {
   return `<footer class="site-footer"><div class="container"><div class="footer-top"><div><strong>${e(site.agent.name)} 보험설계사</strong><p>${e(site.agent.company)}</p></div><a href="/privacy">개인정보처리방침</a></div><div class="footer-legal"><p>${e(site.compliance.footerDisclaimer)}</p>${site.compliance.advertisingReviewNumber?`<p>${e(site.compliance.advertisingReviewNumber)}${site.compliance.advertisingReviewExpiresAt?` · 유효기간 ${e(site.compliance.advertisingReviewExpiresAt)}`:''}</p>`:''}<p>상담 요청은 보험 가입 신청이 아닙니다. 계약 전 상품설명서와 약관을 확인해 주세요.</p><p>© ${new Date().getUTCFullYear()} ${e(site.agent.name)} · ${site.demo?.enabled?'디자인 검토용 / 검색 비노출':'보험 상담 안내'}</p></div></div></footer>`;

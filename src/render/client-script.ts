@@ -1,20 +1,10 @@
 /** Demo-only interaction. Intentionally contains no fetch, mailto, SDK or browser storage. */
 export const clientScript = String.raw`
 (() => {
-  const reading = document.querySelector('[data-reading-toggle]');
-  reading?.addEventListener('click', () => {
-    const large = reading.getAttribute('aria-pressed') !== 'true';
-    document.documentElement.dataset.reading = large ? 'large' : 'normal';
-    reading.setAttribute('aria-pressed', String(large));
-    reading.textContent = large ? '기본 글자' : '글자 크게';
-  });
   const menu = document.querySelector('.mobile-menu');
   menu?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => menu.open = false));
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && menu?.open) { menu.open = false; menu.querySelector('summary')?.focus(); }
-  });
-  document.querySelector('[data-template-select]')?.addEventListener('change', event => {
-    const url = new URL(window.location.href); url.pathname = '/'; url.searchParams.set('theme',event.target.value); url.hash = ''; window.location.assign(url);
   });
   document.querySelectorAll('img').forEach(img => img.addEventListener('error', () => {
     if (!img.src.endsWith('/assets/profile-placeholder.svg')) img.src = '/assets/profile-placeholder.svg';

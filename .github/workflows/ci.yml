@@ -36,34 +36,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
       - name: Verify connected Cloudflare build is live
         env:
           LIVE_URL: https://insurance-web-factory.pjmsm0319.workers.dev
-        run: |
-          set -euo pipefail
-          verified=0
-          for attempt in $(seq 1 30); do
-            all=1
-            for theme in trust-blue warm-care premium-navy clean-minimal local-friendly; do
-              html=$(curl --fail --silent --show-error --max-time 15 -H 'Cache-Control: no-cache' "$LIVE_URL/?theme=$theme&verify=${GITHUB_SHA:0:12}") || { all=0; break; }
-              grep -q 'data-design-version="calm-trust-v4"' <<<"$html" || { all=0; break; }
-              grep -q "theme-$theme" <<<"$html" || { all=0; break; }
-              grep -q 'data-submission-mode="discard"' <<<"$html" || { all=0; break; }
-              grep -Fq 'name="robots" content="noindex,nofollow"' <<<"$html" || { all=0; break; }
-            done
-            if [ "$all" -eq 1 ]; then verified=1; break; fi
-            echo "Waiting for connected Cloudflare build ($attempt/30)"
-            sleep 10
-          done
-          test "$verified" -eq 1 || { echo '::error::Connected Cloudflare build was not verified. Inspect Cloudflare Builds or run Deploy Cloudflare demo with configured secrets.'; exit 1; }
-          gallery=$(curl --fail --silent --show-error --max-time 15 -H 'Cache-Control: no-cache' "$LIVE_URL/templates?verify=${GITHUB_SHA:0:12}")
-          grep -Fq 'Calm Trust' <<<"$gallery"
-          grep -Fq 'name="robots" content="noindex,nofollow"' <<<"$gallery"
-          for theme in trust-blue warm-care premium-navy clean-minimal local-friendly; do
-            grep -Fq "href=\"/?theme=$theme\"" <<<"$gallery"
-          done
-          privacy=$(curl --fail --silent --show-error --max-time 15 -H 'Cache-Control: no-cache' "$LIVE_URL/privacy?verify=${GITHUB_SHA:0:12}")
-          grep -Fq '개인정보는 저장하거나 전송하지 않습니다.' <<<"$privacy"
-          grep -Fq 'name="robots" content="noindex,nofollow"' <<<"$privacy"
-          echo "### Calm Trust live verification passed" >> "$GITHUB_STEP_SUMMARY"
-          echo "$LIVE_URL/templates — live gallery, five variants, noindex, demo-only consultation form, and privacy notice verified." >> "$GITHUB_STEP_SUMMARY"
+        run: node scripts/verify-live.mjs

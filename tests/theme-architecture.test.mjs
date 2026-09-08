@@ -2,13 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { renderSitePage, renderTemplateGallery } from '../.preview-dist/render/page.js';
-import { TEMPLATE_IDS } from '../.preview-dist/types.js';
+import { TEMPLATE_IDS, PALETTE_IDS } from '../.preview-dist/types.js';
 import { clientScript } from '../.preview-dist/render/client-script.js';
 import { handleConsultation } from '../.preview-dist/routes/consultation.js';
 const site = JSON.parse(fs.readFileSync(new URL('../sites/demo-agent/site.json', import.meta.url), 'utf8'));
 const page = (config = site, theme = 'trust-blue') => renderSitePage(config, new Request(`https://example.test/?theme=${theme}`));
 
-for (const id of TEMPLATE_IDS) test(`${id}: one accessible master with a distinct variant and safe wizard`, () => {
+for (const id of TEMPLATE_IDS) test(`${id}: distinct layout and safe wizard`, () => {
   const html = page(site,id);
   assert.match(html,new RegExp(`theme-${id}`));
   assert.equal((html.match(/<h1\b/g)||[]).length,1);
@@ -18,7 +18,7 @@ for (const id of TEMPLATE_IDS) test(`${id}: one accessible master with a distinc
   assert.match(html,/data-step="0" disabled/);
   assert.match(html,/data-step="3" hidden disabled/);
   assert.match(html,/실제 상담은 접수되지 않았습니다/);
-  assert.match(html,/data-reading-toggle aria-pressed="false"/);
+  assert.doesNotMatch(html,/data-reading-toggle|글자 크게/);
   assert.doesNotMatch(html,/<a[^>]+href="(?:mailto:|tel:|https:\/\/open.kakao)/);
 });
 
@@ -53,4 +53,36 @@ test('demo API never parses or stores even with a misconfigured store flag', asy
   const env={DB:{prepare(){throw new Error('MUST NOT STORE');}},CONSULTATION_WEBHOOK_URL:'https://must-not-send.invalid'};
   const response=await handleConsultation(request,env,modified);const body=await response.json();assert.equal(body.demo,true);assert.match(body.message,/실제 상담은 접수되지 않았습니다/);
   const wrongMethod=await handleConsultation({method:'GET'},env,modified);assert.equal(wrongMethod.status,405);
+});
+
+
+test('six palettes combine independently with all five layouts and their JSON content', () => {
+  assert.equal(PALETTE_IDS.length,6);
+  assert.equal(TEMPLATE_IDS.length,5);
+  const headlines = new Set();
+  for (const theme of TEMPLATE_IDS) {
+    const headline=site.templateContent[theme].headline;
+    headlines.add(headline);
+    for (const palette of PALETTE_IDS) {
+      const html=renderSitePage(site,new Request(`https://example.test/?theme=${theme}&palette=${palette}`));
+      assert.ok(html.includes(`data-layout="${theme}" data-palette="${palette}"`));
+      assert.ok(html.includes(headline.replaceAll('\n','<br>')));
+      assert.ok(html.includes(`value="${theme}" selected`));
+      assert.ok(html.includes(`value="${palette}" selected`));
+      for(const card of site.templateContent[theme].specialties) assert.ok(html.includes(card.title));
+      assert.ok(html.includes('유퍼스트 해온지사'));
+    }
+  }
+  assert.equal(headlines.size,5);
+});
+
+test('query fallbacks are safe and production ignores preview settings', () => {
+  const request=new Request('https://example.test/?theme=warm-care&palette=stone');
+  const production=structuredClone(site);production.demo.enabled=false;
+  assert.match(renderSitePage(production,request),/data-layout="trust-blue" data-palette="navy"/);
+  const legacy=structuredClone(site);delete legacy.palette;delete legacy.templateContent;
+  assert.match(renderSitePage(legacy,new Request('https://example.test/?theme=INVALID&palette=INVALID')),/data-layout="trust-blue" data-palette="navy"/);
+  assert.ok(renderSitePage(legacy,new Request('https://example.test/?theme=warm-care')).includes(legacy.hero.headline.replaceAll('\n','<br>')));
+  const disabled=structuredClone(site);disabled.demo.allowTemplateSwitch=false;
+  assert.match(renderSitePage(disabled,request),/data-layout="trust-blue" data-palette="navy"/);
 });

@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sitesDir = path.join(root, "sites");
 const templates = new Set(["trust-blue", "warm-care", "premium-navy", "clean-minimal", "local-friendly"]);
+const palettes = new Set(["navy", "forest", "slate", "charcoal", "teal", "stone"]);
 const fonts = new Set(["pretendard", "noto-serif-kr"]);
 const statuses = new Set(["draft", "published"]);
 const submissionModes = new Set(["discard", "store", "mailto"]);
@@ -40,6 +41,25 @@ for (const entry of entries) {
   if (!templates.has(site.template)) errors.push(`[${id}] 알 수 없는 template: ${site.template}`);
   if (!fonts.has(site.headingFont)) errors.push(`[${id}] 알 수 없는 headingFont: ${site.headingFont}`);
   if (site.accentColor && !/^#[0-9a-fA-F]{6}$/.test(site.accentColor)) errors.push(`[${id}] accentColor는 #RRGGBB 형식이어야 합니다.`);
+
+  if (site.palette !== undefined && !palettes.has(site.palette)) errors.push(`[${id}] 알 수 없는 palette: ${site.palette}`);
+  if (site.templateContent !== undefined) {
+    if (!site.templateContent || typeof site.templateContent !== "object" || Array.isArray(site.templateContent)) errors.push(`[${id}] templateContent는 배치별 설정 객체여야 합니다.`);
+    else for (const [template, content] of Object.entries(site.templateContent)) {
+      if (!templates.has(template)) errors.push(`[${id}] 알 수 없는 templateContent 키: ${template}`);
+      if (!content || typeof content !== "object" || Array.isArray(content)) { errors.push(`[${id}] ${template} 설정은 객체여야 합니다.`); continue; }
+      const textFields = ["headline", "subheadline", "eyebrow", "focusTitle"];
+      const arrayFields = ["specialties", "process", "faqs", "focus"];
+      for (const key of Object.keys(content)) if (![...textFields, ...arrayFields].includes(key)) errors.push(`[${id}] 알 수 없는 ${template} 필드: ${key}`);
+      for (const key of textFields) if (content[key] !== undefined && (typeof content[key] !== "string" || !content[key].trim())) errors.push(`[${id}] ${template}.${key}는 비어 있지 않은 문자열이어야 합니다.`);
+      for (const key of arrayFields) if (content[key] !== undefined) {
+        const min = key === "focus" ? 1 : key === "faqs" ? 2 : 3;
+        const fields = key === "faqs" ? ["question", "answer"] : ["title", "body"];
+        const items = content[key];
+        if (!Array.isArray(items) || items.length < min || items.length > 12 || items.some(item => !item || fields.some(field => typeof item[field] !== "string" || !item[field].trim()))) errors.push(`[${id}] ${template}.${key}는 유효한 ${min}~12개 항목이어야 합니다.`);
+      }
+    }
+  }
 
   required(site.agent?.name, "agent.name", id);
   required(site.agent?.title, "agent.title", id);
