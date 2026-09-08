@@ -26,6 +26,17 @@ for(const theme of themes) test(`${theme}: WCAG automated scan`,async({page})=>{
   await page.goto(`/?theme=${theme}`);
   const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();
   expect(result.violations).toEqual([]);
+  if(theme==='trust-blue'){
+    // Axe preloads cross-origin CSS with XHR. Keep its scan outside the
+    // separate test that observes every request made by the demo flow.
+    await page.setViewportSize({width:390,height:900});
+    await page.getByLabel('실손·건강보험',{exact:true}).check();
+    await page.locator('[data-next]').click();await page.locator('[data-next]').click();
+    await page.locator('[name="phone"]').fill('01000000000');await page.locator('[data-next]').click();
+    await page.locator('[name="privacyConsent"]').check();
+    const confirmation=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();
+    expect(confirmation.violations).toEqual([]);
+  }
 });
 test('four-step demo validates, preserves back edits, escapes input and sends nothing',async({page},testInfo)=>{
   await page.setViewportSize({width:390,height:900});await page.goto('/');
@@ -39,7 +50,6 @@ test('four-step demo validates, preserves back edits, escapes input and sends no
   await page.locator('[data-prev]').click();await expect(page.locator('[name="name"]')).toHaveValue('테스트');await page.locator('[data-next]').click();
   await page.locator('[data-submit]').click();await expect(page.locator('[data-form-error]')).toContainText('개인정보');
   await page.locator('[name="privacyConsent"]').check();await noOverflow(page);
-  const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();expect(axe.violations).toEqual([]);
   await testInfo.attach('consultation-confirmation',{body:await page.locator('#contact').screenshot(),contentType:'image/png'});
   await page.locator('[data-submit]').click();await expect(page.locator('[data-demo-result]')).toBeVisible();await expect(page.locator('[name="phone"]')).toHaveValue('');expect(requests).toEqual([]);
   const storage=await page.evaluate(()=>({local:localStorage.length,session:sessionStorage.length}));expect(storage).toEqual({local:0,session:0});
@@ -56,5 +66,7 @@ test('mobile CTA, reading control, navigation and FAQ',async({page})=>{
 });
 test('gallery, privacy and no-JavaScript fail-closed behavior',async({page,browser})=>{
   for(const path of ['/templates','/privacy']){await page.setViewportSize({width:320,height:900});await page.goto(path);await noOverflow(page);const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(result.violations).toEqual([]);}
-  const context=await browser.newContext({javaScriptEnabled:false});const nojs=await context.newPage();await nojs.goto('http://127.0.0.1:8787/');await expect(nojs.locator('[data-next]')).toBeDisabled();await expect(nojs.locator('[name="topic"]').first()).toBeDisabled();await expect(nojs.locator('noscript')).toContainText('전송은 비활성화');await context.close();
+  const context=await browser.newContext({javaScriptEnabled:false});const nojs=await context.newPage();await nojs.goto('http://127.0.0.1:8787/');await expect(nojs.locator('[data-next]')).toBeDisabled();await expect(nojs.locator('[name="topic"]').first()).toBeDisabled();
+  // Playwright deliberately skips NOSCRIPT itself in text matching.
+  const notice=nojs.locator('noscript p');await expect(notice).toBeVisible();await expect(notice).toContainText('전송은 비활성화');await context.close();
 });
