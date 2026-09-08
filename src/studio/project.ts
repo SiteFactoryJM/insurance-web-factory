@@ -1,4 +1,4 @@
-import { DESIGN_SECTION_IDS, PALETTE_IDS, TEMPLATE_IDS, type SiteConfig } from "../types.js";
+import { DESIGN_SECTION_IDS, HEADING_FONT_IDS, PALETTE_IDS, TEMPLATE_IDS, type DesignSectionId, type SiteConfig } from "../types.js";
 
 export const PROJECT_FORMAT = "insurance-web-factory/diy" as const;
 export const PROJECT_VERSION = 1 as const;
@@ -71,7 +71,7 @@ const siteRule = object({
   id: { ...text(63), check: value => /^[a-z0-9][a-z0-9-]{1,62}$/.test(value) ? undefined : "사이트 ID는 영문 소문자·숫자·하이픈으로 2~63자여야 합니다." },
   status: choice(["draft", "published"]), domains: list(domainRule, 0, 40, false, true), template: choice(TEMPLATE_IDS),
   accentColor: { ...text(7, true), check: value => /^#[0-9a-f]{6}$/i.test(value) ? undefined : "색상은 #RRGGBB 형식이어야 합니다." },
-  headingFont: choice(["pretendard", "noto-serif-kr"]), palette: choice(PALETTE_IDS, true), design: designRule,
+  headingFont: choice(HEADING_FONT_IDS), palette: choice(PALETTE_IDS, true), design: designRule,
   footer: object({ heading: text(80, true), note: text(400, true) }, true),
   templateContent: object(Object.fromEntries(TEMPLATE_IDS.map(id => [id, templateRule])), true),
   contentBrief: object({ purpose: text(100, true, 1), targetAudience: text(80, true, 1), primaryAction: text(60, true, 1) }, true),
@@ -92,6 +92,31 @@ const siteRule = object({
   demo: object({ enabled: bool(), allowTemplateSwitch: bool(true), submissionMode: choice(["discard", "store", "mailto"], true) }, true),
 });
 
+/** Shared editor/save visibility: hidden drafts remain editable when re-enabled. */
+export function isSectionEnabled(site: Pick<SiteConfig, "design" | "sections">, id: DesignSectionId): boolean {
+  if (Array.isArray(site.design?.hiddenSections) && site.design.hiddenSections.includes(id)) return false;
+  if (id === "reviews") return site.sections?.reviews === true;
+  if (id === "process" || id === "faq") return site.sections?.[id] !== false;
+  return true;
+}
+
+function draftContentRule(rule: Rule, allowMissing = true): Rule {
+  if (rule.type === "string") return { ...rule, min: 0, optional: allowMissing || rule.optional };
+  if (rule.type === "array") return { ...rule, min: 0, items: draftContentRule(rule.items!, false) };
+  if (rule.type === "object") return { ...rule, properties: Object.fromEntries(Object.entries(rule.properties!).map(([key, child]) => [key, draftContentRule(child)])) };
+  return rule;
+}
+
+function sectionAwareSiteRule(input: unknown): Rule {
+  const site = input && typeof input === "object" ? input as SiteConfig : {} as SiteConfig;
+  const properties = { ...siteRule.properties! };
+  const sectionFields: Partial<Record<DesignSectionId, string[]>> = { about: ["intro", "career"], services: ["specialties"], process: ["process"], faq: ["faqs"], reviews: ["reviews"], contact: ["consultation"] };
+  for (const [section, fields] of Object.entries(sectionFields)) {
+    if (!isSectionEnabled(site, section as DesignSectionId)) for (const field of fields) properties[field] = draftContentRule(properties[field]);
+  }
+  return { ...siteRule, properties };
+}
+
 function inspect(value: unknown, rule: Rule, path: string, errors: string[]): void {
   if (errors.length >= 40) return;
   if (value === undefined && rule.optional) return;
@@ -108,7 +133,7 @@ function inspect(value: unknown, rule: Rule, path: string, errors: string[]): vo
     if (!Array.isArray(value)) { errors.push(`${path}: 목록이 필요합니다.`); return; }
     if (value.length < (rule.min ?? 0) || value.length > (rule.max ?? 12)) { errors.push(`${path}: ${rule.min ?? 0}~${rule.max ?? 12}개 항목으로 작성하세요.`); return; }
     if (rule.unique && new Set(value).size !== value.length) errors.push(`${path}: 중복 항목을 제거하세요.`);
-    value.forEach((item, index) => inspect(item, rule.items!, `${path}[${index + 1}]`, errors));
+    for (const [index, item] of value.entries()) inspect(item, rule.items!, `${path}[${index + 1}]`, errors);
   } else if (typeof value !== rule.type) errors.push(`${path}: ${rule.type === "string" ? "문자" : rule.type === "boolean" ? "참/거짓" : "숫자"} 형식이어야 합니다.`);
   else if (typeof value === "string") {
     // Uploaded base64 is ASCII and may contain four million characters; avoid
@@ -124,12 +149,12 @@ function inspect(value: unknown, rule: Rule, path: string, errors: string[]): vo
 
 export function validateProjectSite(site: unknown): string[] {
   const errors: string[] = [];
-  inspect(site, siteRule, "site", errors);
+  inspect(site, sectionAwareSiteRule(site), "site", errors);
   if (!errors.length) {
     const config = site as SiteConfig;
-    if (config.sections.process && config.process.length < 3) errors.push("site.process: 진행 과정을 표시하려면 3개 이상 필요합니다.");
-    if (config.sections.faq && config.faqs.length < 2) errors.push("site.faqs: FAQ를 표시하려면 2개 이상 필요합니다.");
-    if (config.sections.reviews && !config.reviews?.length) errors.push("site.reviews: 후기를 표시하려면 1개 이상 필요합니다.");
+    if (isSectionEnabled(config, "process") && config.process.length < 3) errors.push("site.process: 진행 과정을 표시하려면 3개 이상 필요합니다.");
+    if (isSectionEnabled(config, "faq") && config.faqs.length < 2) errors.push("site.faqs: FAQ를 표시하려면 2개 이상 필요합니다.");
+    if (isSectionEnabled(config, "reviews") && !config.reviews?.length) errors.push("site.reviews: 후기를 표시하려면 1개 이상 필요합니다.");
     if (new TextEncoder().encode(JSON.stringify(site)).byteLength > MAX_PROJECT_BYTES - 256) errors.push("제작 파일은 전체 8MB 이하여야 합니다. 이미지 크기를 줄여 주세요.");
   }
   return errors;
@@ -181,7 +206,7 @@ export function parseProject(input: unknown): StudioProject {
     try { input = JSON.parse(input); } catch { throw new Error("JSON 제작 파일을 읽을 수 없습니다. 저장한 .json 파일을 선택해 주세요."); }
   }
   const errors: string[] = [];
-  inspect(input, object({ format: choice([PROJECT_FORMAT]), version: { type: "number", min: 1, max: 1 }, savedAt: { ...text(40), check: value => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value) && Number.isFinite(Date.parse(value)) ? undefined : "저장 날짜 형식이 올바르지 않습니다." }, site: siteRule }), "project", errors);
+  inspect(input, object({ format: choice([PROJECT_FORMAT]), version: { type: "number", min: 1, max: 1 }, savedAt: { ...text(40), check: value => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value) && Number.isFinite(Date.parse(value)) ? undefined : "저장 날짜 형식이 올바르지 않습니다." }, site: sectionAwareSiteRule(input && typeof input === "object" ? (input as Record<string, unknown>).site : undefined) }), "project", errors);
   if (errors.length) throw new Error(`제작 파일을 확인해 주세요.\n${errors.join("\n")}`);
   const project = input as StudioProject;
   const issues = validateProjectSite(project.site);

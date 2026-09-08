@@ -1,17 +1,25 @@
 /** Demo-only interaction. Intentionally contains no fetch, mailto, SDK or browser storage. */
 export const clientScript = String.raw`
 (() => {
-  const menu = document.querySelector('.mobile-menu');
-  menu?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => menu.open = false));
+  document.addEventListener('click', event => {
+    const link = event.target.closest?.('.mobile-menu a');
+    if (link) link.closest('.mobile-menu').open = false;
+  });
   document.addEventListener('keydown', event => {
+    const menu = document.querySelector('.mobile-menu');
     if (event.key === 'Escape' && menu?.open) { menu.open = false; menu.querySelector('summary')?.focus(); }
   });
-  document.querySelectorAll('img').forEach(img => img.addEventListener('error', () => {
+  document.addEventListener('error', event => {
+    const img = event.target;
+    if (!(img instanceof HTMLImageElement)) return;
     if (!img.src.endsWith('/assets/profile-placeholder.svg')) img.src = '/assets/profile-placeholder.svg';
-  }, { once: true }));
+  }, true);
 
+  const initializedForms = new WeakSet();
+  window.initializeConsultationDemo = () => {
   const form = document.querySelector('[data-contact-form]');
-  if (form instanceof HTMLFormElement) {
+  if (form instanceof HTMLFormElement && !initializedForms.has(form)) {
+    initializedForms.add(form);
     const steps = [...form.querySelectorAll('[data-step]')];
     const indicators = [...form.querySelectorAll('[data-step-indicator]')];
     const previous = form.querySelector('[data-prev]');
@@ -86,6 +94,8 @@ export const clientScript = String.raw`
     window.addEventListener('pageshow', event => {if(event.persisted)reset(false);});
     show(0,false);
   }
+  };
+  window.initializeConsultationDemo();
   const cta = document.querySelector('[data-mobile-cta]');
   const hero = document.querySelector('.hero');
   const contact = document.querySelector('#contact');

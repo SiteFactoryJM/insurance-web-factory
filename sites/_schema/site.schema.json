@@ -55,19 +55,29 @@
     "headingFont": {
       "enum": [
         "pretendard",
-        "noto-serif-kr"
+        "noto-serif-kr",
+        "noto-sans-kr",
+        "nanum-gothic",
+        "nanum-myeongjo",
+        "gowun-batang"
       ]
     },
     "agent": {
       "type": "object",
       "properties": {
-        "businessNumber": { "type": "string", "maxLength": 80 }
+        "businessNumber": {
+          "type": "string",
+          "maxLength": 80
+        }
       }
     },
     "hero": {
       "type": "object",
       "properties": {
-        "image": { "type": "string", "description": "Optional decorative JPG, PNG, or WebP image." },
+        "image": {
+          "type": "string",
+          "description": "Optional decorative JPG, PNG, or WebP image."
+        },
         "headline": {
           "type": "string",
           "minLength": 1,
@@ -95,38 +105,41 @@
       "properties": {
         "title": {
           "type": "string",
-          "minLength": 1,
+          "minLength": 0,
           "maxLength": 40
         },
         "body": {
           "type": "string",
-          "minLength": 1,
+          "minLength": 0,
           "maxLength": 400
         },
         "mobileTitle": {
           "type": "string",
-          "minLength": 1,
+          "minLength": 0,
           "maxLength": 24
         },
         "mobileBody": {
           "type": "string",
-          "minLength": 1,
+          "minLength": 0,
           "maxLength": 100
         }
       }
     },
     "specialties": {
       "type": "array",
-      "minItems": 3,
+      "minItems": 0,
       "items": {
-        "$ref": "#/$defs/contentCard"
-      }
+        "$ref": "#/$defs/draftContentCard"
+      },
+      "maxItems": 12
     },
     "process": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/contentCard"
-      }
+        "$ref": "#/$defs/draftContentCard"
+      },
+      "minItems": 0,
+      "maxItems": 12
     },
     "career": {
       "type": "array"
@@ -134,33 +147,18 @@
     "reviews": {
       "type": "array",
       "items": {
-        "type": "object",
-        "required": [
-          "quote",
-          "author"
-        ],
-        "properties": {
-          "quote": {
-            "type": "string"
-          },
-          "author": {
-            "type": "string"
-          },
-          "context": {
-            "type": "string"
-          },
-          "isExample": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      }
+        "$ref": "#/$defs/draftReviewItem"
+      },
+      "minItems": 0,
+      "maxItems": 12
     },
     "faqs": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/faqItem"
-      }
+        "$ref": "#/$defs/draftFaqItem"
+      },
+      "minItems": 0,
+      "maxItems": 12
     },
     "contact": {
       "type": "object"
@@ -190,24 +188,79 @@
     "design": {
       "type": "object",
       "properties": {
-        "hero": { "enum": ["portrait", "editorial", "statement"] },
-        "services": { "enum": ["cards", "list", "split"] },
-        "about": { "enum": ["editorial", "profile", "quote"] },
-        "process": { "enum": ["steps", "timeline"] },
-        "faq": { "enum": ["accordion", "columns"] },
-        "footer": { "enum": ["classic", "columns", "minimal"] },
-        "ornament": { "enum": ["line", "grid", "none"] },
-        "density": { "enum": ["airy", "compact"] },
-        "sectionOrder": { "$ref": "#/$defs/designSections" },
-        "hiddenSections": { "$ref": "#/$defs/designSections" }
+        "hero": {
+          "enum": [
+            "portrait",
+            "editorial",
+            "statement"
+          ]
+        },
+        "services": {
+          "enum": [
+            "cards",
+            "list",
+            "split"
+          ]
+        },
+        "about": {
+          "enum": [
+            "editorial",
+            "profile",
+            "quote"
+          ]
+        },
+        "process": {
+          "enum": [
+            "steps",
+            "timeline"
+          ]
+        },
+        "faq": {
+          "enum": [
+            "accordion",
+            "columns"
+          ]
+        },
+        "footer": {
+          "enum": [
+            "classic",
+            "columns",
+            "minimal"
+          ]
+        },
+        "ornament": {
+          "enum": [
+            "line",
+            "grid",
+            "none"
+          ]
+        },
+        "density": {
+          "enum": [
+            "airy",
+            "compact"
+          ]
+        },
+        "sectionOrder": {
+          "$ref": "#/$defs/designSections"
+        },
+        "hiddenSections": {
+          "$ref": "#/$defs/designSections"
+        }
       },
       "additionalProperties": false
     },
     "footer": {
       "type": "object",
       "properties": {
-        "heading": { "type": "string", "maxLength": 80 },
-        "note": { "type": "string", "maxLength": 400 }
+        "heading": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 400
+        }
       },
       "additionalProperties": false
     },
@@ -237,12 +290,12 @@
       "properties": {
         "topics": {
           "type": "array",
-          "minItems": 1,
+          "minItems": 0,
           "maxItems": 12,
           "uniqueItems": true,
           "items": {
             "type": "string",
-            "minLength": 1,
+            "minLength": 0,
             "maxLength": 60
           }
         }
@@ -277,7 +330,16 @@
       "type": "array",
       "maxItems": 6,
       "uniqueItems": true,
-      "items": { "enum": ["services", "about", "process", "reviews", "faq", "contact"] }
+      "items": {
+        "enum": [
+          "services",
+          "about",
+          "process",
+          "reviews",
+          "faq",
+          "contact"
+        ]
+      }
     },
     "templateContent": {
       "type": "object",
@@ -392,6 +454,391 @@
         }
       },
       "additionalProperties": false
+    },
+    "draftContentCard": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 0
+        },
+        "body": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 120
+        },
+        "mobileBody": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 48
+        }
+      },
+      "additionalProperties": false
+    },
+    "draftFaqItem": {
+      "type": "object",
+      "properties": {
+        "question": {
+          "type": "string",
+          "minLength": 0
+        },
+        "answer": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 240
+        },
+        "mobileAnswer": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 80
+        }
+      },
+      "additionalProperties": false
+    },
+    "reviewItem": {
+      "type": "object",
+      "required": [
+        "quote",
+        "author"
+      ],
+      "properties": {
+        "quote": {
+          "type": "string"
+        },
+        "author": {
+          "type": "string"
+        },
+        "context": {
+          "type": "string"
+        },
+        "isExample": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "draftReviewItem": {
+      "type": "object",
+      "properties": {
+        "quote": {
+          "type": "string",
+          "minLength": 0
+        },
+        "author": {
+          "type": "string",
+          "minLength": 0
+        },
+        "context": {
+          "type": "string",
+          "minLength": 0
+        },
+        "isExample": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "not": {
+          "required": [
+            "design"
+          ],
+          "properties": {
+            "design": {
+              "required": [
+                "hiddenSections"
+              ],
+              "properties": {
+                "hiddenSections": {
+                  "contains": {
+                    "const": "about"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "intro": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "body": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 400
+              },
+              "mobileTitle": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 24
+              },
+              "mobileBody": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              }
+            },
+            "required": [
+              "title",
+              "body"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "not": {
+          "required": [
+            "design"
+          ],
+          "properties": {
+            "design": {
+              "required": [
+                "hiddenSections"
+              ],
+              "properties": {
+                "hiddenSections": {
+                  "contains": {
+                    "const": "services"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "specialties"
+        ],
+        "properties": {
+          "specialties": {
+            "minItems": 3,
+            "items": {
+              "$ref": "#/$defs/contentCard"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "allOf": [
+          {
+            "not": {
+              "required": [
+                "design"
+              ],
+              "properties": {
+                "design": {
+                  "required": [
+                    "hiddenSections"
+                  ],
+                  "properties": {
+                    "hiddenSections": {
+                      "contains": {
+                        "const": "process"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "sections"
+            ],
+            "properties": {
+              "sections": {
+                "required": [
+                  "process"
+                ],
+                "properties": {
+                  "process": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "required": [
+          "process"
+        ],
+        "properties": {
+          "process": {
+            "minItems": 3,
+            "items": {
+              "$ref": "#/$defs/contentCard"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "allOf": [
+          {
+            "not": {
+              "required": [
+                "design"
+              ],
+              "properties": {
+                "design": {
+                  "required": [
+                    "hiddenSections"
+                  ],
+                  "properties": {
+                    "hiddenSections": {
+                      "contains": {
+                        "const": "faq"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "sections"
+            ],
+            "properties": {
+              "sections": {
+                "required": [
+                  "faq"
+                ],
+                "properties": {
+                  "faq": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "required": [
+          "faqs"
+        ],
+        "properties": {
+          "faqs": {
+            "minItems": 2,
+            "items": {
+              "$ref": "#/$defs/faqItem"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "allOf": [
+          {
+            "not": {
+              "required": [
+                "design"
+              ],
+              "properties": {
+                "design": {
+                  "required": [
+                    "hiddenSections"
+                  ],
+                  "properties": {
+                    "hiddenSections": {
+                      "contains": {
+                        "const": "reviews"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "sections"
+            ],
+            "properties": {
+              "sections": {
+                "required": [
+                  "reviews"
+                ],
+                "properties": {
+                  "reviews": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "required": [
+          "reviews"
+        ],
+        "properties": {
+          "reviews": {
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/reviewItem"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "not": {
+          "required": [
+            "design"
+          ],
+          "properties": {
+            "design": {
+              "required": [
+                "hiddenSections"
+              ],
+              "properties": {
+                "hiddenSections": {
+                  "contains": {
+                    "const": "contact"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "consultation": {
+            "properties": {
+              "topics": {
+                "minItems": 1,
+                "items": {
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

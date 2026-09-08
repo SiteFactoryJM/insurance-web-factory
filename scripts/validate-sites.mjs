@@ -6,7 +6,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sitesDir = path.join(root, "sites");
 const templates = new Set(["trust-blue", "warm-care", "premium-navy", "clean-minimal", "local-friendly"]);
 const palettes = new Set(["navy", "forest", "slate", "charcoal", "teal", "stone"]);
-const fonts = new Set(["pretendard", "noto-serif-kr"]);
+const fonts = new Set(["pretendard", "noto-serif-kr", "noto-sans-kr", "nanum-gothic", "nanum-myeongjo", "gowun-batang"]);
 const statuses = new Set(["draft", "published"]);
 const submissionModes = new Set(["discard", "store", "mailto"]);
 const domainOwners = new Map();
@@ -19,6 +19,44 @@ const isUrl = (value) => {
   try { const url = new URL(value); return ["http:", "https:"].includes(url.protocol); } catch { return false; }
 };
 const isEmail = (value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value));
+
+// Mirrors the browser helper without depending on an already-compiled build.
+export function isSectionEnabled(site, id) {
+  if (Array.isArray(site.design?.hiddenSections) && site.design.hiddenSections.includes(id)) return false;
+  if (id === "reviews") return site.sections?.reviews === true;
+  if (id === "process" || id === "faq") return site.sections?.[id] !== false;
+  return true;
+}
+
+export function validateSectionContent(site) {
+  const issues = [];
+  const checkText = (value, label, active, required = true) => {
+    if (value === undefined && (!active || !required)) return;
+    if (typeof value !== "string" || (active && !value.trim())) issues.push(`${label}: ${active ? "비어 있지 않은" : "올바른"} 문자열이어야 합니다.`);
+  };
+  if (!site.intro || typeof site.intro !== "object" || Array.isArray(site.intro)) issues.push("intro는 소개 설정 객체여야 합니다.");
+  else for (const key of ["title", "body", "mobileTitle", "mobileBody", "philosophy"]) checkText(site.intro[key], `intro.${key}`, isSectionEnabled(site, "about") && key !== "philosophy", ["title", "body"].includes(key));
+  for (const [field, section, min, fields, optionalFields] of [
+    ["specialties", "services", 3, ["title", "body"], ["mobileBody"]],
+    ["process", "process", 3, ["title", "body"], ["mobileBody"]],
+    ["faqs", "faq", 2, ["question", "answer"], ["mobileAnswer"]],
+    ["reviews", "reviews", 1, ["quote", "author"], ["context"]],
+  ]) {
+    const active = isSectionEnabled(site, section);
+    const items = site[field];
+    if (field === "reviews" && items === undefined && !active) continue;
+    if (!Array.isArray(items)) { issues.push(`${field}는 목록이어야 합니다.`); continue; }
+    if ((active && items.length < min) || items.length > 12) issues.push(`${field}: ${active ? min : 0}~12개 항목이 필요합니다.`);
+    items.forEach((item, index) => {
+      if (!item || typeof item !== "object" || Array.isArray(item)) { issues.push(`${field}[${index}]: 설정 객체가 필요합니다.`); return; }
+      for (const key of fields) checkText(item[key], `${field}[${index}].${key}`, active);
+      for (const key of optionalFields) checkText(item[key], `${field}[${index}].${key}`, active && key !== "context", false);
+      for (const key of Object.keys(item)) if (![...fields, ...optionalFields, ...(field === "reviews" ? ["isExample"] : [])].includes(key)) issues.push(`${field}[${index}].${key}: 지원하지 않는 항목입니다.`);
+      if (field === "reviews" && item.isExample !== undefined && typeof item.isExample !== "boolean") issues.push(`${field}[${index}].isExample: 참/거짓 값이 필요합니다.`);
+    });
+  }
+  return issues;
+}
 
 export function validateDesignConfiguration(site) {
   const issues = [];
@@ -37,7 +75,7 @@ export function validateDesignConfiguration(site) {
     }
   }
   if (site.footer !== undefined) {
-    if (!site.footer || typeof site.footer !== "object" || Array.isArray(site.footer)) issues.push("footer는 푸터 설정 객체여야 합니다.");
+    if (!site.footer || typeof site.footer !== "object" || Array.isArray(site.footer)) issues.push("footer는 하단입력 설정 객체여야 합니다.");
     else for (const [key, value] of Object.entries(site.footer)) {
       const limit = key === "heading" ? 80 : key === "note" ? 400 : 0;
       if (!limit || typeof value !== "string" || Array.from(value).length > limit) issues.push(`footer.${key}: ${limit || "지원되는"}자 이내의 문구를 입력하세요.`);
@@ -58,7 +96,9 @@ export function validateContentLengths(site) {
   const issues = [];
   const check = (value, label, maxLength) => {
     if (value === undefined) return;
-    if (typeof value !== "string" || !value.trim()) {
+    const section = label.startsWith("intro.") ? "about" : label.startsWith("specialties[") ? "services" : label.startsWith("process[") ? "process" : label.startsWith("faqs[") ? "faq" : undefined;
+    const allowEmpty = section && !isSectionEnabled(site, section);
+    if (typeof value !== "string" || (!allowEmpty && !value.trim())) {
       issues.push(`${label}는 비어 있지 않은 문자열이어야 합니다.`);
       return;
     }
@@ -70,10 +110,10 @@ export function validateContentLengths(site) {
   };
   const headlineLimits = { headline: 40, subheadline: 120, mobileHeadline: 24, mobileSubheadline: 60 };
   const cards = (items, prefix) => {
-    if (Array.isArray(items)) items.forEach((item, index) => checkObject(item, `${prefix}[${index}]`, { body: 120, mobileBody: 48 }));
+    if (Array.isArray(items)) items.forEach((item, index) => checkObject(item, `${prefix}[${index}]`, { title: 60, body: 120, mobileBody: 48 }));
   };
   const faqs = (items, prefix) => {
-    if (Array.isArray(items)) items.forEach((item, index) => checkObject(item, `${prefix}[${index}]`, { answer: 240, mobileAnswer: 80 }));
+    if (Array.isArray(items)) items.forEach((item, index) => checkObject(item, `${prefix}[${index}]`, { question: 100, answer: 240, mobileAnswer: 80 }));
   };
   checkObject(site.hero, "hero", headlineLimits);
   checkObject(site.intro, "intro", { title: 40, body: 400, mobileTitle: 24, mobileBody: 100 });
@@ -103,6 +143,7 @@ for (const entry of entries) {
   const id = String(site.id ?? entry.name);
   errors.push(...validateDesignConfiguration(site).map(message => `[${id}] ${message}`));
   errors.push(...validateContentLengths(site).map(message => `[${id}] ${message}`));
+  errors.push(...validateSectionContent(site).map(message => `[${id}] ${message}`));
   if (id !== entry.name) errors.push(`[${id}] 폴더명과 site.id가 다릅니다: ${entry.name}`);
   if (!/^[a-z0-9][a-z0-9-]{1,62}$/.test(id)) errors.push(`[${id}] site.id는 영문 소문자·숫자·하이픈만 사용할 수 있습니다.`);
   if (!statuses.has(site.status)) errors.push(`[${id}] status는 draft 또는 published여야 합니다.`);
@@ -135,8 +176,6 @@ for (const entry of entries) {
   required(site.agent?.profileImage, "agent.profileImage", id);
   required(site.hero?.headline, "hero.headline", id);
   required(site.hero?.subheadline, "hero.subheadline", id);
-  required(site.intro?.title, "intro.title", id);
-  required(site.intro?.body, "intro.body", id);
   required(site.contact?.phone, "contact.phone", id);
   required(site.contact?.availableHours, "contact.availableHours", id);
   required(site.seo?.title, "seo.title", id);
@@ -145,10 +184,6 @@ for (const entry of entries) {
   required(site.compliance?.privacyOfficer, "compliance.privacyOfficer", id);
   required(site.compliance?.privacyRetentionPeriod, "compliance.privacyRetentionPeriod", id);
 
-  if ((site.specialties ?? []).length < 3) errors.push(`[${id}] specialties는 최소 3개가 필요합니다.`);
-  if (site.sections?.process && (site.process ?? []).length < 3) errors.push(`[${id}] process 표시 시 최소 3개 단계가 필요합니다.`);
-  if (site.sections?.reviews && (site.reviews ?? []).length < 1) errors.push(`[${id}] 고객 후기 표시 시 reviews가 최소 1개 필요합니다.`);
-  if (site.sections?.faq && (site.faqs ?? []).length < 2) errors.push(`[${id}] FAQ 표시 시 최소 2개가 필요합니다.`);
   if (!isUrl(site.contact?.kakaoUrl)) errors.push(`[${id}] kakaoUrl 형식이 올바르지 않습니다.`);
   if (!isUrl(site.contact?.instagramUrl)) errors.push(`[${id}] instagramUrl 형식이 올바르지 않습니다.`);
   if (!isUrl(site.contact?.mapUrl)) errors.push(`[${id}] mapUrl 형식이 올바르지 않습니다.`);
@@ -159,12 +194,11 @@ for (const entry of entries) {
 
   if (site.consultation?.topics !== undefined) {
     const topics = site.consultation.topics;
-    if (!Array.isArray(topics) || topics.length < 1 || topics.length > 12 || topics.some(value => typeof value !== "string" || !value.trim() || value.length > 60) || new Set(topics).size !== topics.length) errors.push(`[${id}] consultation.topics는 중복 없는 1~12개의 짧은 문자열이어야 합니다.`);
+    const active = isSectionEnabled(site, "contact");
+    if (!Array.isArray(topics) || topics.length < (active ? 1 : 0) || topics.length > 12 || topics.some(value => typeof value !== "string" || (active && !value.trim()) || Array.from(value).length > 60) || new Set(topics).size !== topics.length) errors.push(`[${id}] consultation.topics는 중복 없는 ${active ? 1 : 0}~12개의 짧은 문자열이어야 합니다.`);
   }
 
   for (const [index, review] of (site.reviews ?? []).entries()) {
-    required(review?.quote, `reviews[${index}].quote`, id);
-    required(review?.author, `reviews[${index}].author`, id);
     if (review?.isExample !== true && site.demo?.enabled) warnings.push(`[${id}] 데모 후기는 isExample: true 표기를 권장합니다.`);
   }
 

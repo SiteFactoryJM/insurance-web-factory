@@ -20,7 +20,7 @@ for(let attempt=1;attempt<=30;attempt++) {
   try {
     for(const theme of themes) for(const palette of palettes) {
       const html=await get(`/?theme=${theme}&palette=${palette}`);shared(html);
-      assert.ok(html.includes('data-design-version="atelier-diy-v7"'),'new design not yet live');
+      assert.ok(html.includes('data-design-version="atelier-focus-v8"'),'new design not yet live');
       assert.ok(html.includes(`data-layout="${theme}" data-palette="${palette}"`),`${theme}/${palette}: wrong combination`);
       assert.ok(html.includes('data-submission-mode="discard"'),'demo discard mode missing');
       assert.ok(html.includes('실제 상담은 접수되지 않았습니다'),'demo completion notice missing');
@@ -35,6 +35,6 @@ for(let attempt=1;attempt<=30;attempt++) {
   }catch(error){console.log(`Waiting for connected Cloudflare build (${attempt}/30): ${error.message}`);if(attempt<30)await new Promise(resolve=>setTimeout(resolve,10000));}
 }
 assert.ok(verified,'Connected Cloudflare build was not verified. Inspect Cloudflare Builds or run Deploy Cloudflare demo with configured secrets.');
-const summary=`Atelier DIY v7 live verification passed: 5 layouts × 6 palettes, gallery, noindex, company name, demo-only form, completion notice and privacy.\n${origin}/templates\n`;
+const summary=`Atelier Focus v8 live verification passed: 5 layouts × 6 palettes, gallery, noindex, company name, demo-only form, completion notice and privacy.\n${origin}/templates\n`;
 console.log(summary);
 if(process.env.GITHUB_STEP_SUMMARY)await appendFile(process.env.GITHUB_STEP_SUMMARY,summary);

@@ -3,9 +3,11 @@ import assert from "node:assert/strict";
 import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { createProject, createStudioExample, parseProject, validateProjectSite, validateImageSource, MAX_PROJECT_BYTES, MAX_IMAGE_BYTES } from "../.preview-dist/studio/project.js";
+import { createProject, createStudioExample, parseProject, validateProjectSite, validateImageSource, isSectionEnabled, MAX_PROJECT_BYTES, MAX_IMAGE_BYTES } from "../.preview-dist/studio/project.js";
+import { HEADING_FONT_IDS } from "../.preview-dist/types.js";
+import { HEADING_FONTS, fontStylesheetLinks, headingFont, headingFontStyle } from "../.preview-dist/render/fonts.js";
 import { importStudioProject } from "../scripts/import-studio.mjs";
-import { validateDesignConfiguration } from "../scripts/validate-sites.mjs";
+import { validateContentLengths, validateDesignConfiguration, validateSectionContent } from "../scripts/validate-sites.mjs";
 
 const raw = JSON.parse(await readFile(new URL("../sites/demo-agent/site.json", import.meta.url), "utf8"));
 const clone = value => JSON.parse(JSON.stringify(value));
@@ -42,6 +44,61 @@ test("DIY JSON round-trip preserves chosen patterns, mobile copy, footer and cus
   assert.equal(restored.site.hero.mobileHeadline, "우리 가족의 다음 선택");
   assert.equal(restored.site.hero.image, png);
   assert.equal(restored.site.agent.businessNumber, "123-45-67890");
+});
+
+test("all six licensed heading choices survive export, restore and source validation", () => {
+  assert.equal(HEADING_FONT_IDS.length, 6);
+  assert.deepEqual(HEADING_FONTS.map(font => font.id), [...HEADING_FONT_IDS]);
+  for (const id of HEADING_FONT_IDS) {
+    const site = example(); site.headingFont = id;
+    assert.equal(parseProject(JSON.stringify(createProject(site))).site.headingFont, id);
+    assert.ok(headingFontStyle(id).includes(headingFont(id).family));
+    assert.match(headingFont(id).licenseUrl, /^https:\/\/github\.com\/(orioncactus\/pretendard|google\/fonts)\//);
+    assert.equal((fontStylesheetLinks([id, id]).match(/<link /g) || []).length, id === "pretendard" ? 1 : 2);
+  }
+  assert.equal(headingFont("constructor").id, "pretendard");
+  const invalid = example(); invalid.headingFont = "unknown-font";
+  assert.match(validateProjectSite(invalid).join("\n"), /headingFont/);
+});
+
+test("hidden incomplete sections preserve drafts without blocking project save or backend validation", () => {
+  const site = example();
+  site.design = { ...site.design, hiddenSections: ["about", "services", "process", "faq", "reviews"] };
+  site.intro = { title: "", body: "", mobileBody: "" };
+  site.specialties = [{ title: "작성 중인 제목", body: "" }, {}];
+  site.process = [];
+  site.faqs = [{ question: "", answer: "" }];
+  site.reviews = [{ quote: "", author: "" }];
+  assert.deepEqual(validateProjectSite(site), []);
+  assert.deepEqual(validateContentLengths(site), []);
+  assert.deepEqual(validateSectionContent(site), []);
+  const restored = parseProject(JSON.stringify(createProject(site))).site;
+  for (const key of ["intro", "specialties", "process", "faqs", "reviews"]) assert.deepEqual(restored[key], site[key]);
+  for (const section of ["about", "services", "process", "faq", "reviews"]) assert.equal(isSectionEnabled(restored, section), false);
+  restored.design.hiddenSections = [];
+  assert.ok(validateProjectSite(restored).length > 0, "restoring a section restores its content requirements");
+  assert.ok(validateSectionContent(restored).length > 0);
+});
+
+test("hidden drafts still reject malformed shape, overlong copy, unsafe fields and absent legal identity", () => {
+  const site = example();
+  site.design = { ...site.design, hiddenSections: ["about", "services", "process", "faq", "reviews", "contact"] };
+  for (const mutate of [s => s.intro = [], s => s.specialties = [null], s => s.specialties = [{ body: 42 }], s => s.intro.body = "가".repeat(401), s => s.faqs[0].answer = "가".repeat(241), s => s.specialties[0].script = "alert(1)", s => s.contact.kakaoUrl = "javascript:alert(1)", s => s.agent.name = "", s => s.compliance.footerDisclaimer = ""]) {
+    const changed = clone(site); mutate(changed);
+    assert.ok(validateProjectSite(changed).length > 0);
+  }
+  const changed = clone(site); changed.sections.process = false; changed.sections.faq = false; changed.sections.reviews = false; changed.design.hiddenSections = [];
+  changed.process = []; changed.faqs = []; changed.reviews = [];
+  assert.equal(isSectionEnabled(changed, "process"), false);
+  assert.equal(isSectionEnabled(changed, "faq"), false);
+  assert.equal(isSectionEnabled(changed, "reviews"), false);
+  assert.deepEqual(validateProjectSite(changed), []);
+  const noContact = clone(site); noContact.consultation.topics = [];
+  assert.deepEqual(validateProjectSite(noContact), []);
+  noContact.contact.phone = "";
+  assert.ok(validateProjectSite(noContact).some(issue => issue.includes("contact.phone")), "footer contact stays required even when the survey is hidden");
+  const malformed = clone(site); malformed.career = [undefined];
+  assert.ok(validateProjectSite(malformed).some(issue => issue.includes("career")), "hidden arrays still require typed elements");
 });
 
 test("example resolution removes template overrides without changing the source", () => {
@@ -152,6 +209,21 @@ test("CLI imports into site.json, extracts uploaded images, and preserves visual
   assert.deepEqual(await readFile(path.join(rootDir, "public", config.agent.profileImage)), Buffer.from(png.split(",")[1], "base64"));
   assert.deepEqual(validateProjectSite(config), []);
   assert.equal((await readdir(path.join(rootDir, "sites", "agent-kim"))).length, 1);
+});
+
+test("CLI imported hidden drafts stay valid in the source-site validator", async t => {
+  const { rootDir, site, file } = await fixture(t);
+  site.headingFont = "gowun-batang";
+  site.design = { ...site.design, hiddenSections: ["about", "services", "process", "faq", "reviews"] };
+  site.intro = { title: "", body: "" }; site.specialties = [{ title: "미완성", body: "" }]; site.process = []; site.faqs = []; site.reviews = [];
+  await writeFile(file, JSON.stringify(createProject(site)));
+  const result = await importStudioProject(file, { rootDir, id: "hidden-draft" });
+  const config = JSON.parse(await readFile(result.configPath, "utf8"));
+  assert.equal(config.headingFont, "gowun-batang");
+  assert.deepEqual(validateProjectSite(config), []);
+  assert.deepEqual(validateDesignConfiguration(config), []);
+  assert.deepEqual(validateContentLengths(config), []);
+  assert.deepEqual(validateSectionContent(config), []);
 });
 
 test("CLI refuses existing sites by default and only replaces with explicit force", async t => {

@@ -1,6 +1,6 @@
 import { DESIGN_SECTION_IDS, PALETTE_IDS, TEMPLATE_IDS, type PaletteId, type SiteConfig, type SiteDesign, type TemplateId } from "../types.js";
 
-export const DESIGN_VERSION = "atelier-diy-v7";
+export const DESIGN_VERSION = "atelier-focus-v8";
 export const TEMPLATE_META: Record<TemplateId, { name: string; purpose: string; description: string; palette: PaletteId }> = {
   "trust-blue": { name: "신뢰의 기준", purpose: "기업형", description: "담당자와 상담 분야를 먼저 확인합니다. 정돈된 항목과 설명으로 필요한 정보를 차례로 살펴봅니다.", palette: "navy" },
   "warm-care": { name: "사람과 대화", purpose: "소개 중심형", description: "사진과 상담 원칙에서 시작합니다. 상담 철학과 준비할 내용을 깊이 있게 전달합니다.", palette: "forest" },
@@ -34,7 +34,7 @@ export function getDesign(site: SiteConfig): Required<SiteDesign> {
   const supplied = site.design || {};
   const order = supplied.sectionOrder?.filter((key, i, all) => DESIGN_SECTION_IDS.includes(key) && all.indexOf(key) === i);
   return {
-    hero: site.template === 'warm-care' ? 'portrait' : ['premium-navy','clean-minimal'].includes(site.template) ? 'statement' : 'editorial',
+    hero: ['trust-blue','warm-care'].includes(site.template) ? 'portrait' : ['premium-navy','clean-minimal'].includes(site.template) ? 'statement' : 'editorial',
     services: site.template === 'trust-blue' ? 'list' : site.template === 'premium-navy' ? 'split' : 'cards',
     about: site.template === 'warm-care' ? 'profile' : 'editorial',
     process: site.template === 'clean-minimal' ? 'steps' : 'timeline',
