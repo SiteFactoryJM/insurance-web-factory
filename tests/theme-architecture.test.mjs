@@ -80,12 +80,12 @@ test('six palettes combine independently with all five layouts and their JSON co
 test('query fallbacks are safe and production ignores preview settings', () => {
   const request=new Request('https://example.test/?theme=warm-care&palette=stone');
   const production=structuredClone(site);production.demo.enabled=false;
-  assert.match(renderSitePage(production,request),/data-layout="trust-blue" data-palette="navy"/);
+  assert.match(renderSitePage(production,request),new RegExp(`data-layout="trust-blue" data-palette="${site.palette}"`));
   const legacy=structuredClone(site);delete legacy.palette;delete legacy.templateContent;
   assert.match(renderSitePage(legacy,new Request('https://example.test/?theme=INVALID&palette=INVALID')),/data-layout="trust-blue" data-palette="navy"/);
   assert.ok(renderSitePage(legacy,new Request('https://example.test/?theme=warm-care')).includes(legacy.hero.headline.replaceAll('\n','<br>')));
   const disabled=structuredClone(site);disabled.demo.allowTemplateSwitch=false;
-  assert.match(renderSitePage(disabled,request),/data-layout="trust-blue" data-palette="navy"/);
+  assert.match(renderSitePage(disabled,request),new RegExp(`data-layout="trust-blue" data-palette="${site.palette}"`));
 });
 
 test('studio tools precede the site header and stay out of production', () => {
