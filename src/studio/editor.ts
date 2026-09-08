@@ -57,6 +57,8 @@ let previewTimer: number | undefined;
 let previewReady = false;
 let activeBlock = "";
 let pendingPreviewSection = "";
+let previewFocusAnimation: Animation | undefined;
+let pendingPreviewFocus = "";
 let previewTopics = "";
 const detachedPreviewNodes = new Map<string, Element>();
 let view: "editor" | "preview" = "editor";
@@ -156,7 +158,6 @@ function renderPanels(): void {
   const openSummaries = [...panels.querySelectorAll<HTMLDetailsElement>("details[open]")].map(details => details.querySelector("summary")?.textContent?.replace(/\s*\(\d+\)$/, ""));
   panels.innerHTML = [stylePanel(), contentPanel(), footerPanel(), savePanel()].map((content, index) => `<section class="panel" id="panel-${index}" role="tabpanel" aria-labelledby="step-${index}"${step === index ? "" : " hidden"}>${content}</section>`).join("");
   for (const details of panels.querySelectorAll<HTMLDetailsElement>("details")) if (openSummaries.includes(details.querySelector("summary")?.textContent?.replace(/\s*\(\d+\)$/, ""))) details.open = true;
-  [...panels.querySelectorAll<HTMLElement>("[data-editor-block]")].find(element => element.dataset.editorBlock === activeBlock)?.classList.add("is-active-block");
 }
 function activateStep(index: number, focus = false): void {
   step = Math.max(0, Math.min(3, index));
@@ -175,6 +176,7 @@ function setView(next: "editor" | "preview"): void {
   document.getElementById("studio-workspace")!.dataset.view = view;
   document.querySelectorAll<HTMLButtonElement>("button[data-view]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.view === view)));
   fitPreview();
+  if (view === "preview") playPreviewFocus();
 }
 function fitPreview(): void {
   const width = preview.dataset.viewport === "mobile" ? 390 : 1440;
@@ -242,6 +244,17 @@ function morphPreviewChildren(current: Node, next: Node): void {
     current.removeChild(node);
   }
 }
+function playPreviewFocus(): void {
+  if (!pendingPreviewFocus || !preview.getBoundingClientRect().width) return;
+  const target = preview.contentDocument?.getElementById(pendingPreviewFocus);
+  const win = preview.contentWindow;
+  pendingPreviewFocus = "";
+  previewFocusAnimation?.cancel();
+  if (target && win && !win.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    previewFocusAnimation = target.animate([{ opacity: 1 }, { opacity: .45, offset: .3 }, { opacity: 1 }], { duration: 420, easing: "ease-in-out" });
+    previewFocusAnimation.id = "studio-section-focus";
+  }
+}
 function navigatePreviewSection(): void {
   if (!previewReady || !pendingPreviewSection) return;
   const doc = preview.contentDocument;
@@ -253,14 +266,13 @@ function navigatePreviewSection(): void {
   const top = Math.max(0, win.scrollY + target.getBoundingClientRect().top - headerHeight - 20);
   pendingPreviewSection = "";
   win.scrollTo({ top, behavior: "instant" });
+  pendingPreviewFocus = target.id;
+  playPreviewFocus();
 }
 function activateEditorBlock(block: HTMLElement): void {
   const key = block.dataset.editorBlock;
   if (!key || activeBlock === key) return;
   activeBlock = key;
-  panels.querySelectorAll<HTMLElement>(".is-active-block").forEach(element => element.classList.remove("is-active-block"));
-  block.classList.add("is-active-block");
-  panels.dataset.activeBlock = key;
   pendingPreviewSection = block.dataset.previewSection || "";
   navigatePreviewSection();
 }

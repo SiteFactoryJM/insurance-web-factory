@@ -255,7 +255,7 @@ test('entering a copy block locates it once and typing preserves preview positio
   const introduction=field(page,'intro.body');
   await reveal(introduction);
   await introduction.focus();
-  await expect(page.locator('[data-writing-section="about"]')).toHaveClass(/is-active-block/);
+  await expect(introduction).toBeFocused();
   await expect.poll(()=>frame(page).locator('#about').evaluate(element=>Math.abs(element.getBoundingClientRect().top))).toBeLessThan(180);
   const firstQuestion=frame(page).locator('#faq details').first();
   await firstQuestion.locator('summary').click();
@@ -275,19 +275,77 @@ test('entering a copy block locates it once and typing preserves preview positio
   expect(navigations).toEqual([]);
 });
 
-test('copy block focus highlights the current block and honors reduced motion',async({page})=>{
+test('copy block focus fades only the matching preview section and honors reduced motion',async({page})=>{
   await page.emulateMedia({reducedMotion:'no-preference'});
   await start(page);await example(page);await step(page,1);
-  await field(page,'hero.headline').focus();
-  const active=page.locator('[data-editor-block="hero"]');
-  await expect(active).toHaveClass(/is-active-block/);
-  expect(await active.evaluate(element=>getComputedStyle(element).animationName)).not.toBe('none');
+  await frame(page).locator('body').evaluate(()=>document.fonts.ready);
+  const initial=await page.evaluate(()=>{
+    document.querySelector('[data-field="hero.headline"]').focus();
+    const target=document.querySelector('#site-preview').contentDocument.getElementById('home');
+    const animations=target.getAnimations();
+    const animation=animations[0];
+    if(animation) {animation.pause();animation.currentTime=Number(animation.effect.getTiming().duration)/2;}
+    window.__previewFocusAnimation=animation;
+    window.__previewFocusTarget=target;
+    return {count:animations.length,opacity:Number(getComputedStyle(target).opacity)};
+  });
+  expect(initial.count).toBe(1);
+  expect(initial.opacity).toBeGreaterThan(0);
+  expect(initial.opacity).toBeLessThan(.95);
+  await expect(page.locator('.is-active-block')).toHaveCount(0);
+  const leftEffects=await page.locator('[data-editor-block]').evaluateAll(blocks=>blocks.map(block=>({
+    block:block.dataset.editorBlock,animation:getComputedStyle(block).animationName,shadow:getComputedStyle(block).boxShadow,
+  })).filter(block=>block.animation!=='none'||block.shadow!=='none'));
+  expect(leftEffects).toEqual([]);
+  await field(page,'hero.headline').fill('현재 보장을 차분히 살펴봅니다.');
+  await expect(frame(page).locator('h1 .copy-desktop')).toHaveText('현재 보장을 차분히 살펴봅니다.');
+  expect(await page.evaluate(()=>{
+    const target=document.querySelector('#site-preview').contentDocument.getElementById('home');
+    const animations=target.getAnimations();
+    return target===window.__previewFocusTarget&&animations.length===1&&animations[0]===window.__previewFocusAnimation;
+  })).toBe(true);
+  const moved=await page.evaluate(()=>{
+    const summary=document.querySelector('[data-writing-section="about"] > summary');
+    if(!summary.parentElement.open) summary.click();
+    document.querySelector('[data-field="intro.body"]').focus();
+    const doc=document.querySelector('#site-preview').contentDocument;
+    const target=doc.getElementById('about');
+    const animations=target.getAnimations();
+    if(animations[0]) {animations[0].pause();animations[0].currentTime=Number(animations[0].effect.getTiming().duration)/2;}
+    return {count:animations.length,opacity:Number(getComputedStyle(target).opacity),oldCount:doc.getElementById('home').getAnimations().length,oldOpacity:Number(getComputedStyle(doc.getElementById('home')).opacity)};
+  });
+  expect(moved.count).toBe(1);
+  expect(moved.opacity).toBeLessThan(.95);
+  expect(moved.oldCount).toBe(0);
+  expect(moved.oldOpacity).toBe(1);
+  await frame(page).locator('#about').evaluate(element=>element.getAnimations().forEach(animation=>animation.finish()));
+  await page.setViewportSize({width:390,height:1000});
+  await expect(page.locator('#site-preview')).toBeHidden();
+  expect(await page.evaluate(()=>{
+    document.querySelector('[data-field="hero.headline"]').focus();
+    const doc=document.querySelector('#site-preview').contentDocument;
+    return ['home','about'].map(id=>doc.getElementById(id).getAnimations().length);
+  })).toEqual([0,0]);
+  const mobile=await page.evaluate(()=>{
+    document.querySelector('button[data-view="preview"]').click();
+    const target=document.querySelector('#site-preview').contentDocument.getElementById('home');
+    const animations=target.getAnimations();
+    if(animations[0]) {animations[0].pause();animations[0].currentTime=Number(animations[0].effect.getTiming().duration)/2;}
+    return {count:animations.length,opacity:Number(getComputedStyle(target).opacity)};
+  });
+  await expect(page.locator('#site-preview')).toBeVisible();
+  expect(mobile.count).toBe(1);
+  expect(mobile.opacity).toBeGreaterThan(0);
+  expect(mobile.opacity).toBeLessThan(.95);
   await page.emulateMedia({reducedMotion:'reduce'});
-  await field(page,'agent.name').focus();
-  const profile=page.locator('[data-editor-block="profile"]');
-  await expect(profile).toHaveClass(/is-active-block/);
-  expect(await profile.evaluate(element=>getComputedStyle(element).animationName)).toBe('none');
-  await expect(active).not.toHaveClass(/is-active-block/);
+  await page.locator('button[data-view="editor"]').click();
+  const reduced=await page.evaluate(()=>{
+    document.querySelector('[data-field="intro.body"]').focus();
+    document.querySelector('button[data-view="preview"]').click();
+    const doc=document.querySelector('#site-preview').contentDocument;
+    return ['home','about'].map(id=>({count:doc.getElementById(id).getAnimations().length,opacity:Number(getComputedStyle(doc.getElementById(id)).opacity)}));
+  });
+  expect(reduced).toEqual([{count:0,opacity:1},{count:0,opacity:1}]);
 });
 
 test('the representative page gives the adviser a large loaded portrait on desktop and mobile',async({page},testInfo)=>{

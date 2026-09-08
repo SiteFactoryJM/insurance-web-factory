@@ -30,7 +30,7 @@ for(let attempt=1;attempt<=30;attempt++) {
     for(const palette of palettes) assert.ok(gallery.includes(`name="palette" value="${palette}"`),`gallery: ${palette} missing`);
     const privacy=await get('/privacy');shared(privacy);assert.ok(privacy.includes('개인정보는 저장하거나 전송하지 않습니다.'));
     const studio=await get('/studio');assert.ok(studio.includes('id="site-preview"'),'DIY preview missing');assert.ok(studio.includes('data-action="export"'),'DIY export missing');
-    const bundle=await get('/assets/studio.js');assert.ok(bundle.length>10000,'DIY bundle missing');
+    const bundle=await get('/assets/studio.js');assert.ok(bundle.length>10000,'DIY bundle missing');assert.ok(bundle.includes('studio-section-focus'),'preview focus effect not yet live');
     verified=true;break;
   }catch(error){console.log(`Waiting for connected Cloudflare build (${attempt}/30): ${error.message}`);if(attempt<30)await new Promise(resolve=>setTimeout(resolve,10000));}
 }
