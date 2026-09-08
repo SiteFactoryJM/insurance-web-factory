@@ -5,6 +5,7 @@ import { renderSitePage, renderTemplateGallery } from '../.preview-dist/render/p
 import { TEMPLATE_IDS, PALETTE_IDS } from '../.preview-dist/types.js';
 import { clientScript } from '../.preview-dist/render/client-script.js';
 import { handleConsultation } from '../.preview-dist/routes/consultation.js';
+import { responsiveCopy } from '../.preview-dist/render/copy.js';
 const site = JSON.parse(fs.readFileSync(new URL('../sites/demo-agent/site.json', import.meta.url), 'utf8'));
 const page = (config = site, theme = 'trust-blue') => renderSitePage(config, new Request(`https://example.test/?theme=${theme}`));
 
@@ -85,4 +86,31 @@ test('query fallbacks are safe and production ignores preview settings', () => {
   assert.ok(renderSitePage(legacy,new Request('https://example.test/?theme=warm-care')).includes(legacy.hero.headline.replaceAll('\n','<br>')));
   const disabled=structuredClone(site);disabled.demo.allowTemplateSwitch=false;
   assert.match(renderSitePage(disabled,request),/data-layout="trust-blue" data-palette="navy"/);
+});
+
+test('studio tools precede the site header and stay out of production', () => {
+  const html=page();
+  assert.ok(html.indexOf('<aside class="sample-bar"') < html.indexOf('<header class="site-header"'));
+  assert.doesNotMatch(html,/<span class="brand-mark"|<aside class="customization-band"/);
+  const production=structuredClone(site);production.demo.enabled=false;
+  assert.doesNotMatch(page(production),/<aside class="sample-bar"/);
+  production.status='published';production.seo.noIndex=false;
+  assert.match(page(production),/name="robots" content="index,follow,max-image-preview:large"/);
+  production.status='draft';
+  assert.match(page(production),/name="robots" content="noindex,nofollow"/);
+});
+
+test('responsive copy preserves complete escaped text and legacy fallbacks', () => {
+  assert.equal(responsiveCopy('기존 원문\n두 번째 줄'), '기존 원문<br>두 번째 줄');
+  assert.equal(responsiveCopy('원문', ''), '원문');
+  assert.equal(responsiveCopy('<b>PC</b>', '<img src=x>'), '<span class="copy-desktop">&lt;b&gt;PC&lt;/b&gt;</span><span class="copy-mobile">&lt;img src=x&gt;</span>');
+  const modified=structuredClone(site);
+  modified.hero.mobileHeadline='기본 모바일';
+  modified.templateContent['warm-care'].headline='별도 PC 제목';
+  delete modified.templateContent['warm-care'].mobileHeadline;
+  assert.ok(page(modified,'warm-care').includes('별도 PC 제목'));
+  assert.ok(!page(modified,'warm-care').includes('기본 모바일'));
+  modified.templateContent['warm-care']={mobileHeadline:'모바일만 별도 작성',mobileSubheadline:'짧은 설명만 교체'};
+  assert.ok(page(modified,'warm-care').includes('모바일만 별도 작성'));
+  assert.ok(page(modified,'warm-care').includes('짧은 설명만 교체'));
 });

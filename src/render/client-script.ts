@@ -24,7 +24,8 @@ export const clientScript = String.raw`
     const progress = form.querySelector('[data-step-status]');
     const phone = form.elements.namedItem('phone');
     const message = form.elements.namedItem('message');
-    const labels = ['분야 선택','상황 작성','연락 정보','최종 확인'];
+    const messageLimit = Number(message.dataset.maxCharacters);
+    const labels = ['분야 선택','상담 목적','예시 정보','최종 확인'];
     let current = 0;
     let complete = false;
     const value = name => String(form.elements.namedItem(name)?.value || '').trim();
@@ -34,6 +35,7 @@ export const clientScript = String.raw`
     const validate = () => {
       clearError();
       if(current === 0 && !value('topic')) return invalid('상담 분야를 하나 선택해 주세요.', form.querySelector('[name="topic"]'));
+      if(current === 1 && Array.from(message.value).length > messageLimit) return invalid('덧붙일 내용은 공백 포함 ' + messageLimit + '자 이내로 적어 주세요.', message);
       if(current === 2 && !/^01[016789][0-9]{7,8}$/.test(value('phone').replace(/\D/g,''))) return invalid('휴대전화 번호를 확인해 주세요. 예: 010-0000-0000', phone);
       if(current === 3 && !form.elements.namedItem('privacyConsent').checked) return invalid('샘플 개인정보 안내 확인에 체크해 주세요.', form.elements.namedItem('privacyConsent'));
       return true;
@@ -42,7 +44,7 @@ export const clientScript = String.raw`
       review.replaceChildren();
       const digits = value('phone').replace(/\D/g,'');
       const maskedPhone = digits ? digits.slice(0,3) + '-****-' + digits.slice(-4) : '';
-      [['상담 분야',value('topic')],['궁금한 내용',value('message') || '상담 때 말씀드릴게요'],['이름 / 호칭',value('name') || '작성하지 않음'],['연락처',maskedPhone],['연락 방법',value('contactMethod')],['희망 시간',value('contactTime')]].forEach(([key,text]) => {
+      [['상담 분야',value('topic')],['상담 목적',value('goal') || '상담하며 정할게요'],['덧붙일 내용',value('message') || '상담 때 말씀드릴게요'],['이름 / 호칭',value('name') || '작성하지 않음'],['연락처',maskedPhone],['연락 방법',value('contactMethod')],['희망 시간',value('contactTime')]].forEach(([key,text]) => {
         const row = document.createElement('div'); const dt = document.createElement('dt'); const dd = document.createElement('dd'); dt.textContent = key; dd.textContent = text; row.append(dt,dd); review.append(row);
       });
     };
@@ -56,7 +58,7 @@ export const clientScript = String.raw`
       if(step === 3) buildReview();
       if(focus) steps[step].querySelector('[data-step-title]')?.focus();
     };
-    const count = () => { form.querySelector('[data-character-count]').textContent = message.value.length + ' / 300자'; };
+    const count = () => { form.querySelector('[data-character-count]').textContent = Array.from(message.value).length + ' / ' + messageLimit + '자'; };
     message.addEventListener('input', count);
     // Format on blur, never move the caret while someone edits the middle of a number.
     phone.addEventListener('blur', () => {
