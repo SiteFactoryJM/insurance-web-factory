@@ -7,7 +7,9 @@ const frame = page => page.frameLocator('#site-preview');
 const step = (page, index) => page.locator(`.step-tab[data-step="${index}"]`).click();
 async function start(page) {
   await page.setViewportSize({width:1440,height:1000});
-  await page.goto('/studio');
+  // The editor is ready independently of late external font subsets. Actual
+  // font loading remains asserted by the dedicated six-font test below.
+  await page.goto('/studio/advanced', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#panel-0')).toBeVisible();
   page.on('dialog',dialog => dialog.accept());
 }
@@ -69,7 +71,8 @@ test('patterns, order, hidden sections and real device widths work independently
   await expect(frame(page).locator('#about + #specialties')).toHaveCount(1);
   await page.locator('[data-section="contact"]').uncheck();await page.locator('[data-section="services"]').uncheck();
   await expect(frame(page).locator('#contact')).toHaveCount(0);await expect(frame(page).locator('#specialties')).toHaveCount(0);
-  await expect(frame(page).locator('.hero-actions .button')).toHaveAttribute('href','#footer');
+  await expect(frame(page).locator('.hero-actions [data-contact-link="phone"]')).toHaveAttribute('href','tel:01041877511');
+  await expect(frame(page).locator('.hero-actions [data-contact-link="kakao"]')).toHaveAttribute('href','https://open.kakao.com/o/sH6OIpKi');
   await expect(frame(page).locator('.hero-actions .text-link')).toHaveAttribute('href','#footer');
   await page.locator('[data-device="mobile"]').click();
   await expect.poll(()=>frame(page).locator('body').evaluate(()=>innerWidth)).toBe(390);
@@ -149,7 +152,7 @@ test('PDF action prints a complete production brief with both versions of copy',
   await expect(brief.locator('body')).toContainText('상담 페이지 제작 의뢰서');
   await expect(brief.locator('body')).toContainText('PDF에서 확인할 PC 제목');
   await expect(brief.locator('body')).toContainText('모바일용 짧은 제목');
-  await expect(brief.locator('body')).toContainText('하단입력');
+  await expect(brief.locator('body')).toContainText('연락처·고지');
   await expect(brief.locator('body')).toContainText('모바일');
   await expect(brief.locator('body')).toContainText('보험 고지');
   await expect(brief.locator('body')).toContainText('고운바탕');
@@ -197,7 +200,7 @@ test('section controls remove irrelevant inputs and restore the edited copy when
   await step(page,2);
   await expect(field(page,'contact.phone')).toHaveCount(1);
   await expect(field(page,'compliance.footerDisclaimer')).toHaveCount(1);
-  await expect(page.getByRole('tab',{name:'하단입력',exact:true})).toHaveAttribute('aria-selected','true');
+  await expect(page.getByRole('tab',{name:'연락처·고지',exact:true})).toHaveAttribute('aria-selected','true');
   await step(page,0);await page.locator('[data-section="about"]').check();
   await step(page,1);await reveal(field(page,'intro.body'));
   await expect(field(page,'intro.body')).toHaveValue('상황을 충분히 듣고 필요한 내용을 함께 살펴봅니다.');
@@ -367,58 +370,22 @@ test('the representative page gives the adviser a large loaded portrait on deskt
   }
 });
 
-test('editing adviser details preserves the demo form and a re-enabled form initializes only once',async({page})=>{
+test('editing and restoring contact sections updates direct links without sending anything',async({page})=>{
   await start(page);await example(page);
-  const requests=[];
-  page.on('request',request=>{if(['xhr','fetch','ping'].includes(request.resourceType())||request.method()==='POST')requests.push(request.url());});
-  const form=frame(page).locator('[data-contact-form]');
-  await form.locator('[name="topic"]').first().check();
-  await form.locator('[data-next]').click();
-  await expect(form.locator('[data-step="1"]')).toBeVisible();
-  await form.locator('[name="message"]').fill('브라우저 체험에만 남기는 메모 84729');
-  await form.locator('[data-next]').click();
-  await form.locator('[name="name"]').fill('데모고객84729');
-  await form.locator('[name="phone"]').fill('01000000000');
+  const requests=[];page.on('request',r=>{if(['xhr','fetch','ping'].includes(r.resourceType())||r.method()==='POST')requests.push(r.url());});
   await step(page,1);await field(page,'agent.name').fill('정민서');
-  await step(page,2);await field(page,'contact.availableHours').fill('평일 10:00–17:00');
-  await expect(form.locator('[data-preview-copy="contact-adviser"]')).toContainText('정민서');
-  await expect(form.locator('[data-preview-copy="contact-hours"]')).toContainText('평일 10:00–17:00');
-  await expect(form.locator('[data-step="2"]')).toBeVisible();
-  await expect(form.locator('[name="phone"]')).toHaveValue('010-0000-0000');
-  await expect(form.locator('[name="name"]')).toHaveValue('데모고객84729');
-  const {project}=await save(page);
-  const serialized=JSON.stringify(project);
-  for(const value of ['데모고객84729','브라우저 체험에만 남기는 메모 84729','01000000000','010-0000-0000']) expect(serialized).not.toContain(value);
-  expect(project.site.agent.name).toBe('정민서');
-  expect(project.site.contact.availableHours).toBe('평일 10:00–17:00');
-  await step(page,0);await page.locator('[data-section="contact"]').uncheck();
-  await expect(form).toHaveCount(0);
-  await page.locator('[data-section="contact"]').check();
-  await expect(form.locator('[data-next]')).toBeEnabled();
-  await expect(form.locator('[data-step="2"]')).toBeVisible();
-  await expect(form.locator('[name="phone"]')).toHaveValue('010-0000-0000');
-  await form.locator('[data-prev]').click();
-  await expect(form.locator('[data-step="1"]')).toBeVisible();
-  await form.locator('[data-prev]').click();
-  await expect(form.locator('[data-step="0"]')).toBeVisible();
-  await step(page,1);
-  for(const name of ['새 담당자','정민서']) {
-    await field(page,'agent.name').fill(name);
-    await expect(form.locator('[data-preview-copy="contact-adviser"]')).toContainText(name);
-  }
-  await form.locator('[name="topic"]').first().check();
-  await form.locator('[data-next]').click();
-  await expect(form.locator('[data-step="1"]')).toBeVisible();
-  await form.locator('[data-next]').click();
-  await expect(form.locator('[data-step="2"]')).toBeVisible();
-  await form.locator('[name="phone"]').fill('01000000000');
-  await form.locator('[data-next]').click();
-  await expect(form.locator('[data-step="3"]')).toBeVisible();
-  await form.locator('[name="privacyConsent"]').check();
-  await form.locator('[data-submit]').click();
-  await expect(form.locator('[data-demo-result]')).toBeVisible();
-  await expect(form.locator('[data-form-error]')).toBeEmpty();
-  await expect(form.locator('[name="phone"]')).toHaveValue('');
-  expect(requests).toEqual([]);
-  expect(await page.evaluate(()=>({local:localStorage.length,session:sessionStorage.length}))).toEqual({local:0,session:0});
+  await step(page,2);await field(page,'contact.phone').fill('010-0000-1234');
+  await field(page,'contact.kakaoUrl').fill('https://open.kakao.com/o/TestInvite');
+  await field(page,'contact.availableHours').fill('평일 10:00–17:00');
+  const phone=frame(page).locator('#contact [data-contact-link="phone"]');
+  const chat=frame(page).locator('#contact [data-contact-link="kakao"]');
+  await expect(phone).toHaveAttribute('href','tel:01000001234');
+  await expect(chat).toHaveAttribute('href','https://open.kakao.com/o/TestInvite');
+  await expect(frame(page).locator('#contact')).toContainText('평일 10:00–17:00');
+  expect(await chat.evaluate(a=>a.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true})))).toBe(false);
+  await expect(frame(page).locator('[data-contact-form]')).toHaveCount(0);
+  await step(page,0);await page.locator('[data-section="contact"]').uncheck();await expect(phone).toHaveCount(0);
+  await page.locator('[data-section="contact"]').check();await expect(phone).toHaveAttribute('href','tel:01000001234');
+  const {project}=await save(page);expect(project.site.contact.phone).toBe('010-0000-1234');
+  expect(requests).toEqual([]);expect(await page.evaluate(()=>[localStorage.length,sessionStorage.length])).toEqual([0,0]);
 });
