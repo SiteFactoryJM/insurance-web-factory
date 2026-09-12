@@ -177,6 +177,8 @@ for (const entry of entries) {
   required(site.hero?.headline, "hero.headline", id);
   required(site.hero?.subheadline, "hero.subheadline", id);
   required(site.contact?.phone, "contact.phone", id);
+  const phone = typeof site.contact?.phone === "string" ? site.contact.phone.trim() : "";
+  if (!/^[+\d][\d ()-]{5,31}$/.test(phone) || !/^\+?\d{7,15}$/.test(phone.replace(/[ ()-]/g, ""))) errors.push(`[${id}] contact.phone: 연결 가능한 전화번호를 숫자와 +, -, 괄호로 입력하세요.`);
   required(site.contact?.availableHours, "contact.availableHours", id);
   required(site.seo?.title, "seo.title", id);
   required(site.seo?.description, "seo.description", id);
@@ -184,7 +186,8 @@ for (const entry of entries) {
   required(site.compliance?.privacyOfficer, "compliance.privacyOfficer", id);
   required(site.compliance?.privacyRetentionPeriod, "compliance.privacyRetentionPeriod", id);
 
-  if (!isUrl(site.contact?.kakaoUrl)) errors.push(`[${id}] kakaoUrl 형식이 올바르지 않습니다.`);
+  if (site.contact?.kakaoUrl && !/^https:\/\/open\.kakao\.com\/o\/[A-Za-z0-9_-]+\/?$/.test(String(site.contact.kakaoUrl).trim())) errors.push(`[${id}] kakaoUrl은 https://open.kakao.com/o/ 형식의 초대 주소여야 합니다.`);
+  if (site.status === "published" && !site.demo?.enabled && site.compliance?.advertisingReviewStatus === "pending") errors.push(`[${id}] 조직의 게시 검토가 끝나지 않았습니다. approved 또는 조직 기준에 따라 확인된 not-required 상태가 필요합니다.`);
   if (!isUrl(site.contact?.instagramUrl)) errors.push(`[${id}] instagramUrl 형식이 올바르지 않습니다.`);
   if (!isUrl(site.contact?.mapUrl)) errors.push(`[${id}] mapUrl 형식이 올바르지 않습니다.`);
   if (!isEmail(site.contact?.email)) errors.push(`[${id}] email 형식이 올바르지 않습니다.`);

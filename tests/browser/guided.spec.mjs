@@ -1,0 +1,70 @@
+import {test,expect} from '@playwright/test';
+import fs from 'node:fs/promises';
+import AxeBuilder from '@axe-core/playwright';
+const preview=page=>page.frameLocator('#guided-preview');
+async function start(page){await page.setViewportSize({width:1440,height:1000});await page.goto('/studio');await expect(page.locator('[data-purpose]')).toHaveCount(8);page.on('dialog',d=>d.accept());}
+async function stage(page,n){await page.locator(`button[data-stage="${n}"]`).click();}
+async function facts(page){await stage(page,2);for(const [name,value] of [['name','검토용 담당자'],['company','검토용 소속'],['phone','010-0000-1234'],['hours','평일 09:00–18:00'],['kakao','https://open.kakao.com/o/TestInvite']])await page.locator(`input[name="${name}"]`).fill(value);}
+async function confirm(page){for(const input of await page.locator('[data-confirm]').all())await input.check();}
+async function save(page){const pending=page.waitForEvent('download');await page.locator('[data-action="download"]').click();const d=await pending;return JSON.parse(await fs.readFile(await d.path(),'utf8'));}
+test('recommended purposes provide copy without borrowing the demo identity',async({page})=>{
+ await start(page);await expect(preview(page).locator('h1')).toContainText('가입한 보험');await expect(preview(page).locator('[data-contact-link]')).toHaveCount(0);
+ await page.locator('[data-purpose="family"]').click();await expect(preview(page).locator('h1')).toContainText('가족의 보험');
+ await stage(page,1);await expect(page.locator('[name="copy-choice"]')).toHaveCount(24);
+ await page.locator('[name="copy-choice"][value="hero-06"]').check();await expect(preview(page).locator('h1')).toContainText('처음 준비하는 보험');
+ await page.locator('#copy-group').selectOption('faqs');await expect(page.locator('[name="copy-choice"]')).toHaveCount(30);
+ await page.locator('#copy-search').fill('자동 발송');await expect(page.locator('[name="copy-choice"]')).toHaveCount(1);
+});
+test('invalid multi-selection leaves the prior page intact',async({page})=>{
+ await start(page);await stage(page,1);await page.locator('#copy-group').selectOption('services');const before=await preview(page).locator('.service-card h3').allTextContents();
+ const selected=await page.locator('[name="copy-choice"]:checked').evaluateAll(inputs=>inputs.map(input=>input.value));
+ for(const id of selected)await page.locator(`[name="copy-choice"][value="${id}"]`).uncheck();
+ await expect(page.locator('[name="copy-choice"]:checked')).toHaveCount(0);
+ await page.locator('[data-action="apply-copies"]').click();await expect(page.locator('#guided-errors')).toContainText('3~6');expect(await preview(page).locator('.service-card h3').allTextContents()).toEqual(before);
+});
+test('profile, chosen copy, layout and phone/chat links survive JSON export/import',async({page})=>{
+ await start(page);await page.locator('[data-purpose="new"]').click();await facts(page);
+ await expect(preview(page).locator('.hero-actions [data-contact-link="phone"]')).toHaveAttribute('href','tel:01000001234');
+ await expect(preview(page).locator('.hero-actions [data-contact-link="kakao"]')).toHaveAttribute('href','https://open.kakao.com/o/TestInvite');
+ const dispatched=await preview(page).locator('.hero-actions [data-contact-link="kakao"]').evaluate(a=>a.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true})));expect(dispatched).toBe(false);
+ await confirm(page);const project=await save(page);expect(project.site.status).toBe('draft');expect(project.site.design.hero).toBe('statement');expect(project.site.contact.phone).toBe('010-0000-1234');expect(project.site.compliance.publicationConfirmed).toBe(false);
+ await page.reload();await page.locator('#guided-file').setInputFiles({name:'draft.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(project))});
+ await expect(page.locator('#guided-status')).toContainText('불러왔습니다');await stage(page,2);await expect(page.locator('input[name="name"]')).toHaveValue('검토용 담당자');await expect(preview(page).locator('.hero-statement')).toHaveCount(1);
+ await page.goto('/studio/advanced');await page.locator('#project-file').setInputFiles({name:'draft.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(project))});await expect(page.frameLocator('#site-preview').locator('.hero-statement')).toHaveCount(1);
+});
+test('published rights and unsafe URLs cannot slip through save or import',async({page})=>{
+ await start(page);await page.locator('[data-action="download"]').click();await expect(page.locator('#guided-errors')).toContainText('담당자 이름');await facts(page);await page.locator('input[name="kakao"]').fill('https://evil.test');await confirm(page);await page.locator('[data-action="download"]').click();await expect(page.locator('#guided-errors')).toContainText('open.kakao.com');
+ await page.locator('#guided-file').setInputFiles({name:'bad.json',mimeType:'application/json',buffer:Buffer.from('{not json}')});await expect(page.locator('#guided-errors')).toBeVisible();await expect(page.locator('input[name="name"]')).toHaveValue('검토용 담당자');
+});
+test('draft storage is opt-in, explicitly restorable and erasable',async({page})=>{
+ await start(page);expect(await page.evaluate(()=>localStorage.length)).toBe(0);await page.locator('#remember-draft').check();await expect(page.locator('#guided-status')).toContainText('초안을 보관');await facts(page);
+ await expect.poll(()=>page.evaluate(()=>localStorage.getItem('atelier-guided-draft-v1'))).toContain('검토용 담당자');
+ await page.reload();await page.locator('[data-action="restore"]').click();await stage(page,2);await expect(page.locator('input[name="name"]')).toHaveValue('검토용 담당자');
+ await page.locator('[data-action="clear"]').click();expect(await page.evaluate(()=>localStorage.getItem('atelier-guided-draft-v1'))).toBeNull();
+});
+test('selecting a new purpose keeps verified identity but resets the review checkboxes',async({page})=>{
+ await start(page);await facts(page);await confirm(page);await stage(page,0);await page.locator('[data-purpose="retire"]').click();await stage(page,2);
+ await expect(page.locator('input[name="company"]')).toHaveValue('검토용 소속');await expect(page.locator('input[name="phone"]')).toHaveValue('010-0000-1234');for(const c of await page.locator('[data-confirm]').all())await expect(c).not.toBeChecked();
+});
+
+test('import and guided edits preserve custom footer, hidden copy, images and arrangement',async({page})=>{
+ await start(page);await facts(page);await confirm(page);const project=await save(page);
+ project.site.footer={heading:'직접 작성한 하단 제목',note:'소중하게 보관할 사용자 원고'};
+ project.site.seo.title='직접 작성한 검색 제목';
+ project.site.intro.body='숨겨 둔 소개 원고를 그대로 보관합니다.';
+ project.site.design.hiddenSections=['about'];
+ project.site.design.sectionOrder=['faq','services','about','process','contact','reviews'];
+ project.site.agent.profileImage='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aPioAAAAASUVORK5CYII=';
+ await page.locator('#guided-file').setInputFiles({name:'custom.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(project))});
+ await expect(page.locator('#guided-status')).toContainText('불러왔습니다');
+ await stage(page,1);await page.locator('[name="copy-choice"][value="hero-06"]').check();
+ await stage(page,2);await confirm(page);const restored=await save(page);
+ for(const key of ['footer','seo','intro','design','agent'])expect(restored.site[key]).toEqual(project.site[key]);
+});
+test('guided editor works at all five widths with accessible controls',async({page},testInfo)=>{
+ test.setTimeout(120000);await start(page);
+ for(const width of [320,360,390,768,1440]){await page.setViewportSize({width,height:1000});for(const n of [0,1,2]){
+  await stage(page,n);expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+  if([390,1440].includes(width)){expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze()).violations).toEqual([]);await testInfo.attach(`guided-${n}-${width}`,{body:await page.screenshot({fullPage:true}),contentType:'image/png'});}
+ }}
+});

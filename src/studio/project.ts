@@ -1,3 +1,4 @@
+import { directPhoneHref, openChatUrl } from '../utils/contact-links.js';
 import { DESIGN_SECTION_IDS, HEADING_FONT_IDS, PALETTE_IDS, TEMPLATE_IDS, type DesignSectionId, type SiteConfig } from "../types.js";
 
 export const PROJECT_FORMAT = "insurance-web-factory/diy" as const;
@@ -83,7 +84,7 @@ const siteRule = object({
   specialties: list(cardRule, 3), process: list(cardRule), career: list(text(160), 0, 20),
   reviews: list(object({ quote: text(400), author: text(80), context: text(120, true), isExample: bool(true) }), 0, 12, true), faqs: list(faqRule),
   consultation: object({ topics: list(text(60), 1, 12, false, true) }, true),
-  contact: object({ phone: { ...text(32), check: value => /^[+\d][\d() .-]{5,31}$/.test(value) ? undefined : "전화번호는 숫자와 +, -, 괄호로 입력하세요." },
+  contact: object({ phone: { ...text(32), check: value => directPhoneHref(value) ? undefined : "연결 가능한 전화번호를 숫자와 +, -, 괄호로 입력하세요." },
     kakaoUrl: urlRule(), instagramUrl: urlRule(), email: emailRule, formEmail: emailRule, officeAddress: text(240, true), mapUrl: urlRule(), availableHours: text(100) }),
   sections: object({ career: bool(), process: bool(), reviews: bool(true), faq: bool(), location: bool(), contactForm: bool() }),
   seo: object({ title: text(120), description: text(300), ogImage: imageRule(true), noIndex: bool(true) }),
@@ -152,6 +153,7 @@ export function validateProjectSite(site: unknown): string[] {
   inspect(site, sectionAwareSiteRule(site), "site", errors);
   if (!errors.length) {
     const config = site as SiteConfig;
+    if (config.contact.kakaoUrl?.trim() && !openChatUrl(config.contact.kakaoUrl)) errors.push("contact.kakaoUrl: https://open.kakao.com/o/ 형식의 오픈채팅 초대 주소가 필요합니다.");
     if (isSectionEnabled(config, "process") && config.process.length < 3) errors.push("site.process: 진행 과정을 표시하려면 3개 이상 필요합니다.");
     if (isSectionEnabled(config, "faq") && config.faqs.length < 2) errors.push("site.faqs: FAQ를 표시하려면 2개 이상 필요합니다.");
     if (isSectionEnabled(config, "reviews") && !config.reviews?.length) errors.push("site.reviews: 후기를 표시하려면 1개 이상 필요합니다.");
@@ -170,6 +172,8 @@ function draftCopy(site: SiteConfig): SiteConfig {
   copy.compliance.photoUseConfirmed = false;
   copy.compliance.publicationConfirmed = false;
   copy.compliance.advertisingReviewStatus = "pending";
+  copy.compliance.advertisingReviewNumber = "";
+  copy.compliance.advertisingReviewExpiresAt = "";
   return copy;
 }
 
