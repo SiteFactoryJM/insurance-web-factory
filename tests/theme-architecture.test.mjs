@@ -1,116 +1,81 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { renderSitePage, renderTemplateGallery } from '../.preview-dist/render/page.js';
+import { renderSitePage, renderTemplateGallery, renderPrivacyPage } from '../.preview-dist/render/page.js';
 import { TEMPLATE_IDS, PALETTE_IDS } from '../.preview-dist/types.js';
 import { clientScript } from '../.preview-dist/render/client-script.js';
 import { handleConsultation } from '../.preview-dist/routes/consultation.js';
 import { responsiveCopy } from '../.preview-dist/render/copy.js';
-const site = JSON.parse(fs.readFileSync(new URL('../sites/demo-agent/site.json', import.meta.url), 'utf8'));
-const page = (config = site, theme = 'trust-blue') => renderSitePage(config, new Request(`https://example.test/?theme=${theme}`));
-
-for (const id of TEMPLATE_IDS) test(`${id}: distinct layout and safe wizard`, () => {
-  const html = page(site,id);
-  assert.match(html,new RegExp(`theme-${id}`));
-  assert.equal((html.match(/<h1\b/g)||[]).length,1);
-  assert.equal((html.match(/data-contact-form/g)||[]).length >= 1,true);
-  assert.match(html,/data-submission-mode="discard"/);
-  assert.match(html,/name="robots" content="noindex,nofollow"/);
-  assert.match(html,/data-step="0" disabled/);
-  assert.match(html,/data-step="3" hidden disabled/);
-  assert.match(html,/실제 상담은 접수되지 않았습니다/);
-  assert.doesNotMatch(html,/data-reading-toggle|글자 크게/);
-  assert.doesNotMatch(html,/<a[^>]+href="(?:mailto:|tel:|https:\/\/open.kakao)/);
+const site=JSON.parse(fs.readFileSync(new URL('../sites/demo-agent/site.json',import.meta.url),'utf8'));
+const page=(config=site,theme='trust-blue')=>renderSitePage(config,new Request(`https://example.test/?theme=${theme}`));
+for(const id of TEMPLATE_IDS)test(`${id}: direct contact replaces customer-input wizard`,()=>{
+ const html=page(site,id);assert.match(html,new RegExp(`theme-${id}`));assert.equal((html.match(/<h1\b/g)||[]).length,1);
+ assert.match(html,/data-contact-version="direct-v1"/);assert.match(html,/href="tel:01041877511"/);assert.match(html,/href="https:\/\/open\.kakao\.com\/o\/sH6OIpKi"/);
+ assert.match(html,/target="_blank" rel="noopener noreferrer"/);assert.match(html,/data-contact-link="phone"/);assert.match(html,/data-contact-link="kakao"/);
+ assert.match(html,/name="robots" content="noindex,nofollow"/);assert.doesNotMatch(html,/data-contact-form|data-submission-mode|name="privacyConsent"|name="phone"|data-reading-toggle/);
 });
-
-test('shared system preserves five IDs while changing content emphasis', () => {
-  const warm=page(site,'warm-care');assert.ok(warm.indexOf('id="about"') < warm.indexOf('id="specialties"'));
-  const standard=page();assert.ok(standard.indexOf('id="specialties"') < standard.indexOf('id="about"'));
-  assert.match(page(site,'premium-navy'),/새 보험을 준비할 때/);
-  assert.match(page(site,'local-friendly'),/data-start-topic/);
-  assert.doesNotMatch(page(site,'clean-minimal'),/id="reviews"/);
-  const gallery=renderTemplateGallery(site,new Request('https://example.test/templates'));
-  for(const id of TEMPLATE_IDS)assert.match(gallery,new RegExp(`href="/\\?theme=${id}"`));
+test('purpose layouts preserve useful ordering and explicit template diagrams',()=>{
+ const warm=page(site,'warm-care');assert.ok(warm.indexOf('id="about"')<warm.indexOf('id="specialties"'));
+ const standard=page();assert.ok(standard.indexOf('id="specialties"')<standard.indexOf('id="about"'));
+ assert.doesNotMatch(page(site,'clean-minimal'),/id="reviews"/);
+ const gallery=renderTemplateGallery(site,new Request('https://example.test/templates'));
+ for(const id of TEMPLATE_IDS)assert.ok(gallery.includes(`href="/?theme=${id}"`));assert.match(gallery,/구성 안내도/);
 });
-
-test('untrusted content is escaped and absent content does not invent proof', () => {
-  const modified=structuredClone(site);modified.agent.name='<script>alert(1)</script>';modified.career=[];modified.reviews=[];modified.agent.registrationNumber='';modified.agent.profileImage='';
-  const html=page(modified);assert.doesNotMatch(html,/<script>alert\(1\)<\/script>/);assert.match(html,/&lt;script&gt;/);assert.match(html,/\/assets\/profile-placeholder.svg/);assert.doesNotMatch(html,/id="reviews"/);
+test('untrusted content is escaped and missing credentials are never invented',()=>{
+ const modified=structuredClone(site);modified.agent.name='<script>alert(1)</script>';modified.career=[];modified.reviews=[];modified.agent.registrationNumber='';modified.agent.profileImage='';
+ const html=page(modified);assert.doesNotMatch(html,/<script>alert\(1\)<\/script>/);assert.match(html,/&lt;script&gt;/);assert.match(html,/\/assets\/profile-placeholder.svg/);assert.doesNotMatch(html,/id="reviews"/);
 });
-
-test('hidden optional sections and production example filtering work', () => {
-  const modified=structuredClone(site);modified.sections.contactForm=false;modified.sections.faq=false;modified.sections.process=false;modified.demo.enabled=false;
-  const html=page(modified);assert.doesNotMatch(html,/<form class="consultation-form"/);assert.doesNotMatch(html,/id="faq"/);assert.doesNotMatch(html,/id="process"/);assert.doesNotMatch(html,/id="reviews"/);
+test('only real reviews can render, and optional sections remain optional',()=>{
+ const modified=structuredClone(site);modified.sections.faq=false;modified.sections.process=false;modified.sections.reviews=true;
+ modified.reviews=[{quote:'example must never render 84729',author:'example',isExample:true}];
+ for(const enabled of [true,false]){modified.demo.enabled=enabled;const html=page(modified);assert.doesNotMatch(html,/id="faq"|id="process"|id="reviews"|example must never render 84729/);}
+ modified.reviews=[{quote:'검토된 후기 원고',author:'게시 동의 고객',isExample:false}];assert.match(page(modified),/검토된 후기 원고/);
 });
-
-test('demo client contains no submission, SDK, tracking or persistence code', () => {
-  assert.doesNotMatch(clientScript,/\bfetch\s*\(|XMLHttpRequest|sendBeacon|localStorage|sessionStorage|indexedDB|mailto:|Kakao\./);
-  assert.match(clientScript,/event\.preventDefault\(\)/);assert.match(clientScript,/form\.reset\(\)/);assert.match(clientScript,/pagehide/);assert.match(clientScript,/dd\.textContent = text/);
+test('customer client has no automatic sending, SDK, analytics, or storage',()=>{
+ assert.doesNotMatch(clientScript,/\bfetch\s*\(|XMLHttpRequest|sendBeacon|localStorage|sessionStorage|indexedDB|mailto:|Kakao\./);
+ assert.match(clientScript,/studioPreview/);assert.match(clientScript,/event\.preventDefault/);assert.match(clientScript,/IntersectionObserver/);
 });
-
-test('demo API never parses or stores even with a misconfigured store flag', async () => {
-  const modified=structuredClone(site);modified.demo.submissionMode='store';
-  const request={method:'POST',json(){throw new Error('MUST NOT PARSE');}};
-  const env={DB:{prepare(){throw new Error('MUST NOT STORE');}},CONSULTATION_WEBHOOK_URL:'https://must-not-send.invalid'};
-  const response=await handleConsultation(request,env,modified);const body=await response.json();assert.equal(body.demo,true);assert.match(body.message,/실제 상담은 접수되지 않았습니다/);
-  const wrongMethod=await handleConsultation({method:'GET'},env,modified);assert.equal(wrongMethod.status,405);
+for(const enabled of [true,false])for(const method of ['GET','POST','PUT','DELETE'])test(`retired API ${enabled}/${method} does not parse, store or send`,async()=>{
+ let calls=0;const fail=()=>{calls++;throw new Error('must not touch customer input');};
+ const response=await handleConsultation({method,get json(){return fail();},get body(){return fail();}},{get DB(){return fail();},get CONSULTATION_WEBHOOK_URL(){return fail();}},{...site,demo:{enabled,submissionMode:'store'}});
+ assert.equal(response.status,410);assert.equal((await response.json()).code,'DIRECT_CONTACT_ONLY');assert.equal(calls,0);
 });
-
-
-test('six palettes combine independently with all five layouts and their JSON content', () => {
-  assert.equal(PALETTE_IDS.length,6);
-  assert.equal(TEMPLATE_IDS.length,5);
-  const headlines = new Set();
-  for (const theme of TEMPLATE_IDS) {
-    const headline=site.templateContent[theme].headline;
-    headlines.add(headline);
-    for (const palette of PALETTE_IDS) {
-      const html=renderSitePage(site,new Request(`https://example.test/?theme=${theme}&palette=${palette}`));
-      assert.ok(html.includes(`data-layout="${theme}" data-palette="${palette}"`));
-      assert.ok(html.includes(headline.replaceAll('\n','<br>')));
-      assert.ok(html.includes(`value="${theme}" selected`));
-      assert.ok(html.includes(`value="${palette}" selected`));
-      for(const card of site.templateContent[theme].specialties) assert.ok(html.includes(card.title));
-      assert.ok(html.includes('유퍼스트 해온지사'));
-    }
-  }
-  assert.equal(headlines.size,5);
+test('five layouts combine independently with all six palettes and their selected copy',()=>{
+ assert.equal(PALETTE_IDS.length,6);assert.equal(TEMPLATE_IDS.length,5);const headlines=new Set();
+ for(const theme of TEMPLATE_IDS){const headline=site.templateContent[theme].headline;headlines.add(headline);for(const palette of PALETTE_IDS){
+  const html=renderSitePage(site,new Request(`https://example.test/?theme=${theme}&palette=${palette}`));
+  assert.ok(html.includes(`data-layout="${theme}" data-palette="${palette}"`));assert.ok(html.includes(headline.replaceAll('\n','<br>')));
+  assert.ok(html.includes(`value="${theme}" selected`));assert.ok(html.includes(`value="${palette}" selected`));for(const card of site.templateContent[theme].specialties)assert.ok(html.includes(card.title));
+  assert.ok(html.includes('유퍼스트 해온지사'));assert.ok(html.includes('tel:01041877511'));
+ }}assert.equal(headlines.size,5);
 });
-
-test('query fallbacks are safe and production ignores preview settings', () => {
-  const request=new Request('https://example.test/?theme=warm-care&palette=stone');
-  const production=structuredClone(site);production.demo.enabled=false;
-  assert.match(renderSitePage(production,request),new RegExp(`data-layout="trust-blue" data-palette="${site.palette}"`));
-  const legacy=structuredClone(site);delete legacy.palette;delete legacy.templateContent;
-  assert.match(renderSitePage(legacy,new Request('https://example.test/?theme=INVALID&palette=INVALID')),/data-layout="trust-blue" data-palette="navy"/);
-  assert.ok(renderSitePage(legacy,new Request('https://example.test/?theme=warm-care')).includes(legacy.hero.headline.replaceAll('\n','<br>')));
-  const disabled=structuredClone(site);disabled.demo.allowTemplateSwitch=false;
-  assert.match(renderSitePage(disabled,request),new RegExp(`data-layout="trust-blue" data-palette="${site.palette}"`));
+test('query fallbacks remain safe and production ignores preview switches',()=>{
+ const request=new Request('https://example.test/?theme=warm-care&palette=stone'),production=structuredClone(site);production.demo.enabled=false;
+ assert.match(renderSitePage(production,request),new RegExp(`data-layout="trust-blue" data-palette="${site.palette}"`));
+ const legacy=structuredClone(site);delete legacy.palette;delete legacy.templateContent;
+ assert.match(renderSitePage(legacy,new Request('https://example.test/?theme=INVALID&palette=INVALID')),/data-layout="trust-blue" data-palette="navy"/);
+ assert.ok(renderSitePage(legacy,new Request('https://example.test/?theme=warm-care')).includes(legacy.hero.headline.replaceAll('\n','<br>')));
+ const disabled=structuredClone(site);disabled.demo.allowTemplateSwitch=false;assert.match(renderSitePage(disabled,request),new RegExp(`data-layout="trust-blue" data-palette="${site.palette}"`));
 });
-
-test('studio tools precede the site header and stay out of production', () => {
-  const html=page();
-  assert.ok(html.indexOf('<aside class="sample-bar"') < html.indexOf('<header class="site-header"'));
-  assert.doesNotMatch(html,/<span class="brand-mark"|<aside class="customization-band"/);
-  const production=structuredClone(site);production.demo.enabled=false;
-  assert.doesNotMatch(page(production),/<aside class="sample-bar"/);
-  production.status='published';production.seo.noIndex=false;
-  assert.match(page(production),/name="robots" content="index,follow,max-image-preview:large"/);
-  production.status='draft';
-  assert.match(page(production),/name="robots" content="noindex,nofollow"/);
+test('studio tools are outside the consumer header and stay out of production',()=>{
+ const html=page();assert.ok(html.indexOf('<aside class="sample-bar"')<html.indexOf('<header class="site-header"'));
+ const production=structuredClone(site);production.demo.enabled=false;assert.doesNotMatch(page(production),/<aside class="sample-bar"/);
+ production.status='published';production.seo.noIndex=false;assert.match(page(production),/name="robots" content="index,follow,max-image-preview:large"/);
+ production.status='draft';assert.match(page(production),/name="robots" content="noindex,nofollow"/);
 });
-
-test('responsive copy preserves complete escaped text and legacy fallbacks', () => {
-  assert.equal(responsiveCopy('기존 원문\n두 번째 줄'), '기존 원문<br>두 번째 줄');
-  assert.equal(responsiveCopy('원문', ''), '원문');
-  assert.equal(responsiveCopy('<b>PC</b>', '<img src=x>'), '<span class="copy-desktop">&lt;b&gt;PC&lt;/b&gt;</span><span class="copy-mobile">&lt;img src=x&gt;</span>');
-  const modified=structuredClone(site);
-  modified.hero.mobileHeadline='기본 모바일';
-  modified.templateContent['warm-care'].headline='별도 PC 제목';
-  delete modified.templateContent['warm-care'].mobileHeadline;
-  assert.ok(page(modified,'warm-care').includes('별도 PC 제목'));
-  assert.ok(!page(modified,'warm-care').includes('기본 모바일'));
-  modified.templateContent['warm-care']={mobileHeadline:'모바일만 별도 작성',mobileSubheadline:'짧은 설명만 교체'};
-  assert.ok(page(modified,'warm-care').includes('모바일만 별도 작성'));
-  assert.ok(page(modified,'warm-care').includes('짧은 설명만 교체'));
+test('invalid contact destinations are never exposed as clickable links',()=>{
+ const modified=structuredClone(site);modified.contact.phone='javascript:alert(1)';modified.contact.kakaoUrl='https://open.kakao.com.evil.test/o/x';
+ assert.doesNotMatch(page(modified),/data-contact-link=/);assert.match(page(modified),/연락처 확인 후/);
+});
+test('privacy guidance matches direct contact and never promises a functioning form',()=>{
+ const html=renderPrivacyPage(site,new Request('https://example.test/privacy'));
+ assert.match(html,/오픈채팅/);assert.doesNotMatch(html,/동의하지 않을 수 있으나 상담 신청 기능 이용이 제한/);
+});
+test('responsive copy preserves full escaped text and legacy mobile fallbacks',()=>{
+ assert.equal(responsiveCopy('기존 원문\n두 번째 줄'),'기존 원문<br>두 번째 줄');assert.equal(responsiveCopy('원문',''),'원문');
+ assert.equal(responsiveCopy('<b>PC</b>','<img src=x>'),'<span class="copy-desktop">&lt;b&gt;PC&lt;/b&gt;</span><span class="copy-mobile">&lt;img src=x&gt;</span>');
+ const modified=structuredClone(site);modified.hero.mobileHeadline='기본 모바일';modified.templateContent['warm-care'].headline='별도 PC 제목';delete modified.templateContent['warm-care'].mobileHeadline;
+ assert.ok(page(modified,'warm-care').includes('별도 PC 제목'));assert.ok(!page(modified,'warm-care').includes('기본 모바일'));
+ modified.templateContent['warm-care']={mobileHeadline:'모바일만 별도 작성',mobileSubheadline:'짧은 설명만 교체'};
+ assert.ok(page(modified,'warm-care').includes('모바일만 별도 작성'));assert.ok(page(modified,'warm-care').includes('짧은 설명만 교체'));
 });

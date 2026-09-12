@@ -1,12 +1,12 @@
 import { DESIGN_SECTION_IDS, PALETTE_IDS, TEMPLATE_IDS, type PaletteId, type SiteConfig, type SiteDesign, type TemplateId } from "../types.js";
 
-export const DESIGN_VERSION = "atelier-focus-v8";
+export const DESIGN_VERSION = "atelier-guided-v9";
 export const TEMPLATE_META: Record<TemplateId, { name: string; purpose: string; description: string; palette: PaletteId }> = {
   "trust-blue": { name: "신뢰의 기준", purpose: "기업형", description: "담당자와 상담 분야를 먼저 확인합니다. 정돈된 항목과 설명으로 필요한 정보를 차례로 살펴봅니다.", palette: "navy" },
   "warm-care": { name: "사람과 대화", purpose: "소개 중심형", description: "사진과 상담 원칙에서 시작합니다. 상담 철학과 준비할 내용을 깊이 있게 전달합니다.", palette: "forest" },
   "premium-navy": { name: "선택의 기준", purpose: "가입 점검형", description: "가입 전 점검할 기준을 먼저 제시합니다. 보장·예산·유지 조건을 확인하고 상담을 준비합니다.", palette: "slate" },
   "clean-minimal": { name: "한 장의 정리", purpose: "리포트형", description: "요약, 점검 항목, 진행 순서를 보고서처럼 정리합니다. 후기 없이 필요한 정보에 집중합니다.", palette: "charcoal" },
-  "local-friendly": { name: "바로 묻는 상담", purpose: "상담 메뉴형", description: "궁금한 주제를 먼저 고릅니다. 짧은 안내를 읽고 바로 상담 신청 화면을 체험합니다.", palette: "teal" },
+  "local-friendly": { name: "바로 묻는 상담", purpose: "상담 메뉴형", description: "전화와 오픈채팅 연락 방법을 먼저 확인합니다. 소개받은 고객이 쉽게 연락하는 구성입니다.", palette: "teal" },
 };
 export const PALETTES: Record<PaletteId, { name: string; accent: string; hover: string; ink: string; muted: string; paper: string; tint: string; line: string; input: string; dark: string; detail: string }> = {
   navy: { name: "미드나이트 네이비", accent: "#2D4864", hover: "#1D3249", ink: "#172A3D", muted: "#526170", paper: "#F8F7F3", tint: "#E8EDF3", line: "#CDD6E0", input: "#788696", dark: "#142131", detail: "#D8BC88" },

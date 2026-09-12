@@ -22,12 +22,12 @@ test('profile image exists and is a webp asset', () => {
   assert.ok(fs.statSync(localPath).size > 50_000);
 });
 
-test('demo includes FAQ and clearly labelled example reviews', () => {
+test('demo keeps useful FAQ, direct contact and no invented testimonials', () => {
   assert.equal(site.sections.faq, true);
-  assert.equal(site.sections.reviews, true);
+  assert.equal(site.sections.reviews, false);
+  assert.equal(site.sections.contactForm, false);
   assert.ok(site.faqs.length >= 5);
-  assert.ok(site.reviews.length >= 3);
-  assert.ok(site.reviews.every((review) => review.isExample === true));
+  assert.deepEqual(site.reviews, []);
 });
 
 test('demo is noindex and keeps submissions disabled', () => {
