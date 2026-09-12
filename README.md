@@ -1,86 +1,56 @@
-# Insurance Web Factory · ATELIER
+# Insurance Web Factory · 선택형 상담 페이지
 
-여러 보험설계사 홈페이지를 한 코드베이스와 설계사별 JSON으로 운영하는 Cloudflare Workers 프로젝트입니다. ATELIER는 **프리미엄 상담 페이지 예시와 직접 구성하는 DIY 제작 도구**를 제공합니다. 큰 인물 사진, 차분한 명조 제목, 중립색 바탕과 깊은 그린, 다양한 섹션 패턴을 기본으로 합니다.
+보험사·GA·지사에 제안하는 **담당자 소개 페이지 제작·운영 기반**입니다. 개인별 사이트 JSON과 공통 렌더러를 사용합니다. 일반 사용자는 빈 문장을 작성하기보다 목적과 문구를 선택하고, 실제 이름·소속·연락처를 확인합니다.
 
-## 미리보기
+## 제공 범위
 
-기본 주소: https://insurance-web-factory.pjmsm0319.workers.dev
+- 전화 아이콘 버튼 → `tel:` 링크. 카카오톡 버튼 → 설정된 오픈채팅 초대 주소.
+- 고객용 온라인 신청서, 서버 상담 저장, 카카오톡 자동 발송, 웹훅 전송은 제공하지 않습니다.
+- 문구 선택지 **114개**: 첫 화면 24, 소개 16, 상담 분야 24, 상담 과정 8세트, FAQ 30, 하단 안내 12.
+- 목적별 추천 구성 **8개**. 기존 레이아웃 5개와 팔레트 6개를 유지합니다.
+- `/studio`: 목적·스타일 → 문구 선택 → 실제 정보·검토의 기본 제작 흐름.
+- `/studio/advanced`: 기존 자유 편집 도구. 문구와 상세 배치 조정이 필요한 제작자용입니다.
+- `/proposal`: 보험사·GA·지사에 설명할 제공 범위와 운영 절차. 고객 상담 페이지와 구분합니다.
+- JSON 저장·불러오기, 프로필 이미지 포함, 선택한 경우에만 기기 내 초안 보관.
 
-직접 만들기: `/studio` · [DIY 사용·저장·제작 가이드](docs/DIY_STUDIO_GUIDE.md) · [서체 6종 라이선스](docs/FONT_LICENSES.md)
+114개는 개별 UI 선택지 수입니다. 상담 과정은 3개 단계로 이루어진 한 묶음을 하나로 셉니다. 추천 원고는 광고심의 완료 문구가 아니며 실제 취급 범위와 조직 기준에 맞춰 확인해야 합니다. 경력·성과·후기를 자동으로 만들어 넣지 않습니다.
 
-전체 비교: `/templates`
+## 연락 방식
 
-| 주소 | 샘플 |
-| --- | --- |
-| `/?theme=trust-blue` | 신뢰의 기준 · 기업형 |
-| `/?theme=warm-care` | 사람과 대화 · 소개 중심형 |
-| `/?theme=premium-navy` | 선택의 기준 · 가입 점검형 |
-| `/?theme=clean-minimal` | 한 장의 정리 · 리포트형 |
-| `/?theme=local-friendly` | 바로 묻는 상담 · 상담 메뉴형 |
+사이트 원본 `sites/<id>/site.json`의 `contact.phone`, `contact.kakaoUrl`, `contact.availableHours`를 사용합니다. 오픈채팅은 `https://open.kakao.com/o/초대코드` 형식만 허용합니다. 다른 도메인, 실행 가능한 URL, 쿼리 전달, 로그인·메시지 API를 사용하지 않습니다. 전화 앱이 없는 PC를 위해 번호를 텍스트로도 표시합니다.
 
-기존 5개 샘플 URL과 6개 팔레트를 유지합니다. DIY에서는 첫 화면·분야·소개·과정·FAQ·하단입력을 각각 고르고 순서와 표시 여부를 바꿉니다. 본문·입력·버튼은 기본 18px, 보조 글씨·고지는 최소 16px입니다. 글자 크게 버튼은 제거하고 브라우저 글자 확대를 지원합니다. 모든 하단입력은 어두운 계열입니다.
+대표 샘플의 전화와 오픈채팅 버튼은 **실제 담당자에게 연결**됩니다. 샘플 안내를 유지합니다. 제작 도구의 iframe 미리보기에서는 실제 연결을 막습니다. 메시지를 자동으로 작성하거나 보내지 않습니다.
 
-## 상담 신청은 현재 샘플입니다
+이전 `/api/consultations`는 모든 요청에 HTTP 410을 반환합니다. 요청 본문을 읽거나 DB·웹훅을 호출하지 않습니다. 기존 DB와 마이그레이션 파일을 삭제하는 변경은 포함하지 않습니다.
 
-분야 선택 → 상담 목적·추가 내용(선택) → 예시 연락 정보 → 최종 확인의 4단계입니다. 오류 안내, 이전 단계, 입력 요약, 안내 확인, 완료 상태만 체험할 수 있습니다. **입력값은 서버, 이메일, 카카오톡 또는 브라우저 저장소로 전달되지 않습니다.** 실제 개인정보 대신 예시 정보를 사용하세요.
+## 로컬 실행과 검증
 
-완료와 페이지 이탈 시 입력을 지우며, 자바스크립트가 없으면 입력/전송을 비활성화합니다. 데모 API도 본문 파싱 이전에 종료합니다. 기존 비데모 API는 별도로 남아 있으나 새로운 신청 UI에는 연결되어 있지 않습니다. `submissionMode`, `formEmail`만 바꿔서 실제 전송을 활성화할 수 없습니다.
-
-미래 연동 요구와 구현 지점: [카카오톡 연동 계획](docs/KAKAO_INTEGRATION.md)
-
-## PC·모바일 문구와 자료수집 설문
-
-메인 제목은 PC 40자 / 모바일 24자, 메인 설명은 PC 120자 / 모바일 60자 이내입니다. 소개는 제목 40/24자·본문 400/100자, 상담 분야·절차 설명은 120/48자, FAQ 답변은 240/80자입니다. 공백·줄바꿈 포함 Unicode 문자 수 기준이며 초과하면 가져오기와 사이트 검증에서 오류를 안내합니다. 모바일 문구는 650px 이하에서 표시하고, 비워두면 PC 원문을 그대로 표시합니다. 보험 고지와 개인정보 안내는 축약하지 않습니다.
-
-자료수집 엑셀에는 홈페이지 목적·주요 고객·원하는 방문자 행동과 PC·모바일 원고를 각각 적습니다. `npm run intake:build`로 양식을 갱신합니다. [작성 가이드](docs/EXCEL_INTAKE_GUIDE.md) · [2026 레퍼런스 조사](docs/DESIGN_REFERENCE_RESEARCH_2026.md)
-
-대표 페이지 최상단에는 예시 표시와 DIY 진입을 두고, 편집은 별도 화면에서 합니다. 섹션은 여백·가는 선·배열과 미세한 배경 명도로 구분합니다.
-
-## 설계사별 원본
-
-`sites/<id>/site.json`에서 이름, 소속, 사진, 소개, 상담 분야, FAQ, 실제 경력, 고지 등을 관리합니다. 자료수집 엑셀과 기존 가져오기 기능은 유지합니다. 새 `consultation.topics`는 실제 취급 가능한 상담 분야 목록이며 1~12개의 중복 없는 문자열입니다. 등록 정보가 없으면 임의의 배지를 만들지 않고, 후기가 없으면 영역을 생략합니다.
-
-`src/generated/sites.generated.ts`는 직접 편집하지 않고 생성 스크립트로 갱신합니다.
+Node.js 22 이상을 사용합니다.
 
 ```bash
 npm install
 npm run check
-npm run preview
-# 또는 Cloudflare 환경으로 실행
-npm run dev
-```
-
-```bash
-npm run intake:import -- --file ./incoming/설계사/자료.xlsx
-npm run generate
-npm run check
-```
-
-## 검증과 Actions
-
-```bash
-npm run check
 npx playwright install chromium
 npm run test:e2e
+npm run preview
 ```
 
-설정 검증, TypeScript, 단위/렌더/API 회귀 테스트와 Playwright/axe 자동 검사를 제공합니다. 반응형 검사는 320·360·390·768·1440px, 200% 글자 확대, 신청 단계, 미전송, 모바일 CTA, 키보드와 자바스크립트 비활성화 상태를 포함합니다. 테스트용 정보만 사용합니다.
+`npm run check`는 사이트 레지스트리와 두 편집기 번들을 생성하고 설정·타입·단위 테스트를 실행합니다. `src/generated/sites.generated.ts`와 `public/assets/studio.js`, `public/assets/guided-studio.js`는 직접 수정하지 않습니다.
 
-PR과 main 푸시에서 CI가 실행되고 브라우저 보고서를 Actions artifact로 남깁니다. 연결된 Cloudflare Workers Builds는 main 변경을 배포합니다. main CI의 live verification은 실제 데모 주소에서 새 페이지 식별자와 30개 배치·색상 조합를 확인합니다. 별도 수동 배포 워크플로는 기존 Cloudflare secrets가 설정된 환경에서 사용합니다.
+기본 편집기와 자유 편집기는 같은 `renderSitePage()`와 제작 파일 형식을 사용합니다. 기존 제작 JSON을 가져올 수 있지만, 오픈채팅 이외의 카카오 링크는 수정해야 합니다. 새 저장·가져오기는 게시 권한과 기존 심의번호를 초기화한 초안입니다.
 
-## 문서와 코드
+## 실제 게시
 
-- [프리미엄 레퍼런스 분석](docs/PREMIUM_DIY_DESIGN_RESEARCH.md)
-- [DIY 제작과 JSON·PDF 저장](docs/DIY_STUDIO_GUIDE.md)
-- [디자인 시스템](docs/DESIGN_SYSTEM.md)
-- [5개 샘플과 참고 페이지 반영 범위](docs/THEME_AND_DEMO_GUIDE.md)
-- [카카오톡 연동 계획](docs/KAKAO_INTEGRATION.md)
-- [아키텍처](docs/ARCHITECTURE.md)
-- `src/render/calm-page.ts`: 마스터와 목적별 구성
-- `src/render/shared.ts`: 공통 신청·헤더·고지
-- `src/render/premium-styles.ts`: 프리미엄 패턴과 반응형 스타일
-- `src/render/studio-page.ts`, `src/studio/editor.ts`: DIY 편집·실시간 미리보기·파일/PDF
-- `src/studio/project.ts`: 제작 파일 검증과 변환
-- `src/render/client-script.ts`: 브라우저 내 데모 동작
+자료수집 → 문구·연락처 선택 → 사실·사진 권한 확인 → 소속 조직 검토 → 도메인 및 게시 설정 → 실기기 확인 순서입니다. 데모가 아닌 실제 게시 설정에서 `advertisingReviewStatus: pending`은 검증 오류입니다. 심의 대상 여부와 `approved`/`not-required` 구분은 조직이 확인해야 합니다.
 
-실제 게시 전 소속 조직의 준법/광고심의, 무료 상담 조건, 실제 취급 범위, 등록 정보, 사진 사용권, 개인정보 처리 구조를 확정해야 합니다. 샘플은 noindex이며 실제 고객 후기로 오인할 수 있는 임시 수치나 성과 주장을 추가하지 않습니다.
+선택형 제작의 확인란은 작성자의 점검 기록일 뿐 승인 시스템이나 전자결재가 아닙니다. 저장 버튼은 공개 버튼이 아닙니다. 초안은 `draft`, `noIndex: true`로 유지하며 실제 게시와 수정 이력 관리는 기존 Git 기반 절차를 사용합니다.
+
+## 관련 문서
+
+- `docs/DIY_STUDIO_GUIDE.md`: 선택형·자유 편집 사용법
+- `docs/KAKAO_INTEGRATION.md`: 전화·오픈채팅 직접 연결 계약
+- `docs/ARCHITECTURE.md`: 현재 코드 구조와 호환 필드
+- `docs/OPERATIONS.md`: 조직 단위 운영 절차
+- `docs/B2B_HANDOFF.md`: 제안 범위와 인수 기준
+
+고객관리 CRM, 상담 수신함, 카카오 자동 전송, 온라인 보험 가입, 자동 분석, 계정·역할·결재 시스템은 구현 범위에 포함되지 않습니다. 버튼 클릭만으로 상담 완료 또는 영업 성과를 측정한다고 설명하지 않습니다.
