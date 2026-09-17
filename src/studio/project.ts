@@ -195,7 +195,7 @@ export function validateProjectSite(site: unknown): string[] {
     if (isSectionEnabled(config, "process") && config.process.length < 3) errors.push("site.process: 진행 과정을 표시하려면 3개 이상 필요합니다.");
     if (isSectionEnabled(config, "faq") && config.faqs.length < 2) errors.push("site.faqs: FAQ를 표시하려면 2개 이상 필요합니다.");
     if (isSectionEnabled(config, "reviews") && !config.reviews?.length) errors.push("site.reviews: 후기를 표시하려면 1개 이상 필요합니다.");
-    if (new TextEncoder().encode(JSON.stringify(site)).byteLength > MAX_PROJECT_BYTES - 256) errors.push("제작 파일은 전체 8MB 이하여야 합니다. 이미지 크기를 줄여 주세요.");
+    if (new TextEncoder().encode(JSON.stringify(site)).byteLength > MAX_PROJECT_BYTES - 256) errors.push("작업 파일은 전체 8MB 이하여야 합니다. 사진 크기를 줄여 주세요.");
   }
   return errors;
 }
@@ -293,19 +293,19 @@ export function createProject(site: SiteConfig, options: CreateProjectOptions = 
   };
   // The editor downloads indented JSON. Measure that exact representation so
   // every file we let it save can pass the import file-size limit later.
-  if (new TextEncoder().encode(JSON.stringify(project, null, 2)).byteLength > MAX_PROJECT_BYTES) throw new Error("제작 파일은 전체 8MB 이하여야 합니다. 이미지 크기를 줄여 주세요.");
+  if (new TextEncoder().encode(JSON.stringify(project, null, 2)).byteLength > MAX_PROJECT_BYTES) throw new Error("작업 파일은 전체 8MB 이하여야 합니다. 사진 크기를 줄여 주세요.");
   return project;
 }
 
 /** Accept JSON text as well as a decoded file; no code, HTML, or unknown fields execute. */
 export function parseProject(input: unknown): StudioProject {
   if (typeof input === "string") {
-    if (new TextEncoder().encode(input).byteLength > MAX_PROJECT_BYTES) throw new Error("제작 파일은 전체 8MB 이하여야 합니다.");
-    try { input = JSON.parse(input); } catch { throw new Error("JSON 제작 파일을 읽을 수 없습니다. 저장한 .json 파일을 선택해 주세요."); }
+    if (new TextEncoder().encode(input).byteLength > MAX_PROJECT_BYTES) throw new Error("작업 파일은 전체 8MB 이하여야 합니다.");
+    try { input = JSON.parse(input); } catch { throw new Error("작업 파일을 읽을 수 없습니다. 내보내기로 받은 파일 안의 .json 파일을 골라 주세요."); }
   }
-  if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('제작 파일을 확인해 주세요.');
+  if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('작업 파일을 확인해 주세요.');
   const version = (input as Record<string, unknown>).version;
-  if (version !== LEGACY_PROJECT_VERSION && version !== PROJECT_VERSION) throw new Error('이 제작 파일은 현재 편집기보다 새로운 형식입니다. 최신 편집기에서 불러와 주세요.');
+  if (version !== LEGACY_PROJECT_VERSION && version !== PROJECT_VERSION) throw new Error('이 작업 파일은 지금 화면보다 새로운 형식입니다. 최신 화면에서 불러와 주세요.');
   const savedAtRule = { ...text(40), check: (value: string) => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value) && Number.isFinite(Date.parse(value)) ? undefined : "저장 날짜 형식이 올바르지 않습니다." };
   const siteInput = (input as Record<string, unknown>).site;
   const selectedRule = object({
@@ -320,15 +320,15 @@ export function parseProject(input: unknown): StudioProject {
   const v2Rule = object({
     format: choice([PROJECT_FORMAT]), version: { type: 'number', min: 2, max: 2 }, savedAt: savedAtRule, site: sectionAwareSiteRule(siteInput),
     editor: object({ copyLibraryVersion: choice([COPY_LIBRARY_VERSION]), purposeId: {...choice(COPY_LIBRARY.presets.map(item => item.id)), nullable: true}, selectedCopy: selectedRule, customGroups: list(choice(COPY_GROUP_IDS), 0, 6, false, true), source: choice(['new','demo','imported']) }),
-    handoff: object({ draftId: {...text(100), check: value => /^[a-z0-9-]+$/i.test(value) ? undefined : '초안 ID 형식이 올바르지 않습니다.'}, designVersion: text(80), exportProfile: choice([EXPORT_PROFILE]), requestedDomain: {...domainRule, nullable: true} }),
+    handoff: object({ draftId: {...text(100), check: value => /^[a-z0-9-]+$/i.test(value) ? undefined : '작업 번호 형식이 올바르지 않습니다.'}, designVersion: text(80), exportProfile: choice([EXPORT_PROFILE]), requestedDomain: {...domainRule, nullable: true} }),
   });
   const errors: string[] = [];
   inspect(input, version === LEGACY_PROJECT_VERSION ? v1Rule : v2Rule, "project", errors);
-  if (errors.length) throw new Error(`제작 파일을 확인해 주세요.\n${errors.join("\n")}`);
+  if (errors.length) throw new Error(`작업 파일을 확인해 주세요.\n${errors.join("\n")}`);
   const project = input as StudioProject | StudioProjectV1;
   const issues = validateProjectSite(project.site);
   if (issues.length) throw new Error(issues.join("\n"));
-  if (new TextEncoder().encode(JSON.stringify(project)).byteLength > MAX_PROJECT_BYTES) throw new Error("제작 파일은 전체 8MB 이하여야 합니다.");
+  if (new TextEncoder().encode(JSON.stringify(project)).byteLength > MAX_PROJECT_BYTES) throw new Error("작업 파일은 전체 8MB 이하여야 합니다.");
   if (project.version === LEGACY_PROJECT_VERSION) return createProject(draftCopy(project.site), { savedAt: project.savedAt, source: 'imported', draftId: `legacy-${project.site.id}-${project.savedAt.replace(/\D/g, '').slice(0, 14)}` });
   const inferred = inferCopySelection(project.site);
   const custom = new Set(project.editor.customGroups);

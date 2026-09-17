@@ -26,14 +26,14 @@ export async function createDraftArchive(site: SiteConfig, options: CreateProjec
   const captures = await captureSiteDesign(project.site);
   options.onPhase?.('rendering-pdf');
   const pdfBytes = await createReviewPdf(project, captures);
-  if (pdfBytes.byteLength > MAX_PDF_BYTES) throw new Error('초안 PDF 용량이 20MB를 넘었습니다. 사진을 최적화한 뒤 다시 저장해 주세요.');
+  if (pdfBytes.byteLength > MAX_PDF_BYTES) throw new Error('인쇄본이 20MB를 넘었습니다. 사진 용량을 줄인 뒤 다시 내보내 주세요.');
   await PDFDocument.load(pdfBytes);
   const stem = fileStem(project), pdfName = `${stem}.pdf`, jsonName = `${stem}.json`;
   options.onPhase?.('packaging');
   const zip = new JSZip();
   zip.file(pdfName, pdfBytes); zip.file(jsonName, jsonBytes);
   const zipBytes = await zip.generateAsync({type:'uint8array',compression:'DEFLATE',compressionOptions:{level:6}});
-  if (zipBytes.byteLength > MAX_ARCHIVE_BYTES) throw new Error('초안 ZIP 용량이 30MB를 넘었습니다. 사진을 최적화한 뒤 다시 저장해 주세요.');
+  if (zipBytes.byteLength > MAX_ARCHIVE_BYTES) throw new Error('파일이 30MB를 넘었습니다. 사진 용량을 줄인 뒤 다시 내보내 주세요.');
   options.onPhase?.('ready');
   const zipBuffer = zipBytes.buffer.slice(zipBytes.byteOffset, zipBytes.byteOffset + zipBytes.byteLength) as ArrayBuffer;
   return { project, fileName:`${stem}.zip`, pdfName, jsonName, zipBytes, pdfBytes, jsonBytes, blob:new Blob([zipBuffer],{type:'application/zip'}) };

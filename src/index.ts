@@ -1,4 +1,3 @@
-import { renderStudioPage } from './render/studio-page.js';
 import { renderGuidedStudioPage } from './render/guided-studio-page.js';
 import { renderProposalPage } from './render/proposal-page.js';
 import { renderNotFoundPage, renderPrivacyPage, renderSitePage, renderTemplateGallery } from './render/page.js';
@@ -39,7 +38,6 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
   switch (url.pathname) {
     case '/': return html(renderSitePage(site,request));
     case '/studio': return demoPage(() => renderGuidedStudioPage(site));
-    case '/studio/advanced': return demoPage(() => renderStudioPage(site,request));
     case '/proposal': return demoPage(renderProposalPage);
     case '/templates': return demoPage(() => renderTemplateGallery(site,request));
     case '/privacy': return html(renderPrivacyPage(site,request));

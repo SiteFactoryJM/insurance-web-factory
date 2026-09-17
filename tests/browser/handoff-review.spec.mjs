@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test('handoff pages fit five widths and retain full text at 200 percent', async ({ page }, testInfo) => {
   test.setTimeout(180000);
-  for (const path of ['/', '/templates', '/proposal', '/privacy', '/studio', '/studio/advanced']) {
+  for (const path of ['/', '/templates', '/proposal', '/privacy', '/studio']) {
     await page.goto(path);
     await page.evaluate(() => document.fonts.ready);
     for (const width of [320, 360, 390, 768, 1440]) {

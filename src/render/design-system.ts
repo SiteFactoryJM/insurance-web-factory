@@ -19,9 +19,27 @@ export const PALETTES: Record<PaletteId, { name: string; accent: string; hover: 
 export function paletteId(site: SiteConfig): PaletteId {
   return PALETTE_IDS.includes(site.palette as PaletteId) ? site.palette! : TEMPLATE_META[site.template].palette;
 }
+/**
+ * Channel colours are shared by every palette. The Figma "Contact Button"
+ * component keeps KakaoTalk on one beige regardless of the selected theme so
+ * the channel stays recognisable.
+ */
+export const CHANNEL = { kakao: "#EEE6D4", kakaoHover: "#E3D8C0", kakaoLine: "#C8BDA6", kakaoInk: "#302D24" } as const;
+
+/**
+ * Token names mirror the Clear Human Figma variables (`--ch-*`). The short
+ * aliases stay for the existing stylesheets; the spec layer uses both.
+ */
 export function paletteStyle(id: PaletteId): string {
   const p = PALETTES[id];
-  return `--accent:${p.accent};--accent-hover:${p.hover};--ink:${p.ink};--muted:${p.muted};--paper:${p.paper};--tint:${p.tint};--line:${p.line};--input:${p.input};--dark:${p.dark};--detail:${p.detail}`;
+  return [
+    `--accent:${p.accent}`, `--accent-hover:${p.hover}`, `--ink:${p.ink}`, `--muted:${p.muted}`,
+    `--paper:${p.paper}`, `--tint:${p.tint}`, `--line:${p.line}`, `--input:${p.input}`,
+    `--dark:${p.dark}`, `--detail:${p.detail}`,
+    `--surface:#FFFFFF`, `--on-brand:#FFFFFF`, `--danger:#AC2537`,
+    `--radius-control:8px`, `--radius-contact:2px`,
+    `--kakao:${CHANNEL.kakao}`, `--kakao-hover:${CHANNEL.kakaoHover}`, `--kakao-line:${CHANNEL.kakaoLine}`, `--kakao-ink:${CHANNEL.kakaoInk}`,
+  ].join(";");
 }
 export function getDesign(site: SiteConfig): Required<SiteDesign> {
   const orders: Record<TemplateId, Required<SiteDesign>['sectionOrder']> = {

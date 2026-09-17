@@ -9,7 +9,7 @@ export const siteConfigs = {
     "template": "trust-blue",
     "accentColor": "#2D4864",
     "palette": "navy",
-    "headingFont": "noto-serif-kr",
+    "headingFont": "noto-sans-kr",
     "agent": {
       "name": "이윤복",
       "title": "보험설계사",

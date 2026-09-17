@@ -3,9 +3,20 @@ import { escapeHtml as e, safeUrl } from '../utils/html.js';
 import { responsiveCopy as copy } from './copy.js';
 import { getDesign } from './design-system.js';
 import { arrow, formatIndex, renderContactButtons, renderContactForm } from './shared.js';
+import { directPhoneHref } from '../utils/contact-links.js';
 
 const profile = (site: SiteConfig, className = '', eager = false) => `<img class="${className}" src="${e(site.agent.profileImage || '/assets/profile-placeholder.svg')}" alt="${e(site.agent.name || '담당자')} 프로필" width="600" height="800" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'}>`;
 const identity = (site: SiteConfig) => `<div class="adviser-signature"><strong>${e(site.agent.name || '담당자 이름')}</strong><span>${e(site.agent.title)}<br>${e(site.agent.company)}</span></div>`;
+
+/**
+ * CH2/Navy/Agent Details. 이름·소속·전화·상담 시간을 한 덩어리로 보여 주는
+ * Figma 컴포넌트입니다. 전화번호는 링크가 가능할 때만 `tel:`로 연결합니다.
+ */
+function adviserCard(site: SiteConfig): string {
+  const phone = directPhoneHref(site.contact.phone);
+  const number = e(site.contact.phone || '연락처 확인 필요');
+  return `<div class="adviser-card"><p class="adviser-role">담당 설계사</p><p class="adviser-name">${e(site.agent.name || '담당자 이름')}</p><p class="adviser-org">${e(site.agent.company || '소속 확인 필요')}<br>${e(site.agent.title || '보험설계사')}</p>${phone ? `<a class="adviser-phone" data-contact-link="phone" href="${e(phone)}">${number}</a>` : `<p class="adviser-phone">${number}</p>`}<p class="adviser-hours">상담 시간 ${e(site.contact.availableHours || '담당자에게 확인')}</p></div>`;
+}
 const heading = (kicker: string, title: string, mobile?: string) => `<div class="section-heading"><div><p class="eyebrow">${e(kicker)}</p><h2>${copy(title, mobile)}</h2></div></div>`;
 
 function hero(site: SiteConfig): string {
@@ -15,11 +26,11 @@ function hero(site: SiteConfig): string {
   const lead = `<div class="hero-copy"><p class="eyebrow"><span class="small-line" aria-hidden="true"></span>${e(site.hero.eyebrow || '보험 상담 안내')}</p><h1 id="hero-title">${copy(site.hero.headline || '가입한 보험,\n무엇부터 확인할까요?', site.hero.mobileHeadline)}</h1><p class="hero-description">${copy(site.hero.subheadline, site.hero.mobileSubheadline)}</p><div class="hero-actions">${renderContactButtons(site)}<a class="text-link" href="${servicesTarget}">${e(site.hero.secondaryCtaLabel || '상담 분야 보기')} <span aria-hidden="true">↓</span></a></div><p class="hero-note">상담 요청은 보험 가입 신청이 아닙니다.${site.hero.trustNote ? `<br>${e(site.hero.trustNote)}` : ''}</p>${identity(site)}</div>`;
   let visual: string;
   if (pattern === 'editorial') {
-    visual = `<div class="hero-visual"><figure class="hero-scene"><img src="${e(site.hero.image || site.agent.profileImage || '/assets/profile-placeholder.svg')}" alt="${site.hero.image ? '' : e(`${site.agent.name || '담당자'} 프로필`)}" width="1536" height="1024" fetchpriority="high"><figcaption>담당자와 상담 범위를 확인한 뒤 문의하세요.</figcaption></figure><div class="hero-adviser">${site.hero.image ? profile(site, '', true) : ''}<div><p>상담 담당자</p><strong>${e(site.agent.name)}</strong><span>${e(site.agent.company)}</span></div></div>`;
+    visual = `<div class="hero-visual"><figure class="hero-scene"><img src="${e(site.hero.image || site.agent.profileImage || '/assets/profile-placeholder.svg')}" alt="${site.hero.image ? '' : e(`${site.agent.name || '담당자'} 프로필`)}" width="1536" height="1024" fetchpriority="high"><figcaption>담당자와 상담 범위를 확인한 뒤 문의하세요.</figcaption></figure>${adviserCard(site)}</div>`;
   } else if (pattern === 'portrait') {
-    visual = `<figure class="portrait-figure">${profile(site, '', true)}<figcaption><span>상담 담당자</span><strong>${e(site.agent.name)} ${e(site.agent.title)}</strong></figcaption></figure>`;
+    visual = `<div class="hero-visual"><figure class="portrait-figure">${profile(site, '', true)}</figure>${adviserCard(site)}</div>`;
   } else {
-    visual = `<div class="hero-statement-person">${profile(site, '', true)}<div><p>${e(site.agent.company)}</p><strong>${e(site.agent.name)} ${e(site.agent.title)}</strong><span>${e(site.contact.availableHours)}</span></div></div>`;
+    visual = `<div class="hero-visual hero-statement-person">${profile(site, '', true)}${adviserCard(site)}</div>`;
   }
   return `<section class="hero premium-hero hero-${pattern} container" id="home" aria-labelledby="hero-title">${lead}${visual}</section><div class="container trust-strip"><p>담당자 · ${e(site.agent.name || '확인 필요')}</p><p>소속 · ${e(site.agent.company || '확인 필요')}</p><p>상담 시간 · ${e(site.contact.availableHours || '담당자에게 확인')}</p></div>`;
 }

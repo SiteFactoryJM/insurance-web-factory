@@ -1,24 +1,75 @@
 # Clear Human Figma 대응표
 
-기준 파일: `보험설계 2026 · Clear Human · 5 Color Themes + Guide` (`ngHLfP7Li2mzqWNo8yz8Zu`). 2026-09-17 공개 브라우저에서 실제 프레임을 확인했다. Figma MCP의 편집 권한은 없었으므로 화면 읽기는 공개 파일을 기준으로 했고, 색상 값은 디자인 가이드와 리빌딩 지시서의 토큰을 교차 확인했다.
+기준 파일: `보험설계 2026 · Clear Human · 5 Color Themes + Guide` (`ngHLfP7Li2mzqWNo8yz8Zu`).
+2026-09-17에 Figma MCP로 파일을 다시 읽었다.
 
-| Figma 노드 | 확인한 화면 | 코드 대응 |
+## 파일에 실제로 있는 것
+
+Figma 파일의 최상위 페이지는 두 개뿐이다.
+
+- `0:1` — `00 · Overview`. 개요 문구와 6색 갤러리 안내.
+- `36:12` — `30 · 컴포넌트 · 미드나이트 네이비`. 아래의 컴포넌트 세트.
+
+Overview 본문이 예고하는 "고객용 60개 화면 프로토타입"과 나머지 다섯 색상의 컴포넌트 페이지는
+이 파일에 존재하지 않는다. 따라서 **미드나이트 네이비 컴포넌트 세트를 정본으로 삼고**, 나머지 다섯
+색상은 같은 구조에 팔레트 토큰만 바꿔 쓴다.
+
+## 컴포넌트 대응
+
+| Figma 노드 | 컴포넌트 | 코드 대응 |
 | --- | --- | --- |
-| `0:1` | 전체 개요, 6색·5개 읽기 방식 | `src/render/design-system.ts`, `src/types.ts` |
-| `105:7` | Studio S01, 좌측 단계·중앙 선택·우측 미리보기 | `src/render/guided-studio-page.ts`, `src/studio/guided.ts` 01단계 |
-| `112:82` | Studio S02, 실제 정보 입력 | 같은 파일의 03단계 |
-| `112:260` | Studio S03, 검토·저장 | 같은 파일의 04단계 |
-| `119:246` | 초안 저장 완료 카드 | `.g-handoff`, `.g-result`, `saveArchive()` |
-| `75:547` | 고객 PC, 좌측 원고·우측 인물·직접 연락 | `renderSitePage()`, Clear Human 고객 레이아웃 |
-| `75:1373` | 고객 모바일, 세로 원고·사진·하단 CTA | 공통 반응형 렌더와 모바일 하단 연락 버튼 |
-| `6:2` | 6개 색상 가이드 | `PALETTES`, 단위 테스트의 정확한 토큰 스냅샷 |
+| `38:10` | CH2/Navy/Portrait | `.portrait-figure img` 등, 3:4 비율 고정 |
+| `38:11` | CH2/Navy/Button | `.button`, `.button-secondary` |
+| `68:39` | CH2/Navy/Contact Button | `.direct-contact-actions .button`, `.direct-phone`, `.direct-kakao` |
+| `38:20` | CH2/Navy/Topic Row | `.services-list .service-card` |
+| `38:24` | CH2/Navy/Topic Card | `.services-cards .service-card`, `.services-split .service-card` |
+| `39:22` | CH2/Navy/Accordion | `.faq-list details` |
+| `38:31` | CH2/Navy/Agent Details | `.adviser-card` (`calm-page.ts`의 `adviserCard()`) |
+| `40:22` | CH2/Navy/Field | 제작 화면의 `.g-field` |
+
+수치는 모두 `src/render/clear-human-styles.ts`에 모았다. 이 시트가 마지막 레이어라 앞선
+`styles.ts` · `premium-styles.ts` · `direct-contact-styles.ts`의 값을 덮는다.
+
+## 읽어 온 토큰
+
+| Figma 변수 | 값 | 코드 토큰 |
+| --- | --- | --- |
+| `--ch-ink` | `#172A3D` | `--ink` |
+| `--ch-brand` | `#2D4864` | `--accent` |
+| `--ch-brand-hover` | `#1D3249` | `--accent-hover` |
+| `--ch-soft` | `#E8EDF3` | `--tint` |
+| `--ch-line` | `#CDD6E0` | `--line` |
+| `--ch-control` | `#788696` | `--input` |
+| `--ch-muted` | `#526170` | `--muted` |
+| `--ch-surface` | `#FFFFFF` | `--surface` |
+| `--ch-on-brand` | `#FFFFFF` | `--on-brand` |
+| `--ch-danger` | `#AC2537` | `--danger` |
+| `--ch-radius-control` | `8px` | `--radius-control` |
+| `--radius-contact` | `2px` | `--radius-contact` |
+| 카카오 채널 | `#EEE6D4` / `#E3D8C0` / `#C8BDA6` / `#302D24` | `--kakao`, `--kakao-hover`, `--kakao-line`, `--kakao-ink` |
+
+여섯 팔레트의 정확한 값은 `src/render/design-system.ts`와 `tests/theme-architecture.test.mjs`가 고정한다.
+
+## 타이포
+
+Figma의 모든 텍스트 스타일은 Noto Sans KR이다. 본문 글꼴을 Noto Sans KR로 바꾸고
+(`BODY_FONT`), 제목 글꼴만 선택할 수 있게 남겼다.
+
+| 용도 | Figma | 코드 |
+| --- | --- | --- |
+| 담당자 이름 | 60 / 80 Bold | `--ch-display` |
+| 섹션 제목 | 40 / 56 Bold | `--ch-h2` |
+| 항목 제목 | 26 / 40 Bold | `--ch-h3` |
+| 카드 제목 | 22 / 34 Bold | `--ch-card` |
+| 본문 | 18 / 30 Regular | `--ch-body` |
+| 보조 문구 | 16 / 26 Regular | `--ch-small` |
 
 ## 구현 원칙
 
-- Studio는 1440px에서 단계 탐색, 편집, 고객 미리보기의 3열 관계를 유지하고 1000px 이하에서 한 열로 전환한다.
-- 배치 5종과 색상 6종은 독립 상태다. 목적별 추천만 여러 선택을 한 번에 바꾼다.
-- 밝은 종이색 배경, 짙은 잉크색, 얇은 경계, 작은 모서리 반경, 단정한 고딕을 공통 언어로 사용한다.
-- 고객 화면은 제작 도구 UI를 노출하지 않고 전화·오픈채팅 직접 연결과 법적 고지를 유지한다.
-- Figma의 저장 데모 문구처럼 저장은 초안 생성일 뿐 게시·전송·도메인 연결이 아니다.
+- 고객 화면은 좌측 원고 · 우측 인물 · 담당자 정보 카드 · 직접 연락으로 구성한다.
+- 화면 구성 5종과 색상 6종은 서로 독립이다. 목적별 추천만 여러 선택을 한 번에 바꾼다.
+- 제작 화면은 `/studio` 하나이고, 나가는 길은 메인(`/`) 하나다.
+- 고객 화면에는 제작 도구의 용어를 노출하지 않는다.
+- 저장은 작업본을 만드는 동작일 뿐 게시·전송·주소 연결이 아니다.
 
-현재 `data-design-version`은 `clear-human-v1`이다. 정확한 6개 팔레트 값은 `src/render/design-system.ts`와 `tests/theme-architecture.test.mjs`가 고정한다.
+`data-design-version`은 `clear-human-v1`이다.

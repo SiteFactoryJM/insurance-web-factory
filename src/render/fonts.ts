@@ -51,9 +51,11 @@ export function headingFont(id?: string): HeadingFontOption {
   return id && Object.hasOwn(HEADINGS, id) ? HEADINGS[id as HeadingFont] : HEADINGS.pretendard;
 }
 
-/** Load only the selected heading families plus the common Pretendard body. */
+/** Load only the selected heading families plus the common body face.
+ *  Figma's Clear Human sheets set every text style in Noto Sans KR. */
+export const BODY_FONT: HeadingFont = "noto-sans-kr";
 export function fontStylesheetLinks(ids: readonly HeadingFont[], includeBody = true): string {
-  const requested = includeBody ? ["pretendard" as const, ...ids] : ids;
+  const requested = includeBody ? [BODY_FONT, ...ids] : ids;
   return [...new Set(requested.map(id => headingFont(id).stylesheet))]
     .map(href => `<link rel="stylesheet" href="${escapeHtml(href)}">`).join("");
 }

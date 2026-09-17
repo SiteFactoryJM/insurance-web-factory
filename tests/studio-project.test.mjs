@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import { createProject, createStudioExample, parseProject, validateProjectSite, validateImageSource, isSectionEnabled, MAX_PROJECT_BYTES, MAX_IMAGE_BYTES } from "../.preview-dist/studio/project.js";
 import { HEADING_FONT_IDS } from "../.preview-dist/types.js";
-import { HEADING_FONTS, fontStylesheetLinks, headingFont, headingFontStyle } from "../.preview-dist/render/fonts.js";
+import { BODY_FONT, HEADING_FONTS, fontStylesheetLinks, headingFont, headingFontStyle } from "../.preview-dist/render/fonts.js";
 import { importStudioProject } from "../scripts/import-studio.mjs";
 import { validateContentLengths, validateDesignConfiguration, validateSectionContent } from "../scripts/validate-sites.mjs";
 
@@ -54,7 +54,7 @@ test("all six licensed heading choices survive export, restore and source valida
     assert.equal(parseProject(JSON.stringify(createProject(site))).site.headingFont, id);
     assert.ok(headingFontStyle(id).includes(headingFont(id).family));
     assert.match(headingFont(id).licenseUrl, /^https:\/\/github\.com\/(orioncactus\/pretendard|google\/fonts)\//);
-    assert.equal((fontStylesheetLinks([id, id]).match(/<link /g) || []).length, id === "pretendard" ? 1 : 2);
+    assert.equal((fontStylesheetLinks([id, id]).match(/<link /g) || []).length, id === BODY_FONT ? 1 : 2);
   }
   assert.equal(headingFont("constructor").id, "pretendard");
   const invalid = example(); invalid.headingFont = "unknown-font";
@@ -135,9 +135,9 @@ test("rejects wrong versions, missing fields and malformed shapes with Korean fe
   const project = createProject(example());
   for (const mutate of [p => p.version = 3, p => p.format = "other", p => delete p.site.agent, p => p.site.hero = [], p => p.site.contact.phone = "javascript:alert(1)", p => p.site.agent.careerYears = -1, p => p.savedAt = "yesterday"]) {
     const changed = clone(project); mutate(changed);
-    assert.throws(() => parseProject(changed), /제작 파일|필수|형식|지원|날짜|정수/);
+    assert.throws(() => parseProject(changed), /작업 파일|필수|형식|지원|날짜|정수/);
   }
-  assert.throws(() => parseProject("not json"), /JSON 제작 파일/);
+  assert.throws(() => parseProject("not json"), /작업 파일을 읽을 수 없습니다/);
 });
 
 test("v1 projects migrate to v2 while preserving content and resetting publication authority", () => {

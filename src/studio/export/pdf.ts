@@ -29,7 +29,7 @@ function wrap(font: PDFFont, value: string, size: number, maxWidth: number): str
 
 function footer(page: PDFPage, font: PDFFont, draftId: string, pageNumber: number): void {
   page.drawLine({ start: {x: margin, y: 27}, end: {x: A4[0] - margin, y: 27}, thickness: .5, color: rgb(.78,.8,.82) });
-  page.drawText(`보험설계사 소개 페이지 · 검토용 초안 · ${draftId}`, { x: margin, y: 14, size: 7.5, font, color: rgb(.35,.39,.43) });
+  page.drawText(`보험 상담 페이지 · 확인용 인쇄본 · ${draftId}`, { x: margin, y: 14, size: 7.5, font, color: rgb(.35,.39,.43) });
   page.drawText(String(pageNumber), { x: A4[0] - margin - 12, y: 14, size: 8, font, color: rgb(.35,.39,.43) });
 }
 
@@ -76,11 +76,11 @@ export async function createReviewPdf(project: StudioProject, captures: PreviewC
   cover.drawRectangle({x:0,y:0,width:A4[0],height:A4[1],color:color(palette.paper)});
   cover.drawRectangle({x:margin,y:A4[1]-220,width:5,height:150,color:accent});
   cover.drawText('보험설계사 소개 페이지', {x:margin+24,y:A4[1]-92,size:13,font,color:accent});
-  cover.drawText('검토용 초안', {x:margin+24,y:A4[1]-142,size:31,font,color:color(palette.ink)});
-  const summary = [`담당자  ${site.agent.name} · ${site.agent.company}`, `배치  ${TEMPLATE_META[site.template].name}`, `색상  ${palette.name}`, `생성 시각  ${project.savedAt}`, `초안 ID  ${project.handoff.draftId}`];
+  cover.drawText('확인용 인쇄본', {x:margin+24,y:A4[1]-142,size:31,font,color:color(palette.ink)});
+  const summary = [`담당자  ${site.agent.name} · ${site.agent.company}`, `화면 구성  ${TEMPLATE_META[site.template].name}`, `색상  ${palette.name}`, `생성 시각  ${project.savedAt}`, `작업 번호  ${project.handoff.draftId}`];
   summary.forEach((line, index) => cover.drawText(line, {x:margin+24,y:A4[1]-190-index*28,size:11,font,color:color(palette.ink)}));
   cover.drawRectangle({x:margin,y:125,width:A4[0]-margin*2,height:118,color:color(palette.tint),borderColor:color(palette.line),borderWidth:1});
-  ['이 문서는 디자인과 원고를 확인하는 검토용 초안입니다.', '저장만으로 담당자에게 전송되거나 사이트가 공개되지 않습니다.', 'ZIP 파일을 압축 풀지 말고 지정된 제작 담당자에게 전달해 주세요.'].forEach((line,index) => cover.drawText(line,{x:margin+20,y:210-index*27,size:10.5,font,color:color(palette.ink)}));
+  ['이 문서는 화면과 문구를 눈으로 확인하는 인쇄본입니다.', '내보내기만으로는 누구에게도 전송되거나 공개되지 않습니다.', '받은 압축 파일은 풀지 말고 그대로 제작 담당자에게 전달해 주세요.'].forEach((line,index) => cover.drawText(line,{x:margin+20,y:210-index*27,size:10.5,font,color:color(palette.ink)}));
 
   for (const capture of captures) {
     const image = await pdf.embedPng(capture.png);
@@ -112,7 +112,7 @@ export async function createReviewPdf(project: StudioProject, captures: PreviewC
   if (isSectionEnabled(site,'process')) { writer.heading('상담 과정'); site.process.forEach((item,index)=>writer.write(`${index+1}. ${item.title}\n${item.body}${item.mobileBody ? `\n모바일: ${item.mobileBody}` : ''}`)); }
   if (isSectionEnabled(site,'faq')) { writer.heading('자주 묻는 질문'); site.faqs.forEach((item,index)=>writer.write(`${index+1}. ${item.question}\n${item.answer}${item.mobileAnswer ? `\n모바일: ${item.mobileAnswer}` : ''}`)); }
   writer.heading('하단 안내와 필수 고지'); writer.write(`${site.footer?.heading || ''}\n${site.footer?.note || ''}\n\n${site.compliance.footerDisclaimer}`);
-  writer.heading('검토·전달 안내'); writer.write(`사진 사용 권한과 사실 관계, 소속 조직의 검토가 필요합니다.${project.handoff.requestedDomain ? `\n희망 도메인: ${project.handoff.requestedDomain} (구매·연결되지 않은 희망사항)` : ''}\n다운로드한 ZIP 파일 그대로 제작 담당자에게 전달해 주세요. JSON은 같은 편집기에서 다시 불러올 수 있습니다.`);
+  writer.heading('확인하고 전달하기'); writer.write(`사진을 써도 되는지, 내용이 사실인지, 소속 조직의 확인이 끝났는지 살펴봐 주세요.${project.handoff.requestedDomain ? `\n쓰고 싶은 주소: ${project.handoff.requestedDomain} (아직 만들어지지 않은 희망 주소)` : ''}\n내려받은 압축 파일을 그대로 제작 담당자에게 전달해 주세요. 안에 든 작업 파일을 불러오면 이어서 고칠 수 있습니다.`);
   writer.finalize();
   return pdf.save();
 }

@@ -13,8 +13,8 @@ await copyFile(
   'public/assets/fonts/noto-sans-kr-korean-400-normal.woff',
 );
 await build({
-  entryPoints: { studio: 'src/studio/editor.ts', 'guided-studio': 'src/studio/guided.ts' },
+  entryPoints: { 'guided-studio': 'src/studio/guided.ts' },
   outdir: 'public/assets', bundle: true, format: 'esm', splitting: true, chunkNames: 'chunks/[name]-[hash]', target: 'es2022',
   minify: true, legalComments: 'none',
 });
-console.log('Built guided studio, advanced editor, export chunks and PDF font');
+console.log('Built the studio bundle, export chunks and PDF font');

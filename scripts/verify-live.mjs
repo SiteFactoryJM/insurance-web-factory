@@ -17,7 +17,6 @@ for(let attempt=1;attempt<=30;attempt++){
   const privacy=await get('/privacy');shared(privacy);assert.ok(privacy.includes('오픈채팅'));
   const studio=await get('/studio');assert.ok(studio.includes('id="guided-preview"'));assert.ok(studio.includes('id="guided-bootstrap"'));
   const bundle=await get('/assets/guided-studio.js');assert.ok(bundle.length>10000);assert.ok(bundle.includes('copy-choice'));
-  const advanced=await get('/studio/advanced');assert.ok(advanced.includes('id="site-preview"'));assert.ok((await get('/assets/studio.js')).includes('studio-section-focus'));
   assert.ok((await get('/proposal')).includes('보험사'));
   const retired=await fetch(new URL('/api/consultations',origin),{method:'POST',headers:{'content-type':'application/json'},body:'{}',signal:AbortSignal.timeout(15000)});
   assert.equal(retired.status,410);assert.equal((await retired.json()).code,'DIRECT_CONTACT_ONLY');
@@ -25,5 +24,5 @@ for(let attempt=1;attempt<=30;attempt++){
  }catch(error){console.log(`Waiting for connected Cloudflare build (${attempt}/30): ${error.message}`);if(attempt<30)await new Promise(resolve=>setTimeout(resolve,10000));}
 }
 assert.ok(verified,'Live deployment not verified. Inspect Cloudflare Builds; do not report deployment success.');
-const summary=`Clear Human live verification passed: 5 layouts × 6 palettes, phone/open chat, retired API, guided/advanced editors, proposal and privacy.\n${origin}/\n`;
+const summary=`Clear Human live verification passed: 5 layouts × 6 palettes, phone/open chat, retired API, studio, proposal and privacy.\n${origin}/\n`;
 console.log(summary);if(process.env.GITHUB_STEP_SUMMARY)await appendFile(process.env.GITHUB_STEP_SUMMARY,summary);
