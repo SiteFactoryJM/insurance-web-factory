@@ -133,11 +133,34 @@ test("export and import always reset publishing authority and preserve required 
 
 test("rejects wrong versions, missing fields and malformed shapes with Korean feedback", () => {
   const project = createProject(example());
-  for (const mutate of [p => p.version = 2, p => p.format = "other", p => delete p.site.agent, p => p.site.hero = [], p => p.site.contact.phone = "javascript:alert(1)", p => p.site.agent.careerYears = -1, p => p.savedAt = "yesterday"]) {
+  for (const mutate of [p => p.version = 3, p => p.format = "other", p => delete p.site.agent, p => p.site.hero = [], p => p.site.contact.phone = "javascript:alert(1)", p => p.site.agent.careerYears = -1, p => p.savedAt = "yesterday"]) {
     const changed = clone(project); mutate(changed);
     assert.throws(() => parseProject(changed), /제작 파일|필수|형식|지원|날짜|정수/);
   }
   assert.throws(() => parseProject("not json"), /JSON 제작 파일/);
+});
+
+test("v1 projects migrate to v2 while preserving content and resetting publication authority", () => {
+  const current = createProject(example());
+  const legacy = { format: current.format, version: 1, savedAt: current.savedAt, site: clone(current.site) };
+  legacy.site.status = "published"; legacy.site.domains = ["example.com"]; legacy.site.seo.noIndex = false;
+  const migrated = parseProject(legacy);
+  assert.equal(migrated.version, 2);
+  assert.equal(migrated.savedAt, legacy.savedAt);
+  assert.equal(migrated.site.hero.headline, legacy.site.hero.headline);
+  assert.equal(migrated.site.status, "draft"); assert.deepEqual(migrated.site.domains, []); assert.equal(migrated.site.seo.noIndex, true);
+  assert.equal(migrated.editor.source, "imported");
+  assert.match(migrated.handoff.draftId, /^legacy-/);
+});
+
+test("v2 round-trip preserves explicit handoff metadata and never regenerates copy from IDs", () => {
+  const project = createProject(example(), { purposeId: "check", requestedDomain: "agent.example.com", source: "demo" });
+  const restored = parseProject(JSON.stringify(project));
+  assert.equal(restored.version, 2);
+  assert.equal(restored.handoff.draftId, project.handoff.draftId);
+  assert.equal(restored.handoff.requestedDomain, "agent.example.com");
+  assert.equal(restored.editor.purposeId, "check");
+  assert.equal(restored.site.hero.headline, project.site.hero.headline);
 });
 
 test("rejects prototype pollution and unknown properties at any supported level", () => {

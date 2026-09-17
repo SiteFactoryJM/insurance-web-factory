@@ -67,6 +67,7 @@ export function applyPurpose(site: SiteConfig, preset: PurposeChoice): SiteConfi
 export function blankGuidedSite(example: SiteConfig): SiteConfig {
   const out = structuredClone(example);
   out.id = 'new-adviser';
+  out.headingFont = 'noto-sans-kr';
   out.agent = { name: '', title: '보험설계사', company: '', branch: '', registrationNumber: '', regions: [], profileImage: '/assets/profile-placeholder.svg', logoImage: '' };
   out.contact = { phone: '', kakaoUrl: '', availableHours: '', email: '', officeAddress: '' };
   out.hero = { ...out.hero, image: undefined, trustNote: '계약 조건을 충분히 확인한 뒤 결정하세요.' };

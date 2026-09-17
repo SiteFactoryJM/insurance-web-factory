@@ -1,15 +1,28 @@
 import {test,expect} from '@playwright/test';
 import fs from 'node:fs/promises';
 import AxeBuilder from '@axe-core/playwright';
+import JSZip from 'jszip';
+import {PDFDocument} from 'pdf-lib';
+import {getDocument} from 'pdfjs-dist/legacy/build/pdf.mjs';
 const preview=page=>page.frameLocator('#guided-preview');
 async function start(page){await page.setViewportSize({width:1440,height:1000});await page.goto('/studio');await expect(page.locator('[data-purpose]')).toHaveCount(8);page.on('dialog',d=>d.accept());}
 async function stage(page,n){await page.locator(`button[data-stage="${n}"]`).click();}
+async function purpose(page,id){await stage(page,0);const details=page.locator('#guided-panel details');if(!(await details.evaluate(node=>node.open)))await details.locator('summary').click();await page.locator(`[data-purpose="${id}"]`).click();}
+async function storageOptions(page){const details=page.locator('.g-save-options details');if(!(await details.evaluate(node=>node.open)))await details.locator('summary').click();}
 async function facts(page){await stage(page,2);for(const [name,value] of [['name','검토용 담당자'],['company','검토용 소속'],['phone','010-0000-1234'],['hours','평일 09:00–18:00'],['kakao','https://open.kakao.com/o/TestInvite']])await page.locator(`input[name="${name}"]`).fill(value);}
-async function confirm(page){for(const input of await page.locator('[data-confirm]').all())await input.check();}
-async function save(page){const pending=page.waitForEvent('download');await page.locator('[data-action="download"]').click();const d=await pending;return JSON.parse(await fs.readFile(await d.path(),'utf8'));}
+async function confirm(page){await stage(page,3);for(const input of await page.locator('[data-confirm]').all())await input.check();}
+async function archive(page){
+ const pending=page.waitForEvent('download');await page.locator('[data-action="save-zip"]').click();const download=await pending;
+ const bytes=new Uint8Array(await fs.readFile(await download.path()));const zip=await JSZip.loadAsync(bytes);
+ const names=Object.keys(zip.files).sort();const jsonName=names.find(name=>name.endsWith('.json'));const pdfName=names.find(name=>name.endsWith('.pdf'));
+ expect(jsonName).toBeTruthy();expect(pdfName).toBeTruthy();
+ const project=JSON.parse(await zip.file(jsonName).async('text'));const pdfBytes=await zip.file(pdfName).async('uint8array');
+ return {download,bytes,names,jsonName,pdfName,project,pdfBytes};
+}
+async function save(page){return (await archive(page)).project;}
 test('recommended purposes provide copy without borrowing the demo identity',async({page})=>{
  await start(page);await expect(preview(page).locator('h1')).toContainText('가입한 보험');await expect(preview(page).locator('[data-contact-link]')).toHaveCount(0);
- await page.locator('[data-purpose="family"]').click();await expect(preview(page).locator('h1')).toContainText('가족의 보험');
+ await purpose(page,'family');await expect(preview(page).locator('h1')).toContainText('가족의 보험');
  await stage(page,1);await expect(page.locator('[name="copy-choice"]')).toHaveCount(24);
  await page.locator('[name="copy-choice"][value="hero-06"]').check();await expect(preview(page).locator('h1')).toContainText('처음 준비하는 보험');
  await page.locator('#copy-group').selectOption('faqs');await expect(page.locator('[name="copy-choice"]')).toHaveCount(30);
@@ -23,7 +36,7 @@ test('invalid multi-selection leaves the prior page intact',async({page})=>{
  await page.locator('[data-action="apply-copies"]').click();await expect(page.locator('#guided-errors')).toContainText('3~6');expect(await preview(page).locator('.service-card h3').allTextContents()).toEqual(before);
 });
 test('profile, chosen copy, layout and phone/chat links survive JSON export/import',async({page})=>{
- await start(page);await page.locator('[data-purpose="new"]').click();await facts(page);
+ await start(page);await purpose(page,'new');await facts(page);
  await expect(preview(page).locator('.hero-actions [data-contact-link="phone"]')).toHaveAttribute('href','tel:01000001234');
  await expect(preview(page).locator('.hero-actions [data-contact-link="kakao"]')).toHaveAttribute('href','https://open.kakao.com/o/TestInvite');
  const dispatched=await preview(page).locator('.hero-actions [data-contact-link="kakao"]').evaluate(a=>a.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true})));expect(dispatched).toBe(false);
@@ -33,18 +46,18 @@ test('profile, chosen copy, layout and phone/chat links survive JSON export/impo
  await page.goto('/studio/advanced');await page.locator('#project-file').setInputFiles({name:'draft.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(project))});await expect(page.frameLocator('#site-preview').locator('.hero-statement')).toHaveCount(1);
 });
 test('published rights and unsafe URLs cannot slip through save or import',async({page})=>{
- await start(page);await page.locator('[data-action="download"]').click();await expect(page.locator('#guided-errors')).toContainText('담당자 이름');await facts(page);await page.locator('input[name="kakao"]').fill('https://evil.test');await confirm(page);await page.locator('[data-action="download"]').click();await expect(page.locator('#guided-errors')).toContainText('open.kakao.com');
- await page.locator('#guided-file').setInputFiles({name:'bad.json',mimeType:'application/json',buffer:Buffer.from('{not json}')});await expect(page.locator('#guided-errors')).toBeVisible();await expect(page.locator('input[name="name"]')).toHaveValue('검토용 담당자');
+ await start(page);await stage(page,3);await page.locator('[data-action="save-zip"]').click();await expect(page.locator('#guided-errors')).toContainText('담당자 이름');await facts(page);await page.locator('input[name="kakao"]').fill('https://evil.test');await confirm(page);await page.locator('[data-action="save-zip"]').click();await expect(page.locator('#guided-errors')).toContainText('open.kakao.com');
+ await page.locator('#guided-file').setInputFiles({name:'bad.json',mimeType:'application/json',buffer:Buffer.from('{not json}')});await expect(page.locator('#guided-errors')).toBeVisible();await stage(page,2);await expect(page.locator('input[name="name"]')).toHaveValue('검토용 담당자');
 });
 test('draft storage is opt-in, explicitly restorable and erasable',async({page})=>{
- await start(page);expect(await page.evaluate(()=>localStorage.length)).toBe(0);await page.locator('#remember-draft').check();await expect(page.locator('#guided-status')).toContainText('초안을 보관');await facts(page);
+ await start(page);expect(await page.evaluate(()=>localStorage.length)).toBe(0);await storageOptions(page);await page.locator('#remember-draft').check();await expect(page.locator('#guided-status')).toContainText('초안을 보관');await facts(page);
  await expect.poll(()=>page.evaluate(()=>localStorage.getItem('atelier-guided-draft-v1'))).toContain('검토용 담당자');
- await page.reload();await page.locator('[data-action="restore"]').click();await stage(page,2);await expect(page.locator('input[name="name"]')).toHaveValue('검토용 담당자');
+ await page.reload();await storageOptions(page);await page.locator('[data-action="restore"]').click();await stage(page,2);await expect(page.locator('input[name="name"]')).toHaveValue('검토용 담당자');
  await page.locator('[data-action="clear"]').click();expect(await page.evaluate(()=>localStorage.getItem('atelier-guided-draft-v1'))).toBeNull();
 });
 test('selecting a new purpose keeps verified identity but resets the review checkboxes',async({page})=>{
- await start(page);await facts(page);await confirm(page);await stage(page,0);await page.locator('[data-purpose="retire"]').click();await stage(page,2);
- await expect(page.locator('input[name="company"]')).toHaveValue('검토용 소속');await expect(page.locator('input[name="phone"]')).toHaveValue('010-0000-1234');for(const c of await page.locator('[data-confirm]').all())await expect(c).not.toBeChecked();
+ await start(page);await facts(page);await confirm(page);await purpose(page,'retire');await stage(page,2);
+ await expect(page.locator('input[name="company"]')).toHaveValue('검토용 소속');await expect(page.locator('input[name="phone"]')).toHaveValue('010-0000-1234');await stage(page,3);for(const c of await page.locator('[data-confirm]').all())await expect(c).not.toBeChecked();
 });
 
 test('import and guided edits preserve custom footer, hidden copy, images and arrangement',async({page})=>{
@@ -61,9 +74,21 @@ test('import and guided edits preserve custom footer, hidden copy, images and ar
  await stage(page,2);await confirm(page);const restored=await save(page);
  for(const key of ['footer','seo','intro','design','agent'])expect(restored.site[key]).toEqual(project.site[key]);
 });
+test('handoff ZIP contains one valid PDF and one v2 JSON snapshot with extractable Korean text',async({page})=>{
+ test.setTimeout(120000);await start(page);await facts(page);await confirm(page);const result=await archive(page);
+ expect(result.names).toEqual([result.jsonName,result.pdfName].sort());expect(result.project.version).toBe(2);
+ expect(result.project.handoff.designVersion).toBe('clear-human-v1');expect(result.project.handoff.draftId).toMatch(/^draft-/);
+ expect(result.project.site.status).toBe('draft');expect(result.project.site.seo.noIndex).toBe(true);expect(result.project.site.sections.contactForm).toBe(false);
+ const pdf=await PDFDocument.load(result.pdfBytes);expect(pdf.getPageCount()).toBeGreaterThan(3);
+ if(process.env.REBUILD_PDF_OUTPUT)await fs.writeFile(process.env.REBUILD_PDF_OUTPUT,result.pdfBytes);
+ const document=await getDocument({data:result.pdfBytes,disableWorker:true}).promise;let text='';
+ for(let pageNumber=1;pageNumber<=document.numPages;pageNumber++){const page=await document.getPage(pageNumber);const content=await page.getTextContent();text+=content.items.map(item=>'str' in item?item.str:'').join(' ');}
+ expect(text).toContain('검토용 담당자');expect(text).toContain('검토용 소속');expect(text).toContain('제작 담당자에게 전달');
+ await expect(page.locator('.g-result')).toContainText('전달용 초안 ZIP이 준비되었습니다');
+});
 test('guided editor works at all five widths with accessible controls',async({page},testInfo)=>{
  test.setTimeout(120000);await start(page);
- for(const width of [320,360,390,768,1440]){await page.setViewportSize({width,height:1000});for(const n of [0,1,2]){
+ for(const width of [320,360,390,768,1440]){await page.setViewportSize({width,height:1000});for(const n of [0,1,2,3]){
   await stage(page,n);expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
   if([390,1440].includes(width)){expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze()).violations).toEqual([]);await testInfo.attach(`guided-${n}-${width}`,{body:await page.screenshot({fullPage:true}),contentType:'image/png'});}
  }}

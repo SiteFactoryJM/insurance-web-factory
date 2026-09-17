@@ -9,7 +9,7 @@ let verified=false;
 for(let attempt=1;attempt<=30;attempt++){
  try{
   for(const theme of themes)for(const palette of palettes){const html=await get(`/?theme=${theme}&palette=${palette}`);shared(html);
-   assert.ok(html.includes('data-design-version="atelier-guided-v9"'));assert.ok(html.includes('data-contact-version="direct-v1"'));
+   assert.ok(html.includes('data-design-version="clear-human-v1"'));assert.ok(html.includes('data-contact-version="direct-v1"'));
    assert.ok(html.includes(`data-layout="${theme}" data-palette="${palette}"`));assert.ok(html.includes('href="tel:01041877511"'));
    assert.ok(html.includes('href="https://open.kakao.com/o/sH6OIpKi"'));assert.ok(!html.includes('data-contact-form'));
   }

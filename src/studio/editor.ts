@@ -4,6 +4,7 @@ import { PALETTES } from "../render/design-system.js";
 import { HEADING_FONTS, headingFont, fontStylesheetLinks } from "../render/fonts.js";
 import { escapeHtml as esc } from "../utils/html.js";
 import { createProject, createStudioExample, parseProject, validateProjectSite, validateImageSource, isSectionEnabled, MAX_IMAGE_BYTES, MAX_PROJECT_BYTES } from "./project.js";
+import type { DraftArchiveResult, ExportPhase } from './export/types.js';
 
 type FieldOptions = { max?: number; rows?: number; optional?: boolean; hint?: string; placeholder?: string; type?: string; lines?: boolean };
 type PatternOption = readonly [string, string, string];
@@ -11,6 +12,7 @@ const bootstrap = document.getElementById("studio-bootstrap");
 if (!bootstrap?.textContent) throw new Error("페이지 예시를 불러오지 못했습니다.");
 const example = createStudioExample(JSON.parse(bootstrap.textContent) as SiteConfig);
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
+let exportBusy = false, archiveResult: DraftArchiveResult | null = null, archiveUrl = '';
 const defaultDesign: NonNullable<SiteConfig["design"]> = { hero: "portrait", services: "list", about: "editorial", process: "steps", faq: "accordion", footer: "classic", ornament: "line", density: "airy", sectionOrder: [...DESIGN_SECTION_IDS], hiddenSections: ["reviews"] };
 const sectionNames: Record<DesignSectionId, string> = { services: "상담 분야", about: "소개와 원칙", process: "진행 과정", reviews: "고객 후기", faq: "자주 묻는 질문", contact: "상담 연락" };
 const patterns: Record<string, { label: string; options: readonly PatternOption[] }> = {
@@ -68,6 +70,11 @@ const previewMat = document.querySelector<HTMLElement>(".preview-mat")!;
 const previewCanvas = document.querySelector<HTMLElement>(".preview-canvas")!;
 const status = document.getElementById("studio-status")!;
 const fileInput = document.getElementById("project-file") as HTMLInputElement;
+const topExport = document.querySelector<HTMLButtonElement>('.top-actions [data-action="export"]');
+if (topExport) {
+  topExport.dataset.action = 'export-zip';
+  topExport.innerHTML = '초안 ZIP 저장 <span aria-hidden="true">↓</span>';
+}
 const optionalNonempty = /(?:mobileHeadline|mobileSubheadline|mobileTitle|mobileBody|mobileAnswer|contentBrief\.(?:purpose|targetAudience|primaryAction))$/;
 
 function readPath(path: string): unknown {
@@ -149,7 +156,7 @@ function footerPanel(): string {
   return `<h2 class="panel-heading">마지막까지, 신뢰 있게.</h2><p class="panel-subtitle">소속과 연락처를 분명하게 안내하세요. 정보와 고지가 잘 읽히는 연락처·고지을 만듭니다.</p><div class="footer-preview" aria-label="연락처·고지 정보 구성 안내"><strong>설계사 이름 보험상담</strong><p>소속 GA·대리점 · 등록 정보<br>주소</p><p>전화 · 이메일 · 상담시간</p><hr><p>보험 고지와 개인정보 안내</p></div>${patternGroup("footer")}${group("연락처·고지 소개", `${field("footer.heading", "연락처·고지 제목", { max: 80, optional: true, placeholder: "예: 홍길동 보험상담", hint: "비우면 이름과 직함으로 표시" })}${field("footer.note", "추가 안내", { max: 400, rows: 4, optional: true, placeholder: "예: 방문 상담은 사전 예약제로 진행합니다." })}${field("agent.registrationNumber", "설계사 등록번호", { max: 80, optional: true })}${field("agent.businessNumber", "사업자등록번호", { max: 80, optional: true })}`, "footer")}${group("연락처와 상담 시간", `${field("contact.phone", "전화번호", { max: 32, type: "tel" })}${field("contact.email", "이메일", { max: 254, type: "email", optional: true, placeholder: "email@example.com" })}${field("contact.kakaoUrl", "카카오톡 오픈채팅 주소", { max: 2048, type: "url", optional: true, placeholder: "https://open.kakao.com/o/초대코드", hint: "오픈채팅 초대 주소만 허용 · 자동 메시지 없음" })}${field("contact.instagramUrl", "인스타그램 주소", { max: 2048, type: "url", optional: true })}${field("contact.availableHours", "상담 가능 시간", { max: 100 })}${field("contact.officeAddress", "사무실 주소", { max: 240, rows: 3, optional: true })}${field("contact.mapUrl", "지도 링크", { max: 2048, type: "url", optional: true })}`, "contact")}${group("보험 고지와 개인정보", `<p class="hint">필수 고지는 줄이거나 숨기지 않습니다. 실제 게시 전에 소속 조직의 확인을 받아 주세요.</p>${field("compliance.footerDisclaimer", "보험 고지 문구", { max: 2000, rows: 8 })}${field("compliance.advertisingReviewNumber", "광고 심의번호", { max: 120, optional: true })}${field("compliance.advertisingReviewExpiresAt", "심의 유효기간", { max: 40, optional: true })}${field("compliance.privacyOfficer", "개인정보 담당자", { max: 120 })}${field("compliance.privacyRetentionPeriod", "개인정보 보유 기간 안내", { max: 500, rows: 4 })}`, "compliance")}<details class="section-details"><summary>페이지 제목과 공유 설명</summary>${field("seo.title", "브라우저·검색 제목", { max: 120 })}${field("seo.description", "페이지 설명", { max: 300, rows: 4 })}<p class="hint">제작 파일은 검색 비공개 초안으로 저장됩니다.</p></details>${panelNav(2)}`;
 }
 function savePanel(): string {
-  return `<h2 class="panel-heading">이제, 제작자에게 전하세요.</h2><p class="panel-subtitle">작성한 내용과 선택한 구성을 파일로 남겨 두세요. 파일을 다시 열어 이어서 수정할 수 있습니다.</p><div id="studio-errors" class="error-box" role="alert" tabindex="-1"></div><div class="save-card"><span class="pill">다시 편집할 수 있는 원본</span><h3>제작 파일 저장</h3><p>선택한 패턴, PC·모바일 원고, 사진과 연락처·고지 정보를 JSON 파일 하나에 담습니다.</p><button type="button" class="btn primary" data-action="export">제작 파일 저장 ↓</button></div><div class="save-card"><span class="pill">검토하고 공유하는 문서</span><h3>제작 의뢰서 PDF</h3><p>모든 원고와 구성 정보를 보기 좋은 제작서로 정리합니다. 인쇄 창에서 ‘PDF로 저장’을 선택하세요.</p><button type="button" class="btn" data-action="print">PDF로 저장 ↓</button></div><p class="save-note">다운로드한 제작 파일을 제작자에게 전달해 주세요. 개인별 페이지 제작에 사용하고, 나중에 ‘파일 불러오기’로 복원할 수 있습니다.</p><p class="hint">입력 내용은 서버로 전송하거나 브라우저 저장소에 자동 저장하지 않습니다. 페이지를 닫기 전에 제작 파일을 저장해 주세요.</p><div class="brief-details"><h3 style="font-size:17px">현재 구성</h3><p>${esc(PALETTES[site.palette || "forest"].name)} · ${esc(headingFont(site.headingFont).label)}<br>${esc(patterns.hero.options.find(option => option[0] === site.design?.hero)?.[1] || "에디토리얼")} · ${(site.design?.sectionOrder || DESIGN_SECTION_IDS).filter(id => !site.design?.hiddenSections?.includes(id)).length}개 섹션</p></div>${panelNav(3)}`;
+  return `<h2 class="panel-heading">이제, 제작자에게 전하세요.</h2><p class="panel-subtitle">검토용 PDF와 다시 편집할 JSON을 하나의 ZIP으로 저장합니다.</p><div id="studio-errors" class="error-box" role="alert" tabindex="-1"></div><div class="save-card"><span class="pill">PDF + JSON · 정확히 두 파일</span><h3>초안을 저장한 뒤 제작 담당자에게 전달해 주세요.</h3><p>다운로드한 ZIP 파일을 압축을 풀지 말고 제작 담당자에게 전달해 주세요. 저장만으로 자동 전송되거나 사이트가 공개되지는 않습니다.</p><button type="button" class="btn primary" data-action="export-zip"${exportBusy ? ' disabled' : ''}>${exportBusy ? '초안 ZIP 만드는 중…' : '초안 저장 · ZIP ↓'}</button></div>${archiveResult ? `<div class="save-card"><span class="pill">전달용 초안 ZIP 준비 완료</span><h3>${esc(archiveResult.fileName)}</h3><p>ZIP 그대로 지정된 제작 담당자에게 전달하세요. 파일에는 이름·연락처·사진이 포함될 수 있습니다.</p><button type="button" class="btn" data-action="redownload-zip">다시 다운로드</button></div>` : ''}<details class="section-details"><summary>고급 보조 기능</summary><p class="hint">JSON 단독 저장과 브라우저 인쇄는 보조 기능입니다. 기본 전달은 ZIP을 사용하세요.</p><button type="button" class="btn" data-action="export">JSON만 저장</button> <button type="button" class="btn" data-action="print">브라우저 인쇄</button></details><p class="save-note">실제 게시 전에는 원고의 사실 여부, 사진 사용 권한, 소속 조직의 검토가 필요합니다.</p><p class="hint">입력 내용은 서버로 전송하거나 브라우저 저장소에 자동 저장하지 않습니다.</p><div class="brief-details"><h3 style="font-size:17px">현재 구성</h3><p>${esc(PALETTES[site.palette || "forest"].name)} · ${esc(headingFont(site.headingFont).label)}<br>${esc(patterns.hero.options.find(option => option[0] === site.design?.hero)?.[1] || "에디토리얼")} · ${(site.design?.sectionOrder || DESIGN_SECTION_IDS).filter(id => !site.design?.hiddenSections?.includes(id)).length}개 섹션</p></div>${panelNav(3)}`;
 }
 function panelNav(index: number): string {
   return `<div class="panel-nav">${index > 0 ? `<button type="button" class="btn" data-go-step="${index - 1}">← 이전</button>` : ""}${index < 3 ? `<button type="button" class="btn primary" data-go-step="${index + 1}">${["프로필·문구 작성", "연락처·고지 작성", "파일 저장하기"][index]} →</button>` : ""}</div>`;
@@ -425,6 +432,32 @@ function downloadProject(): void {
   document.getElementById("studio-errors")?.replaceChildren();
   announce("제작 파일을 저장했습니다. 이 JSON 파일을 제작자에게 전달하거나 ‘파일 불러오기’로 다시 편집하세요.");
 }
+const archivePhase: Record<ExportPhase,string> = {
+  validating:'입력한 내용을 확인하고 있습니다.', 'preparing-assets':'사진과 글꼴을 준비하고 있습니다.',
+  'rendering-pdf':'PC·모바일 디자인과 PDF를 만들고 있습니다.', packaging:'PDF와 JSON을 ZIP으로 묶고 있습니다.',
+  ready:'전달용 초안 ZIP이 준비되었습니다.', failed:'초안 ZIP을 만들지 못했습니다. 입력 내용은 유지됩니다.',
+};
+function requestZipDownload(): void {
+  if (!archiveResult) return;
+  if (!archiveUrl) archiveUrl = URL.createObjectURL(archiveResult.blob);
+  const link = document.createElement('a'); link.href = archiveUrl; link.download = archiveResult.fileName;
+  document.body.append(link); link.click(); link.remove();
+  announce('다운로드를 시작했습니다. 브라우저의 다운로드 목록에서 ZIP 파일을 확인해 주세요.');
+}
+async function downloadArchive(): Promise<void> {
+  if (exportBusy || !checkedProject()) return;
+  exportBusy = true; renderPanels();
+  try {
+    const { createDraftArchive } = await import('./export/archive.js');
+    const result = await createDraftArchive(site,{source:'imported',onPhase:phase=>announce(archivePhase[phase])});
+    if (archiveUrl) URL.revokeObjectURL(archiveUrl);
+    archiveResult = result; archiveUrl = ''; dirty = false;
+    requestZipDownload();
+  } catch (error) {
+    announce(archivePhase.failed);
+    showErrors(String(error instanceof Error ? error.message : error).split('\n'));
+  } finally { exportBusy = false; renderPanels(); }
+}
 function printPair(label: string, pc: string | undefined, mobile?: string): string {
   return `<tr><th>${esc(label)}</th><td><span class="copy-label">PC · ${Array.from(pc || "").length}자</span><p>${esc(pc || "미작성")}</p>${mobile !== undefined ? `<span class="copy-label">모바일 · ${Array.from(mobile).length}자</span><p>${esc(mobile || "PC 문구와 동일")}</p>` : ""}</td></tr>`;
 }
@@ -561,7 +594,7 @@ document.addEventListener("change", event => {
     if (id === "reviews" && target.checked && !site.reviews?.length) announce("후기 영역을 선택했습니다. 프로필·문구 단계에서 실제 후기 또는 디자인 예시를 추가하면 표시됩니다.");
   }
 });
-document.addEventListener("click", event => {
+document.addEventListener("click", async event => {
   const origin = event.target as Element;
   const summary = origin.closest("summary");
   if (summary && panels.contains(summary) && !summary.closest("details")?.open) {
@@ -621,11 +654,14 @@ document.addEventListener("click", event => {
     case "example": useFullExample(); break;
     case "import": fileInput.click(); break;
     case "export": downloadProject(); break;
+    case "export-zip": await downloadArchive(); break;
+    case "redownload-zip": requestZipDownload(); break;
     case "print": printBrief(); break;
     case "blank": if (confirmReplace("작성 중인 내용을 지우고 빈 원고로 시작할까요?")) { site = blankSite(); dirty = false; hasOwnContent = false; renderPanels(); updatePreview(); document.getElementById("save-status")!.textContent = "이 브라우저에서만 편집 중"; announce("빈 원고로 시작합니다. 오른쪽은 참고용 예시이며 ‘예시 사용’으로 원하는 내용만 가져올 수 있습니다."); } break;
     case "remove-photo": site.agent.profileImage = "/assets/profile-placeholder.svg"; delete site.seo.ogImage; markChanged(); renderPanels(); announce("프로필 사진을 기본 이미지로 바꿨습니다."); break;
   }
 });
+window.addEventListener('pagehide', () => { if (archiveUrl) URL.revokeObjectURL(archiveUrl); });
 document.querySelector("[role=tablist]")?.addEventListener("keydown", event => {
   const key = (event as KeyboardEvent).key;
   if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(key)) return;

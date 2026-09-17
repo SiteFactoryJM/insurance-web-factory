@@ -28,10 +28,16 @@ async function reveal(input) {
   }
 }
 async function save(page) {
+  const current=Number(await page.locator('.step-tab[aria-selected="true"]').getAttribute('data-step'));
+  await step(page,3);
+  const details=page.locator('#panel-3 details.section-details');
+  if(!(await details.evaluate(node=>node.open)))await details.locator('summary').click();
   const pending=page.waitForEvent('download');
-  await page.locator('[data-action="export"]').first().click();
+  await details.locator('[data-action="export"]').click();
   const download=await pending;
-  return {project:JSON.parse(await fs.readFile(await download.path(),'utf8')),download};
+  const project=JSON.parse(await fs.readFile(await download.path(),'utf8'));
+  if(current!==3)await step(page,current);
+  return {project,download};
 }
 async function choose(page,key,value) {
   const input=page.locator(`[data-design="${key}"][value="${value}"]`);
@@ -89,7 +95,7 @@ test('copy limits count Unicode and block saving without truncating the draft',a
   await field(page,'hero.mobileHeadline').fill('가😀');
   await expect(page.locator('[data-count="hero.mobileHeadline"]')).toHaveText('2 / 24');
   await field(page,'hero.mobileHeadline').fill('가'.repeat(25));
-  await page.locator('[data-action="export"]').first().click();
+  await page.locator('.top-actions [data-action="export-zip"]').click();
   await expect(page.locator('#studio-errors')).toContainText('24');
   await step(page,1);await expect(field(page,'hero.mobileHeadline')).toHaveValue('가'.repeat(25));
   await field(page,'hero.mobileHeadline').fill('내일을 위한 상담');
@@ -223,7 +229,7 @@ test('a concise page can be saved with unfilled sections hidden and completed la
   await step(page,0);await page.locator('[data-section="about"]').check();
   await step(page,1);await reveal(field(page,'intro.body'));
   await expect(field(page,'intro.body')).toHaveValue('');
-  await page.locator('[data-action="export"]').first().click();
+  await page.locator('.top-actions [data-action="export-zip"]').click();
   await expect(page.locator('#studio-errors')).toContainText('소개');
 });
 

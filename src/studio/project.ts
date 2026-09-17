@@ -1,11 +1,48 @@
 import { directPhoneHref, openChatUrl } from '../utils/contact-links.js';
 import { DESIGN_SECTION_IDS, HEADING_FONT_IDS, PALETTE_IDS, TEMPLATE_IDS, type DesignSectionId, type SiteConfig } from "../types.js";
+import { COPY_LIBRARY } from '../content/copy-library.js';
+import { DESIGN_VERSION } from '../render/design-system.js';
 
 export const PROJECT_FORMAT = "insurance-web-factory/diy" as const;
-export const PROJECT_VERSION = 1 as const;
+export const PROJECT_VERSION = 2 as const;
+export const LEGACY_PROJECT_VERSION = 1 as const;
+export const COPY_LIBRARY_VERSION = "clear-human-copy-v1" as const;
+export const EXPORT_PROFILE = "a4-review-v1" as const;
 export const MAX_PROJECT_BYTES = 8 * 1024 * 1024;
 export const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
-export interface StudioProject { format: typeof PROJECT_FORMAT; version: typeof PROJECT_VERSION; savedAt: string; site: SiteConfig; }
+export const COPY_GROUP_IDS = ['heroes', 'intros', 'services', 'processes', 'faqs', 'footers'] as const;
+export type CopyGroupId = (typeof COPY_GROUP_IDS)[number];
+export interface SelectedCopy {
+  heroes: string | null; intros: string | null; services: string[];
+  processes: string | null; faqs: string[]; footers: string | null;
+}
+export interface StudioProjectV1 { format: typeof PROJECT_FORMAT; version: typeof LEGACY_PROJECT_VERSION; savedAt: string; site: SiteConfig; }
+export interface StudioProject {
+  format: typeof PROJECT_FORMAT;
+  version: typeof PROJECT_VERSION;
+  savedAt: string;
+  site: SiteConfig;
+  editor: {
+    copyLibraryVersion: typeof COPY_LIBRARY_VERSION;
+    purposeId: string | null;
+    selectedCopy: SelectedCopy;
+    customGroups: CopyGroupId[];
+    source: 'new' | 'demo' | 'imported';
+  };
+  handoff: {
+    draftId: string;
+    designVersion: string;
+    exportProfile: typeof EXPORT_PROFILE;
+    requestedDomain: string | null;
+  };
+}
+export interface CreateProjectOptions {
+  savedAt?: string;
+  draftId?: string;
+  purposeId?: string | null;
+  requestedDomain?: string | null;
+  source?: StudioProject['editor']['source'];
+}
 
 export const DESIGN_OPTIONS = {
   hero: ["portrait", "editorial", "statement"], services: ["cards", "list", "split"],
@@ -16,7 +53,7 @@ export const DESIGN_OPTIONS = {
 
 type Rule = {
   type: "string" | "number" | "boolean" | "array" | "object";
-  optional?: boolean; max?: number; min?: number; values?: readonly string[];
+  optional?: boolean; nullable?: boolean; max?: number; min?: number; values?: readonly string[];
   properties?: Record<string, Rule>; items?: Rule; unique?: boolean;
   check?: (value: string) => string | undefined;
 };
@@ -120,6 +157,7 @@ function sectionAwareSiteRule(input: unknown): Rule {
 
 function inspect(value: unknown, rule: Rule, path: string, errors: string[]): void {
   if (errors.length >= 40) return;
+  if (value === null && rule.nullable) return;
   if (value === undefined && rule.optional) return;
   if (value === undefined) { errors.push(`${path}: 필수 항목을 입력하세요.`); return; }
   if (rule.type === "object") {
@@ -167,6 +205,7 @@ function draftCopy(site: SiteConfig): SiteConfig {
   copy.status = "draft";
   copy.domains = [];
   copy.seo.noIndex = true;
+  copy.sections.contactForm = false;
   copy.demo = { enabled: true, allowTemplateSwitch: false, submissionMode: "discard" };
   copy.compliance.contentTruthConfirmed = false;
   copy.compliance.photoUseConfirmed = false;
@@ -175,6 +214,41 @@ function draftCopy(site: SiteConfig): SiteConfig {
   copy.compliance.advertisingReviewNumber = "";
   copy.compliance.advertisingReviewExpiresAt = "";
   return copy;
+}
+
+function exactHero(site: SiteConfig): string | null {
+  return COPY_LIBRARY.heroes.find(item => item.headline === site.hero.headline && item.subheadline === site.hero.subheadline
+    && (item.mobileHeadline || '') === (site.hero.mobileHeadline || '') && (item.mobileSubheadline || '') === (site.hero.mobileSubheadline || '')
+    && (item.eyebrow || '') === (site.hero.eyebrow || ''))?.id || null;
+}
+function exactIntro(site: SiteConfig): string | null {
+  return COPY_LIBRARY.intros.find(item => item.title === site.intro.title && item.body === site.intro.body
+    && (item.mobileTitle || '') === (site.intro.mobileTitle || '') && (item.mobileBody || '') === (site.intro.mobileBody || '')
+    && (item.philosophy || '') === (site.intro.philosophy || ''))?.id || null;
+}
+function exactCards<T extends {id:string;title:string;body:string;mobileBody?:string}>(source: T[], values: SiteConfig['specialties']): string[] | null {
+  const result = values.map(value => source.find(item => item.title === value.title && item.body === value.body && (item.mobileBody || '') === (value.mobileBody || ''))?.id);
+  return result.every(Boolean) ? result as string[] : null;
+}
+function exactFaqs(site: SiteConfig): string[] | null {
+  const result = site.faqs.map(value => COPY_LIBRARY.faqs.find(item => item.question === value.question && item.answer === value.answer && (item.mobileAnswer || '') === (value.mobileAnswer || ''))?.id);
+  return result.every(Boolean) ? result as string[] : null;
+}
+export function inferCopySelection(site: SiteConfig): {selectedCopy: SelectedCopy; customGroups: CopyGroupId[]} {
+  const services = exactCards(COPY_LIBRARY.services, site.specialties);
+  const faqs = exactFaqs(site);
+  const process = COPY_LIBRARY.processes.find(item => JSON.stringify(item.items) === JSON.stringify(site.process))?.id || null;
+  const selectedCopy: SelectedCopy = {
+    heroes: exactHero(site), intros: exactIntro(site), services: services || [], processes: process,
+    faqs: faqs || [], footers: COPY_LIBRARY.footers.find(item => item.text === site.footer?.note)?.id || null,
+  };
+  const customGroups = COPY_GROUP_IDS.filter(group => group === 'services' ? !services : group === 'faqs' ? !faqs : !selectedCopy[group]);
+  return { selectedCopy, customGroups };
+}
+
+function makeDraftId(siteId: string, savedAt: string): string {
+  const random = globalThis.crypto?.randomUUID?.().replace(/-/g, '').slice(0, 10) || Math.random().toString(36).slice(2, 12);
+  return `draft-${siteId}-${savedAt.replace(/\D/g, '').slice(0, 14)}-${random}`.slice(0, 100);
 }
 
 /** Resolve per-template examples once, so later DIY edits stay authoritative. */
@@ -193,10 +267,30 @@ export function createStudioExample(rawSite: SiteConfig): SiteConfig {
   return site;
 }
 
-export function createProject(site: SiteConfig): StudioProject {
+export function createProject(site: SiteConfig, options: CreateProjectOptions = {}): StudioProject {
   const issues = validateProjectSite(site);
   if (issues.length) throw new Error(issues.join("\n"));
-  const project: StudioProject = { format: PROJECT_FORMAT, version: PROJECT_VERSION, savedAt: new Date().toISOString(), site: draftCopy(site) };
+  const savedAt = options.savedAt || new Date().toISOString();
+  const inferred = inferCopySelection(site);
+  const project: StudioProject = {
+    format: PROJECT_FORMAT,
+    version: PROJECT_VERSION,
+    savedAt,
+    site: draftCopy(site),
+    editor: {
+      copyLibraryVersion: COPY_LIBRARY_VERSION,
+      purposeId: options.purposeId ?? null,
+      selectedCopy: inferred.selectedCopy,
+      customGroups: inferred.customGroups,
+      source: options.source || 'new',
+    },
+    handoff: {
+      draftId: options.draftId || makeDraftId(site.id, savedAt),
+      designVersion: DESIGN_VERSION,
+      exportProfile: EXPORT_PROFILE,
+      requestedDomain: options.requestedDomain?.trim() || null,
+    },
+  };
   // The editor downloads indented JSON. Measure that exact representation so
   // every file we let it save can pass the import file-size limit later.
   if (new TextEncoder().encode(JSON.stringify(project, null, 2)).byteLength > MAX_PROJECT_BYTES) throw new Error("제작 파일은 전체 8MB 이하여야 합니다. 이미지 크기를 줄여 주세요.");
@@ -209,12 +303,40 @@ export function parseProject(input: unknown): StudioProject {
     if (new TextEncoder().encode(input).byteLength > MAX_PROJECT_BYTES) throw new Error("제작 파일은 전체 8MB 이하여야 합니다.");
     try { input = JSON.parse(input); } catch { throw new Error("JSON 제작 파일을 읽을 수 없습니다. 저장한 .json 파일을 선택해 주세요."); }
   }
+  if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('제작 파일을 확인해 주세요.');
+  const version = (input as Record<string, unknown>).version;
+  if (version !== LEGACY_PROJECT_VERSION && version !== PROJECT_VERSION) throw new Error('이 제작 파일은 현재 편집기보다 새로운 형식입니다. 최신 편집기에서 불러와 주세요.');
+  const savedAtRule = { ...text(40), check: (value: string) => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value) && Number.isFinite(Date.parse(value)) ? undefined : "저장 날짜 형식이 올바르지 않습니다." };
+  const siteInput = (input as Record<string, unknown>).site;
+  const selectedRule = object({
+    heroes: {...choice(COPY_LIBRARY.heroes.map(item => item.id)), nullable: true},
+    intros: {...choice(COPY_LIBRARY.intros.map(item => item.id)), nullable: true},
+    services: list(choice(COPY_LIBRARY.services.map(item => item.id)), 0, 24, false, true),
+    processes: {...choice(COPY_LIBRARY.processes.map(item => item.id)), nullable: true},
+    faqs: list(choice(COPY_LIBRARY.faqs.map(item => item.id)), 0, 30, false, true),
+    footers: {...choice(COPY_LIBRARY.footers.map(item => item.id)), nullable: true},
+  });
+  const v1Rule = object({ format: choice([PROJECT_FORMAT]), version: { type: 'number', min: 1, max: 1 }, savedAt: savedAtRule, site: sectionAwareSiteRule(siteInput) });
+  const v2Rule = object({
+    format: choice([PROJECT_FORMAT]), version: { type: 'number', min: 2, max: 2 }, savedAt: savedAtRule, site: sectionAwareSiteRule(siteInput),
+    editor: object({ copyLibraryVersion: choice([COPY_LIBRARY_VERSION]), purposeId: {...choice(COPY_LIBRARY.presets.map(item => item.id)), nullable: true}, selectedCopy: selectedRule, customGroups: list(choice(COPY_GROUP_IDS), 0, 6, false, true), source: choice(['new','demo','imported']) }),
+    handoff: object({ draftId: {...text(100), check: value => /^[a-z0-9-]+$/i.test(value) ? undefined : '초안 ID 형식이 올바르지 않습니다.'}, designVersion: text(80), exportProfile: choice([EXPORT_PROFILE]), requestedDomain: {...domainRule, nullable: true} }),
+  });
   const errors: string[] = [];
-  inspect(input, object({ format: choice([PROJECT_FORMAT]), version: { type: "number", min: 1, max: 1 }, savedAt: { ...text(40), check: value => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value) && Number.isFinite(Date.parse(value)) ? undefined : "저장 날짜 형식이 올바르지 않습니다." }, site: sectionAwareSiteRule(input && typeof input === "object" ? (input as Record<string, unknown>).site : undefined) }), "project", errors);
+  inspect(input, version === LEGACY_PROJECT_VERSION ? v1Rule : v2Rule, "project", errors);
   if (errors.length) throw new Error(`제작 파일을 확인해 주세요.\n${errors.join("\n")}`);
-  const project = input as StudioProject;
+  const project = input as StudioProject | StudioProjectV1;
   const issues = validateProjectSite(project.site);
   if (issues.length) throw new Error(issues.join("\n"));
   if (new TextEncoder().encode(JSON.stringify(project)).byteLength > MAX_PROJECT_BYTES) throw new Error("제작 파일은 전체 8MB 이하여야 합니다.");
-  return { format: PROJECT_FORMAT, version: PROJECT_VERSION, savedAt: project.savedAt, site: draftCopy(project.site) };
+  if (project.version === LEGACY_PROJECT_VERSION) return createProject(draftCopy(project.site), { savedAt: project.savedAt, source: 'imported', draftId: `legacy-${project.site.id}-${project.savedAt.replace(/\D/g, '').slice(0, 14)}` });
+  const inferred = inferCopySelection(project.site);
+  const custom = new Set(project.editor.customGroups);
+  for (const group of inferred.customGroups) custom.add(group);
+  return {
+    ...project,
+    site: draftCopy(project.site),
+    editor: { ...project.editor, selectedCopy: inferred.selectedCopy, customGroups: [...custom] },
+    handoff: { ...project.handoff, requestedDomain: project.handoff.requestedDomain?.trim() || null },
+  };
 }
