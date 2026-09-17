@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { appendFile } from 'node:fs/promises';
-const origin=process.env.LIVE_URL||'https://insurance-web-factory.pjmsm0319.workers.dev';
+const origin=process.env.LIVE_URL||'https://insurance-web-factory-demo.pjmsm0319.workers.dev';
 const themes=['trust-blue','warm-care','premium-navy','clean-minimal','local-friendly'];
 const palettes=['navy','forest','slate','charcoal','teal','stone'];
 async function get(path){const url=new URL(path,origin);url.searchParams.set('verify',process.env.GITHUB_SHA?.slice(0,12)||'local');const res=await fetch(url,{headers:{'Cache-Control':'no-cache'},signal:AbortSignal.timeout(15000)});assert.ok(res.ok,`${url.pathname}: HTTP ${res.status}`);return res.text();}
@@ -12,6 +12,9 @@ for(let attempt=1;attempt<=30;attempt++){
    assert.ok(html.includes('data-design-version="clear-human-v1"'));assert.ok(html.includes('data-contact-version="direct-v1"'));
    assert.ok(html.includes(`data-layout="${theme}" data-palette="${palette}"`));assert.ok(html.includes('href="tel:01041877511"'));
    assert.ok(html.includes('href="https://open.kakao.com/o/sH6OIpKi"'));assert.ok(!html.includes('data-contact-form'));
+   assert.ok(html.includes('.premium-page .premium-hero:not(.hero-statement)'));
+   assert.ok(html.includes('.premium-page .services-split{grid-template-columns:repeat(2,minmax(0,1fr))'));
+   assert.ok(html.includes('.premium-page .adviser-card p,.premium-page .adviser-card span{color:var(--detail)}'));
   }
   const gallery=await get('/templates');shared(gallery);for(const theme of themes)assert.ok(gallery.includes(`href="/?theme=${theme}"`));for(const palette of palettes)assert.ok(gallery.includes(`name="palette" value="${palette}"`));
   const privacy=await get('/privacy');shared(privacy);assert.ok(privacy.includes('오픈채팅'));
