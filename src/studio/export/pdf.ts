@@ -47,6 +47,21 @@ function textWriter(pdf: PDFDocument, font: PDFFont, draftId: string) {
   return { write, heading, page: () => page, finalize: () => pdf.getPages().forEach((item, index) => footer(item, font, draftId, index + 1)) };
 }
 
+function continuousSegments(capture: PreviewCapture, maxHeight: number): Array<{start:number; end:number}> {
+  const segments: Array<{start:number; end:number}> = [];
+  let start = 0;
+  while (capture.height - start > maxHeight) {
+    const ideal = start + maxHeight;
+    const earliest = start + maxHeight * .68;
+    const safe = capture.breakpoints.filter(point => point >= earliest && point <= ideal).at(-1);
+    const end = safe && safe > start ? safe : ideal;
+    segments.push({start, end});
+    start = end;
+  }
+  segments.push({start, end:capture.height});
+  return segments;
+}
+
 export async function createReviewPdf(project: StudioProject, captures: PreviewCapture[]): Promise<Uint8Array> {
   const pdf = await PDFDocument.create();
   pdf.registerFontkit(fontkit);
@@ -68,13 +83,23 @@ export async function createReviewPdf(project: StudioProject, captures: PreviewC
   ['이 문서는 디자인과 원고를 확인하는 검토용 초안입니다.', '저장만으로 담당자에게 전송되거나 사이트가 공개되지 않습니다.', 'ZIP 파일을 압축 풀지 말고 지정된 제작 담당자에게 전달해 주세요.'].forEach((line,index) => cover.drawText(line,{x:margin+20,y:210-index*27,size:10.5,font,color:color(palette.ink)}));
 
   for (const capture of captures) {
-    const page = pdf.addPage(A4);
-    page.drawText(`${capture.device} 디자인 · ${capture.section}`, {x:margin,y:A4[1]-35,size:12,font,color:accent});
     const image = await pdf.embedPng(capture.png);
-    const availableWidth = A4[0]-margin*2, availableHeight = A4[1]-92;
-    const scale = Math.min(availableWidth/capture.width, availableHeight/capture.height);
-    const width = capture.width*scale, height = capture.height*scale;
-    page.drawImage(image,{x:(A4[0]-width)/2,y:A4[1]-58-height,width,height});
+    const availableWidth = A4[0] - margin * 2;
+    const contentTop = A4[1] - 58, contentBottom = 38;
+    const availableHeight = contentTop - contentBottom;
+    const targetWidth = capture.device === '모바일' ? Math.min(330, availableWidth) : availableWidth;
+    const scale = targetWidth / capture.width;
+    const width = capture.width * scale, height = capture.height * scale;
+    const segments = continuousSegments(capture, availableHeight / scale);
+    for (const [index, segment] of segments.entries()) {
+      const page = pdf.addPage(A4);
+      const consumed = segment.start * scale;
+      const segmentHeight = (segment.end - segment.start) * scale;
+      page.drawImage(image, { x: (A4[0] - width) / 2, y: contentTop - height + consumed, width, height });
+      page.drawRectangle({ x: 0, y: contentTop, width: A4[0], height: A4[1] - contentTop, color: rgb(1, 1, 1) });
+      page.drawRectangle({ x: 0, y: 0, width: A4[0], height: Math.max(contentBottom, contentTop - segmentHeight), color: rgb(1, 1, 1) });
+      page.drawText(`${capture.device} 웹페이지 · 연속 보기 ${index + 1}/${segments.length}`, {x:margin,y:A4[1]-35,size:12,font,color:accent});
+    }
   }
 
   const writer = textWriter(pdf, font, project.handoff.draftId);

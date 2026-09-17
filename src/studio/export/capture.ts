@@ -20,7 +20,7 @@ async function ready(document: Document): Promise<void> {
   })).then(() => undefined), '사진을 불러오지 못했습니다. 사진을 다시 업로드한 뒤 저장해 주세요.');
 }
 
-async function captureDevice(site: SiteConfig, device: PreviewCapture['device'], width: number): Promise<PreviewCapture[]> {
+async function captureDevice(site: SiteConfig, device: PreviewCapture['device'], width: number): Promise<PreviewCapture> {
   const frame = document.createElement('iframe');
   frame.title = `${device} PDF 출력 준비`;
   frame.setAttribute('aria-hidden', 'true');
@@ -35,23 +35,30 @@ async function captureDevice(site: SiteConfig, device: PreviewCapture['device'],
     const page = frame.contentDocument;
     if (!page) throw new Error('출력용 페이지를 준비하지 못했습니다.');
     page.documentElement.style.scrollBehavior = 'auto';
-    page.querySelectorAll<HTMLDetailsElement>('details').forEach(details => { details.open = true; });
+    page.querySelectorAll<HTMLDetailsElement>('#faq details').forEach(details => { details.open = true; });
     await ready(page);
-    const targets = [page.querySelector('header'), ...page.querySelectorAll('#main > *'), page.querySelector('footer')]
-      .filter((node): node is HTMLElement => Boolean(node && (node as HTMLElement).getBoundingClientRect().height > 1));
-    const captures: PreviewCapture[] = [];
-    for (const [index, target] of targets.entries()) {
-      const canvas = await html2canvas(target, {
-        backgroundColor: '#ffffff', logging: false, scale: width <= 390 ? 1.5 : 1,
-        useCORS: true, width: target.scrollWidth, height: target.scrollHeight, windowWidth: width,
-      });
-      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
-      if (!blob) throw new Error('디자인 캡처 이미지를 만들지 못했습니다.');
-      captures.push({ device, section: target.id || `${target.tagName.toLowerCase()}-${index + 1}`, width: canvas.width, height: canvas.height, png: new Uint8Array(await blob.arrayBuffer()) });
-      canvas.width = 1; canvas.height = 1;
-    }
-    if (!captures.length) throw new Error(`${device} 디자인을 캡처하지 못했습니다.`);
-    return captures;
+    const target = page.body;
+    const height = Math.max(page.documentElement.scrollHeight, target.scrollHeight);
+    if (height <= 1) throw new Error(`${device} 디자인을 캡처하지 못했습니다.`);
+    const canvas = await html2canvas(target, {
+      backgroundColor: '#ffffff', logging: false, scale: width <= 390 ? 1.5 : 1,
+      useCORS: true, width, height, windowWidth: width, windowHeight: height, scrollX: 0, scrollY: 0,
+    });
+    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) throw new Error('디자인 캡처 이미지를 만들지 못했습니다.');
+    const scaleY = canvas.height / height;
+    const breakpoints = [...page.querySelectorAll<HTMLElement>('header,#main>*,#main article,#main li,#main details,#main p,#main h1,#main h2,#main h3,footer')]
+      .flatMap(element => {
+        const rect = element.getBoundingClientRect();
+        return rect.height > 1 ? [rect.top * scaleY, rect.bottom * scaleY] : [];
+      })
+      .map(value => Math.round(value))
+      .filter(value => value > 0 && value < canvas.height)
+      .sort((a, b) => a - b)
+      .filter((value, index, values) => index === 0 || value - values[index - 1] > 3);
+    const capture = { device, section: '전체 페이지', width: canvas.width, height: canvas.height, breakpoints, png: new Uint8Array(await blob.arrayBuffer()) } satisfies PreviewCapture;
+    canvas.width = 1; canvas.height = 1;
+    return capture;
   } finally {
     frame.remove();
   }
@@ -60,5 +67,5 @@ async function captureDevice(site: SiteConfig, device: PreviewCapture['device'],
 export async function captureSiteDesign(site: SiteConfig): Promise<PreviewCapture[]> {
   const desktop = await captureDevice(site, 'PC', 1440);
   const mobile = await captureDevice(site, '모바일', 390);
-  return [...desktop, ...mobile];
+  return [desktop, mobile];
 }

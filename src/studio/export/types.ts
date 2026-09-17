@@ -7,6 +7,7 @@ export interface PreviewCapture {
   section: string;
   width: number;
   height: number;
+  breakpoints: number[];
   png: Uint8Array;
 }
 

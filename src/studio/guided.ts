@@ -50,6 +50,15 @@ function fitPreview(): void {
   frame.style.height = `${Math.max(400, mat.clientHeight / scale)}px`;
   frame.style.transform = `scale(${scale})`;
 }
+function setPreviewExpanded(expanded: boolean): void {
+  const previewArea = document.querySelector<HTMLElement>('.g-preview')!;
+  const button = document.querySelector<HTMLButtonElement>('[data-action="expand-preview"]')!;
+  previewArea.dataset.expanded = String(expanded);
+  document.body.classList.toggle('g-preview-open', expanded);
+  button.setAttribute('aria-expanded', String(expanded));
+  button.textContent = expanded ? '편집으로 돌아가기' : '크게 보기';
+  window.requestAnimationFrame(fitPreview);
+}
 function preview(section?: string): void {
   window.clearTimeout(previewTimer);
   previewTimer = window.setTimeout(() => {
@@ -204,6 +213,7 @@ document.addEventListener('click', async event => {
     if (target.dataset.device) { device = target.dataset.device as 'desktop'|'mobile'; document.querySelectorAll<HTMLElement>('[data-device]').forEach(el => el.setAttribute('aria-pressed',String(el.dataset.device === device))); fitPreview(); }
     if (target.dataset.view) { document.getElementById('guided-layout')!.dataset.view = target.dataset.view; document.querySelectorAll<HTMLElement>('[data-view]:not(#guided-layout)').forEach(el => el.setAttribute('aria-pressed',String(el.dataset.view === target.dataset.view))); fitPreview(); }
     switch (target.dataset.action) {
+      case 'expand-preview': setPreviewExpanded(document.querySelector<HTMLElement>('.g-preview')!.dataset.expanded !== 'true'); break;
       case 'next': stage = Math.min(stage+1,3); renderPanel(); panel.querySelector<HTMLElement>('h2')?.focus(); break;
       case 'previous': stage = Math.max(stage-1,0); renderPanel(); break;
       case 'apply-copies': site = applyCopy(site,group,pendingIds); changed(group === 'services' ? 'specialties' : 'faq'); message('선택한 문구 묶음을 적용했습니다.'); break;
@@ -218,6 +228,12 @@ document.addEventListener('click', async event => {
         site.agent = structuredClone(example.agent); site.contact = structuredClone(example.contact); projectSource = 'demo'; changed(); renderPanel(); message('데모 담당자 정보를 가져왔습니다. 미리보기에서는 연락 버튼이 연결되지 않습니다.'); break;
     }
   } catch(error) { showError(error); }
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && document.querySelector<HTMLElement>('.g-preview')!.dataset.expanded === 'true') {
+    setPreviewExpanded(false);
+    document.querySelector<HTMLButtonElement>('[data-action="expand-preview"]')!.focus();
+  }
 });
 document.addEventListener('input', event => {
   const input = event.target;

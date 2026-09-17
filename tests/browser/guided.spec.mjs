@@ -28,6 +28,11 @@ test('recommended purposes provide copy without borrowing the demo identity',asy
  await page.locator('#copy-group').selectOption('faqs');await expect(page.locator('[name="copy-choice"]')).toHaveCount(30);
  await page.locator('#copy-search').fill('자동 발송');await expect(page.locator('[name="copy-choice"]')).toHaveCount(1);
 });
+test('large preview expands the live customer page and closes with Escape',async({page})=>{
+ await start(page);const area=page.locator('.g-preview');const expand=page.locator('[data-action="expand-preview"]');
+ await expect(expand).toHaveText('크게 보기');await expand.click();await expect(area).toHaveAttribute('data-expanded','true');await expect(expand).toHaveText('편집으로 돌아가기');
+ await expect(preview(page).locator('h1')).toContainText('가입한 보험');await page.keyboard.press('Escape');await expect(area).toHaveAttribute('data-expanded','false');await expect(expand).toBeFocused();
+});
 test('invalid multi-selection leaves the prior page intact',async({page})=>{
  await start(page);await stage(page,1);await page.locator('#copy-group').selectOption('services');const before=await preview(page).locator('.service-card h3').allTextContents();
  const selected=await page.locator('[name="copy-choice"]:checked').evaluateAll(inputs=>inputs.map(input=>input.value));
@@ -83,6 +88,7 @@ test('handoff ZIP contains one valid PDF and one v2 JSON snapshot with extractab
  if(process.env.REBUILD_PDF_OUTPUT)await fs.writeFile(process.env.REBUILD_PDF_OUTPUT,result.pdfBytes);
  const document=await getDocument({data:result.pdfBytes,disableWorker:true}).promise;let text='';
  for(let pageNumber=1;pageNumber<=document.numPages;pageNumber++){const page=await document.getPage(pageNumber);const content=await page.getTextContent();text+=content.items.map(item=>'str' in item?item.str:'').join(' ');}
+ expect(text).toContain('PC 웹페이지 · 연속 보기');expect(text).toContain('모바일 웹페이지 · 연속 보기');expect(text).not.toContain('PC 디자인 · header-1');
  expect(text).toContain('검토용 담당자');expect(text).toContain('검토용 소속');expect(text).toContain('제작 담당자에게 전달');
  await expect(page.locator('.g-result')).toContainText('전달용 초안 ZIP이 준비되었습니다');
 });

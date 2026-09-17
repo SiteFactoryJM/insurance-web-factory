@@ -16,6 +16,8 @@ __pycache__/
 playwright-report/
 test-results/
 review/
+tmp/
+output/
 
 # Generated browser bundle; rebuilt by check, preview and deploy.
 public/assets/studio.js
