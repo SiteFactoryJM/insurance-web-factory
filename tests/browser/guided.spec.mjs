@@ -33,6 +33,26 @@ test('large preview expands the live customer page and closes with Escape',async
  await expect(expand).toHaveText('크게 보기');await expand.click();await expect(area).toHaveAttribute('data-expanded','true');await expect(expand).toHaveText('편집으로 돌아가기');
  await expect(preview(page).locator('h1')).toContainText('가입한 보험');await page.keyboard.press('Escape');await expect(area).toHaveAttribute('data-expanded','false');await expect(expand).toBeFocused();
 });
+test('all five layout choices change the visible page structure while keeping its palette',async({page})=>{
+ await start(page);
+ const layouts={
+  'trust-blue':{hero:'hero-portrait',services:'services-list',about:'about-editorial',sections:['home','specialties','about','process','faq','contact']},
+  'warm-care':{hero:'hero-portrait',services:'services-cards',about:'about-profile',sections:['home','about','specialties','faq','process','contact']},
+  'premium-navy':{hero:'hero-statement',services:'services-split',about:'about-editorial',sections:['home','specialties','process','about','faq','contact']},
+  'clean-minimal':{hero:'hero-statement',services:'services-cards',about:'about-editorial',sections:['home','specialties','process','faq','about','contact']},
+  'local-friendly':{hero:'hero-editorial',services:'services-cards',about:'about-editorial',sections:['home','specialties','contact','faq','about','process']},
+ };
+ for(const [id,expected] of Object.entries(layouts)){
+  await page.locator(`[data-template="${id}"]`).click();
+  await expect(preview(page).locator('body')).toHaveAttribute('data-layout',id);
+  await expect(preview(page).locator('#home')).toHaveClass(new RegExp(expected.hero));
+  await expect(preview(page).locator('.service-grid')).toHaveAttribute('data-pattern',expected.services);
+  await expect(preview(page).locator('.about-grid')).toHaveAttribute('data-pattern',expected.about);
+  expect(await preview(page).locator('#main > section[id]').evaluateAll(nodes=>nodes.map(node=>node.id))).toEqual(expected.sections);
+  await expect(preview(page).locator('body')).toHaveAttribute('data-palette','navy');
+ }
+ await expect(page.locator('#guided-status')).toContainText('첫 화면·섹션 순서·표현 방식이 바뀌고');
+});
 test('invalid multi-selection leaves the prior page intact',async({page})=>{
  await start(page);await stage(page,1);await page.locator('#copy-group').selectOption('services');const before=await preview(page).locator('.service-card h3').allTextContents();
  const selected=await page.locator('[name="copy-choice"]:checked').evaluateAll(inputs=>inputs.map(input=>input.value));
