@@ -1,71 +1,62 @@
 # Cloudflare 배포
 
-## 1. 사전 준비
+현재 데모 Worker 이름은 `insurance-web-factory-demo`이며 기본 공개 주소는 다음과 같습니다.
 
-- Cloudflare 계정
-- Node.js 22 이상
-- `CLOUDFLARE_ACCOUNT_ID`
-- Workers 편집 권한이 있는 `CLOUDFLARE_API_TOKEN`
+`https://insurance-web-factory-demo.pjmsm0319.workers.dev`
 
-공식 문서:
+고객 입력 저장, D1 상담 DB, 웹훅은 현재 기능이 아닙니다. 새 D1 바인딩이나 `CONSULTATION_WEBHOOK_URL`을 배포 요건으로 추가하지 않습니다. 이전 형식과 이력을 위한 타입·마이그레이션은 별도 운영 결정 없이 삭제하지 않습니다.
 
-- https://developers.cloudflare.com/workers/get-started/guide/
-- https://developers.cloudflare.com/workers/static-assets/
-- https://developers.cloudflare.com/workers/wrangler/commands/
+## 배포 전 확인
 
-## 2. 로컬 확인
+Node.js 22 이상에서 의존성을 설치하고 전체 검사를 실행합니다.
 
 ```bash
 npm install
 npm run check
-npm run dev
+npm run test:e2e
 ```
 
-## 3. 예시 페이지 배포
+실제 담당자 사이트는 이름·소속·연락처·사진 권한·광고심의 상태를 확인하고 `status: published`, `seo.noIndex: false`를 의도적으로 설정해야 합니다. 데모는 `draft`와 `noindex`를 유지합니다.
 
-`wrangler.jsonc`의 이름은 `insurance-web-factory-demo`이며 `workers_dev`가 활성화되어 있습니다.
+## 데모 배포와 실서버 확인
+
+현재 데모는 연결된 Cloudflare Build의 성공만으로 배포되었다고 간주하지 않습니다. `main`에 변경을 머지한 뒤 GitHub의 수동 배포 워크플로를 `main` 기준으로 실행하고, 그 실행의 성공과 새 실서버 응답을 모두 확인합니다.
+
+```bash
+gh workflow run deploy-cloudflare.yml --ref main
+gh run list --workflow deploy-cloudflare.yml --limit 1
+```
+
+GitHub CLI를 사용하지 않을 때는 `Actions` → `Deploy Cloudflare demo` → `Run workflow`에서 브랜치를 `main`으로 선택합니다. 배포가 성공한 뒤 `verify-live`를 실행해 5개 구성×6개 팔레트, 직접 연락 링크, 새 hero·상담분야·이름 카드 CSS, `/studio`, `/proposal`, `/privacy`, 폐기 API의 HTTP 410을 확인합니다.
+
+로컬에서 같은 검증을 실행할 때는 올바른 주소를 명시합니다.
+
+PowerShell:
+
+```powershell
+$env:LIVE_URL='https://insurance-web-factory-demo.pjmsm0319.workers.dev'
+node scripts/verify-live.mjs
+```
+
+bash:
+
+```bash
+LIVE_URL='https://insurance-web-factory-demo.pjmsm0319.workers.dev' node scripts/verify-live.mjs
+```
+
+검증이 실패하면 배포 성공으로 보고하지 않고 Cloudflare 빌드와 응답을 확인합니다.
+
+## 수동 GitHub Actions 배포 준비
+
+저장소 또는 Environment에 `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`를 등록한 뒤 GitHub의 `Actions` → `Deploy Cloudflare demo` → `Run workflow`를 실행합니다. 이 워크플로는 수동 실행만 허용합니다.
+
+## 로컬 배포
+
+Workers 편집 권한이 있는 계정으로 로그인한 뒤 실행합니다.
 
 ```bash
 npx wrangler login
 npm run deploy
 ```
 
-배포 후 표시되는 `*.workers.dev` 주소는 수주용 예시 페이지로 사용할 수 있습니다. 예시 페이지는 `noindex`이며 상담 폼 입력을 저장하지 않습니다.
-
-## 4. GitHub Actions 배포
-
-저장소 또는 Environment에 다음 Secrets를 등록합니다.
-
-```text
-CLOUDFLARE_API_TOKEN
-CLOUDFLARE_ACCOUNT_ID
-```
-
-GitHub의 `Actions` → `Deploy Cloudflare demo` → `Run workflow`를 실행합니다. 워크플로는 수동 실행만 허용하여 Secrets가 없는 초기 상태에서 불필요한 실패가 발생하지 않게 했습니다.
-
-## 5. 실제 상담 DB 연결
-
-D1 데이터베이스 생성 후 마이그레이션을 적용합니다.
-
-```bash
-npx wrangler d1 create insurance-consultations
-npx wrangler d1 migrations apply insurance-consultations --remote
-```
-
-반환된 바인딩을 `wrangler.jsonc`의 `d1_databases`에 추가하고 바인딩 이름을 `DB`로 맞춥니다.
-
-상담 알림 서비스를 함께 사용할 때 Worker Secret을 등록합니다.
-
-```bash
-npx wrangler secret put CONSULTATION_WEBHOOK_URL
-```
-
-## 6. 운영 전 확인
-
-- 데모의 예시 개인정보·전화번호·주소 교체
-- 실제 페이지의 `demo` 블록 제거
-- `status: published`
-- `seo.noIndex: false`
-- 광고심의 및 고지 문구 승인
-- 상담정보 보유기간과 삭제 절차 확정
-- Custom Domain 연결
+배포 출력의 Worker 이름과 주소가 위 데모와 일치하는지 확인한 다음 `scripts/verify-live.mjs`를 실행합니다. 이 절차는 코드 배포만 수행하며 도메인 소유 확인, 광고심의, 전화 앱과 오픈채팅방의 실제 동작 확인을 대신하지 않습니다.
