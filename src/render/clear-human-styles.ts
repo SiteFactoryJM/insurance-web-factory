@@ -58,22 +58,26 @@ export const clearHumanStyles = `
 
 /* CH2/Navy/Agent Details — 416×408, 안쪽 여백 40, 항목 간격 20 */
 .premium-page .adviser-card{
- display:flex;flex-direction:column;gap:20px;align-items:flex-start;
+ display:flex;justify-content:center;align-items:center;text-align:center;
  padding:40px;background:var(--ink);color:var(--on-brand);max-width:416px;
 }
-.premium-page .adviser-card p,.premium-page .adviser-card span,.premium-page .adviser-card strong{color:var(--on-brand)}
+.premium-page .adviser-card .adviser-details{
+ display:flex;flex-direction:column;gap:20px;width:max-content;max-width:100%;min-width:0;
+}
+.premium-page .adviser-card p,.premium-page .adviser-card span{color:var(--detail)}
 .premium-page .adviser-card .adviser-role{font-size:var(--ch-small);line-height:var(--ch-small-lh);font-weight:400}
-.premium-page .adviser-card .adviser-name{font-size:var(--ch-display);line-height:var(--ch-display-lh);font-weight:700;letter-spacing:-.03em}
+.premium-page .adviser-card .adviser-name{font-size:var(--ch-display);line-height:var(--ch-display-lh);font-weight:700;letter-spacing:-.03em;color:var(--on-brand)}
 .premium-page .adviser-card .adviser-org{font-size:1.25rem;line-height:1.7;font-weight:400}
-.premium-page .adviser-card .adviser-phone{font-size:1.625rem;line-height:1.538;font-weight:700;text-decoration:none}
+.premium-page .adviser-card .adviser-phone{font-size:1.625rem;line-height:1.538;font-weight:700;text-decoration:none;color:var(--on-brand)}
 .premium-page .adviser-card .adviser-phone:hover{text-decoration:underline}
 .premium-page .adviser-card .adviser-hours{font-size:var(--ch-small);line-height:var(--ch-small-lh);font-weight:400}
 
 /* 고객 첫 화면 — 좌측 원고 · 우측 인물 + 담당자 정보 */
 /* 사진과 담당자 카드는 Figma 폭(사진 432, 카드 416)에서 멈춥니다. 남는 자리를
    카드가 삼키면 글자 오른쪽에 빈 공간만 길게 남습니다. */
-.premium-page .hero-visual{display:flex;flex-direction:column;align-items:stretch;gap:0;padding-bottom:0;min-width:0}
-.premium-page .hero-visual .adviser-card{width:100%;max-width:27rem}
+.premium-page .premium-hero:not(.hero-statement){grid-template-columns:minmax(0,1fr) minmax(22rem,27rem);gap:clamp(3rem,6vw,6.5rem)}
+.premium-page .hero-visual{display:flex;flex-direction:column;align-items:stretch;gap:0;padding-bottom:0;min-width:0;width:100%;max-width:27rem;justify-self:end}
+.premium-page .hero-visual .adviser-card{width:calc(100% - 1rem);max-width:26rem;align-self:flex-end}
 .premium-page .hero-visual .portrait-figure{max-width:27rem;justify-self:auto;border-bottom:0;padding-bottom:0}
 .premium-page .hero-visual .portrait-figure>img{aspect-ratio:3/4;object-position:50% 15%}
 .premium-page .hero-visual .hero-scene img{aspect-ratio:3/2;object-fit:cover}
@@ -84,6 +88,7 @@ export const clearHumanStyles = `
 .premium-page .hero-statement-person>img{flex:0 1 18rem;width:18rem;height:auto;aspect-ratio:3/4}
 .premium-page .hero-statement-person .adviser-card{flex:1 1 18rem;width:auto;max-width:26rem}
 .premium-page .hero-statement .hero-visual{text-align:left}
+.premium-page .section-heading,.premium-page .service-card{text-align:left}
 
 /* CH2/Navy/Topic Row — 위아래 24, 칸 간격 32, 아래 경계선 1 */
 .premium-page .services-list .service-card{
@@ -97,8 +102,12 @@ export const clearHumanStyles = `
 .premium-page .services-list .service-card p{flex:1 1 auto;min-width:0;margin:0}
 
 /* CH2/Navy/Topic Card — 세로 간격 8, 위아래 24, 아래 경계선 1 */
-.premium-page .services-cards .service-card,.premium-page .services-split .service-card{
+.premium-page .services-cards .service-card{
  display:flex;flex-direction:column;gap:8px;align-items:flex-start;padding:24px 0;
+ border:0;border-bottom:1px solid var(--line);background:transparent;
+}
+.premium-page .services-split .service-card{
+ display:flex;flex-direction:column;gap:8px;align-items:flex-start;padding:24px;
  border:0;border-bottom:1px solid var(--line);background:transparent;
 }
 .premium-page .services-cards .service-card .section-index,.premium-page .services-split .service-card .section-index{
@@ -108,17 +117,32 @@ export const clearHumanStyles = `
  margin:0;font-size:var(--ch-card);line-height:var(--ch-card-lh);
 }
 .premium-page .services-cards .service-card p,.premium-page .services-split .service-card p{margin:0}
+.premium-page .services-cards .service-card h3,.premium-page .services-cards .service-card p,
+.premium-page .services-split .service-card h3,.premium-page .services-split .service-card p{
+ min-width:0;max-width:100%;word-break:keep-all;overflow-wrap:anywhere;
+}
 .premium-page .service-card .service-link{align-self:flex-start;color:var(--accent)}
-/* 3칸 격자에 4개를 넣으면 마지막 줄에 한 칸만 남아 오른쪽이 텅 빕니다.
-   항목 수로 칸 수를 정해 줄이 고르게 차도록 합니다. */
+/* 항목 수에 맞춘 대칭 격자. 5개는 3개 아래에 2개가 가운데 오게 배치합니다. */
 .premium-page .services-cards[data-count="2"],
-.premium-page .services-cards[data-count="4"],
-.premium-page .services-cards[data-count="5"]{grid-template-columns:repeat(2,minmax(0,1fr))}
-/* 분할 배치의 첫 칸은 오른쪽 목록 높이에 맞춰 늘어납니다. 항목이 늘면 안쪽이
-   비어 보이므로 내용만큼만 차지하게 둡니다. */
-.premium-page .services-split .service-card:first-child{align-self:start}
+.premium-page .services-cards[data-count="4"]{grid-template-columns:repeat(2,minmax(0,1fr))}
 .premium-page .services-cards[data-count="3"],
 .premium-page .services-cards[data-count="6"]{grid-template-columns:repeat(3,minmax(0,1fr))}
+.premium-page .services-cards[data-count="5"]{grid-template-columns:repeat(6,minmax(0,1fr))}
+.premium-page .services-cards[data-count="5"] .service-card{grid-column:span 2}
+.premium-page .services-cards[data-count="5"] .service-card:nth-child(4){grid-column:2/span 2}
+.premium-page .services-cards[data-count="5"] .service-card:nth-child(5){grid-column:4/span 2}
+
+/* split도 첫 카드가 나머지 전체 높이를 차지하지 않게 같은 크기의 2열로 둡니다. */
+.premium-page .services-split{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 2.5rem}
+.premium-page .services-split .service-card{align-self:stretch}
+.premium-page .services-split .service-card .service-link{margin-top:auto}
+.premium-page .services-split .service-card:first-child{
+ grid-row:auto;align-self:stretch;justify-content:flex-start;padding:24px;
+}
+.premium-page .services-split[data-count="3"] .service-card:last-child,
+.premium-page .services-split[data-count="5"] .service-card:last-child{
+ grid-column:1/-1;width:calc(50% - 1.25rem);justify-self:center;
+}
 
 /* CH2/Navy/Accordion — 위아래 24, 답변 간격 16, 아래 경계선 1 */
 .premium-page .faq-list details{border:0;border-bottom:1px solid var(--line);background:transparent;padding:0}
@@ -151,14 +175,40 @@ export const clearHumanStyles = `
  .premium-page .sample-settings{display:none}
 }
 @media(max-width:900px){
+ .premium-page .premium-hero:not(.hero-statement){grid-template-columns:minmax(0,1fr) minmax(18rem,22rem);gap:2rem}
  .premium-page .services-list .service-card{flex-wrap:wrap;gap:8px 16px}
  .premium-page .services-list .service-card h3{flex:1 1 auto}
  .premium-page .services-list .service-card p{flex:1 1 100%}
- .premium-page .adviser-card{padding:24px;gap:16px;max-width:none}
+ .premium-page .adviser-card{padding:24px;max-width:none}
+ .premium-page .adviser-card .adviser-details{gap:16px}
+ .premium-page .services-cards[data-count],.premium-page .services-split[data-count]{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 2rem}
+ .premium-page .services-cards[data-count] .service-card{grid-column:auto;width:auto;justify-self:stretch}
+ .premium-page .services-cards[data-count="5"] .service-card:nth-child(4),
+ .premium-page .services-cards[data-count="5"] .service-card:nth-child(5){grid-column:auto}
+ .premium-page .services-cards[data-count="3"] .service-card:last-child,
+ .premium-page .services-cards[data-count="5"] .service-card:last-child,
+ .premium-page .services-split[data-count="3"] .service-card:last-child,
+ .premium-page .services-split[data-count="5"] .service-card:last-child{
+  grid-column:1/-1;width:calc(50% - 1rem);justify-self:center;
+ }
 }
 @media(max-width:650px){
+ .premium-page .premium-hero:not(.hero-statement){grid-template-columns:minmax(0,1fr)}
+ .premium-page .hero-visual{max-width:none;justify-self:stretch}
+ .premium-page .hero-visual .adviser-card{width:100%;max-width:none;align-self:stretch}
  .premium-page .adviser-card .adviser-name{font-size:2.5rem}
  .premium-page .adviser-card .adviser-phone{font-size:1.375rem}
  .premium-page .button{width:auto}
+ .premium-page .services-cards[data-count],.premium-page .services-split[data-count]{grid-template-columns:minmax(0,1fr);gap:1rem}
+ .premium-page .services-cards[data-count] .service-card,
+ .premium-page .services-cards[data-count="3"] .service-card:last-child,
+ .premium-page .services-cards[data-count="5"] .service-card:last-child,
+ .premium-page .services-split[data-count] .service-card,
+ .premium-page .services-split[data-count="3"] .service-card:last-child,
+ .premium-page .services-split[data-count="5"] .service-card:last-child{
+  grid-column:auto;width:auto;justify-self:stretch;
+ }
+ .premium-page .services-cards[data-count="5"] .service-card:nth-child(4),
+ .premium-page .services-cards[data-count="5"] .service-card:nth-child(5){grid-column:auto}
 }
 `;

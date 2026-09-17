@@ -55,6 +55,10 @@ npm run preview
 - `docs/B2B_HANDOFF.md`: 제안 범위와 인수 기준
 - `docs/CLEAR_HUMAN_FIGMA_MAP.md`: Figma 화면과 코드 대응표
 - `docs/DRAFT_EXPORT_CONTRACT.md`: 내보내기 파일 구성과 한도
-- `docs/REBUILD_VALIDATION.md`: 리빌딩 검증 근거와 미실행 항목
+- `docs/DESIGN_SYSTEM.md`: Clear Human 색상·배치·접근성 기준
+- `docs/THEME_AND_DEMO_GUIDE.md`: 5개 구성·6개 팔레트와 데모 사용법
+- `docs/CLOUDFLARE_DEPLOY.md`: 현재 데모 배포와 실서버 확인 절차
+- `docs/COMPLIANCE_CHECKLIST.md`: 게시 전 준법·외부 연결 확인 항목
+- `docs/REBUILD_VALIDATION.md`: 현재 자동 검증 범위와 실제 결과
 
 고객관리 CRM, 상담 수신함, 카카오 자동 전송, 온라인 보험 가입, 자동 분석, 계정·역할·결재 시스템은 구현 범위에 포함되지 않습니다. 버튼 클릭만으로 상담 완료 또는 영업 성과를 측정한다고 설명하지 않습니다.

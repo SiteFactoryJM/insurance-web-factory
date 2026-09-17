@@ -9,6 +9,11 @@ import { responsiveCopy } from '../.preview-dist/render/copy.js';
 import { DESIGN_VERSION, PALETTES } from '../.preview-dist/render/design-system.js';
 const site=JSON.parse(fs.readFileSync(new URL('../sites/demo-agent/site.json',import.meta.url),'utf8'));
 const page=(config=site,theme='trust-blue')=>renderSitePage(config,new Request(`https://example.test/?theme=${theme}`));
+const luminance=hex=>{
+ const rgb=hex.slice(1).match(/../g).map(value=>parseInt(value,16)/255).map(value=>value<=.04045?value/12.92:((value+.055)/1.055)**2.4);
+ return .2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2];
+};
+const contrast=(a,b)=>{const first=luminance(a),second=luminance(b);return (Math.max(first,second)+.05)/(Math.min(first,second)+.05);};
 test('Clear Human design version and six Figma palette tokens stay exact',()=>{
  assert.equal(DESIGN_VERSION,'clear-human-v1');
  assert.deepEqual(PALETTES,{
@@ -19,6 +24,7 @@ test('Clear Human design version and six Figma palette tokens stay exact',()=>{
   stone:{name:'웜 스톤',accent:'#605744',hover:'#49412F',ink:'#302C25',muted:'#6D6555',paper:'#FAF8F3',tint:'#F2EDE2',line:'#DDD6C9',input:'#7C7464',dark:'#302C25',detail:'#DDD6C9'},
   slate:{name:'스틸 슬레이트',accent:'#485868',hover:'#303F4E',ink:'#24323F',muted:'#566370',paper:'#F6F6F2',tint:'#E5E9ED',line:'#CDD4DB',input:'#768390',dark:'#24323F',detail:'#CDD4DB'},
  });
+ for(const palette of Object.values(PALETTES))assert.ok(contrast(palette.ink,palette.detail)>=4.5,`${palette.name} detail text contrast`);
 });
 for(const id of TEMPLATE_IDS)test(`${id}: direct contact replaces customer-input wizard`,()=>{
  const html=page(site,id);assert.match(html,new RegExp(`theme-${id}`));assert.equal((html.match(/<h1\b/g)||[]).length,1);
@@ -32,6 +38,12 @@ test('purpose layouts preserve useful ordering and explicit template diagrams',(
  assert.doesNotMatch(page(site,'clean-minimal'),/id="reviews"/);
  const gallery=renderTemplateGallery(site,new Request('https://example.test/templates'));
  for(const id of TEMPLATE_IDS)assert.ok(gallery.includes(`href="/?theme=${id}"`));assert.match(gallery,/구성 안내도/);
+});
+test('service layouts expose counts from three through six for balanced grids',()=>{
+ for(const count of [3,4,5,6])for(const theme of ['warm-care','premium-navy']){
+  const modified=structuredClone(site);modified.templateContent[theme].specialties=modified.templateContent[theme].specialties.slice(0,count);
+  const html=page(modified,theme);assert.match(html,new RegExp(`services-${theme==='premium-navy'?'split':'cards'}[^>]+data-count="${count}"`));
+ }
 });
 test('untrusted content is escaped and missing credentials are never invented',()=>{
  const modified=structuredClone(site);modified.agent.name='<script>alert(1)</script>';modified.career=[];modified.reviews=[];modified.agent.registrationNumber='';modified.agent.profileImage='';
