@@ -41,6 +41,26 @@ test('the large preview opens from every step and closes with the X button or Es
  await expand.click();await expect(area).toHaveAttribute('data-expanded','true');
  await page.keyboard.press('Escape');await expect(area).toHaveAttribute('data-expanded','false');await expect(expand).toBeFocused();
 });
+test('links inside the large preview scroll it instead of killing the frame',async({page})=>{
+ await start(page);await page.locator('.g-steps [data-action="expand-preview"]').click();
+ await expect(page.locator('.g-preview')).toHaveAttribute('data-expanded','true');
+ const inside=page.frameLocator('#guided-preview');
+ // 앵커는 미리보기 안에서 스크롤만 한다.
+ await inside.locator('.desktop-nav a[href="#specialties"]').click();
+ await expect.poll(()=>page.evaluate(()=>document.querySelector('#guided-preview').contentWindow.scrollY)).toBeGreaterThan(0);
+ // 주소가 있는 링크도 프레임을 다른 문서로 보내지 않는다.
+ for(const href of ['/','/privacy']){
+  await inside.locator(`a[href="${href}"]`).first().click();
+  await page.waitForTimeout(300);
+ }
+ expect(await page.evaluate(()=>document.querySelector('#guided-preview').contentDocument.body.dataset.studioPreview)).toBe('true');
+ await expect(inside.locator('h1')).toContainText('가입한 보험');
+ await expect(page.locator('.g-preview')).toHaveAttribute('data-expanded','true');
+ // 프레임이 살아 있으므로 편집도 계속 반영된다.
+ await page.locator('[data-action="close-preview"]').click();
+ await stage(page,1);await page.locator('input[name="name"]').fill('링크 확인 담당자');
+ await expect(inside.locator('.adviser-card .adviser-name')).toContainText('링크 확인 담당자');
+});
 test('all five layout choices change the visible page structure while keeping its palette',async({page})=>{
  await start(page);
  const layouts={

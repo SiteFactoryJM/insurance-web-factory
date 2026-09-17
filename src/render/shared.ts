@@ -31,9 +31,15 @@ export function renderDemoSwitcher(site: SiteConfig): string {
 
 export function renderSocialLinks(site: SiteConfig): string { return renderContactButtons(site); }
 
-/** Legacy export name retained for the advanced renderer. There is no form anymore. */
+/**
+ * 연락 패널. 고객이 읽을 이유가 있는 문장만 남깁니다. 동작 설명(자동 발송 없음,
+ * 새 창에서 열림 같은 것)은 고객에게 필요 없는 내부 사정이라 뺐습니다.
+ * 공개 대화방에 민감한 정보를 남기지 말라는 안내는 고객을 보호하는 내용이라
+ * 유지합니다. 보험 고지는 첫 화면과 맨 아래에 그대로 있습니다.
+ * (함수 이름은 예전 호출부와의 호환을 위해 남겨 둔 것으로, 입력 폼이 아닙니다.)
+ */
 export function renderContactForm(site: SiteConfig): string {
-  return `<div class="direct-contact-panel" data-direct-contact><p class="eyebrow">담당자에게 직접 문의</p><h3>신청서 없이,<br>편한 방법으로 연락하세요.</h3>${renderContactButtons(site)}<dl class="direct-contact-details"><div><dt>전화번호</dt><dd>${e(site.contact.phone || '미입력')}</dd></div><div><dt>상담 시간</dt><dd>${e(site.contact.availableHours || '담당자에게 확인')}</dd></div></dl><p>오픈채팅은 새 창이나 카카오톡에서 열립니다. 메시지는 직접 작성하며 자동으로 발송되지 않습니다.</p><p class="support-note">PC에서 통화 앱이 열리지 않으면 표시된 번호로 직접 전화해 주세요. 연락만으로 예약이나 보험 가입이 확정되지 않습니다.</p><p class="support-note">공개 대화방에 주민등록번호·병력·계약서 원본을 남기지 마세요.</p><p class="preview-contact-notice">미리보기에서는 전화와 카카오톡이 열리지 않습니다.</p>${site.demo?.enabled ? '<p class="demo-contact-notice">디자인 예시입니다. 이 페이지의 연락 버튼은 표시된 담당자에게 실제로 연결됩니다.</p>' : ''}</div>`;
+  return `<div class="direct-contact-panel" data-direct-contact><p class="eyebrow">담당자에게 직접 문의</p><h3>신청서 없이,<br>편한 방법으로 연락하세요.</h3>${renderContactButtons(site)}<dl class="direct-contact-details"><div><dt>전화번호</dt><dd>${e(site.contact.phone || '미입력')}</dd></div><div><dt>상담 시간</dt><dd>${e(site.contact.availableHours || '담당자에게 확인')}</dd></div></dl><p class="support-note">공개 대화방에는 주민등록번호·병력·계약서 원본을 남기지 마세요.</p>${site.demo?.enabled ? '<p class="demo-contact-notice">디자인 예시입니다. 이 페이지의 연락 버튼은 표시된 담당자에게 실제로 연결됩니다.</p>' : ''}</div>`;
 }
 
 export function renderFooter(site: SiteConfig): string {

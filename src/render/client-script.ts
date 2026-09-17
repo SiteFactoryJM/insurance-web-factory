@@ -7,9 +7,19 @@ export const clientScript = String.raw`
     const target = event.target;
     if (!(target instanceof Element)) return;
     const link = target.closest('a');
-    if (document.body.dataset.studioPreview === 'true' && link &&
-        !String(link.getAttribute('href') || '').startsWith('#')) {
-      event.preventDefault(); return;
+    // 제작 화면의 미리보기는 srcdoc 문서라 기준 주소가 제작 화면 자신입니다.
+    // 그래서 '#상담분야' 같은 앵커도 같은 문서 안에서 움직이지 않고 새 주소로
+    // 이동해 버리고, 그 주소는 frame-ancestors 'none' 때문에 거부되어 미리보기가
+    // 오류 화면으로 바뀝니다. 미리보기 안에서는 모든 이동을 막고 앵커만 직접
+    // 스크롤로 처리합니다.
+    if (document.body.dataset.studioPreview === 'true' && link) {
+      event.preventDefault();
+      const href = String(link.getAttribute('href') || '');
+      if (href.length > 1 && href.charAt(0) === '#') {
+        const section = document.getElementById(href.slice(1));
+        if (section) section.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
+      return;
     }
     const menuLink = target.closest('.mobile-menu a');
     if (menuLink) menuLink.closest('.mobile-menu').open = false;

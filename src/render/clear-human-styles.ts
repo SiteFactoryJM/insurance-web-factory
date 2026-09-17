@@ -70,17 +70,19 @@ export const clearHumanStyles = `
 .premium-page .adviser-card .adviser-hours{font-size:var(--ch-small);line-height:var(--ch-small-lh);font-weight:400}
 
 /* 고객 첫 화면 — 좌측 원고 · 우측 인물 + 담당자 정보 */
+/* 사진과 담당자 카드는 Figma 폭(사진 432, 카드 416)에서 멈춥니다. 남는 자리를
+   카드가 삼키면 글자 오른쪽에 빈 공간만 길게 남습니다. */
 .premium-page .hero-visual{display:flex;flex-direction:column;align-items:stretch;gap:0;padding-bottom:0;min-width:0}
-.premium-page .hero-visual .adviser-card{width:100%;max-width:none}
-.premium-page .hero-visual .portrait-figure{max-width:none;justify-self:auto;border-bottom:0;padding-bottom:0}
+.premium-page .hero-visual .adviser-card{width:100%;max-width:27rem}
+.premium-page .hero-visual .portrait-figure{max-width:27rem;justify-self:auto;border-bottom:0;padding-bottom:0}
 .premium-page .hero-visual .portrait-figure>img{aspect-ratio:3/4;object-position:50% 15%}
 .premium-page .hero-visual .hero-scene img{aspect-ratio:3/2;object-fit:cover}
 /* 담당자 정보 카드가 바로 아래 오므로 설명은 겹치지 않게 흐름 안에 둡니다. */
 .premium-page .hero-visual .hero-scene{position:static}
 .premium-page .hero-visual .hero-scene figcaption{position:static;margin:.75rem 0 1.25rem;text-align:right;color:var(--muted)}
-.premium-page .hero-statement-person{display:flex;flex-direction:row;flex-wrap:wrap;align-items:stretch;gap:0;text-align:left;max-width:none;justify-self:auto}
-.premium-page .hero-statement-person>img{flex:1 1 16rem;width:auto;height:auto;aspect-ratio:3/4;max-width:20rem}
-.premium-page .hero-statement-person .adviser-card{flex:1 1 20rem;width:auto}
+.premium-page .hero-statement-person{display:flex;flex-direction:row;flex-wrap:wrap;align-items:stretch;gap:0;text-align:left;justify-content:center;width:100%;max-width:45rem;margin-inline:auto;justify-self:stretch}
+.premium-page .hero-statement-person>img{flex:0 1 18rem;width:18rem;height:auto;aspect-ratio:3/4}
+.premium-page .hero-statement-person .adviser-card{flex:1 1 18rem;width:auto;max-width:26rem}
 .premium-page .hero-statement .hero-visual{text-align:left}
 
 /* CH2/Navy/Topic Row — 위아래 24, 칸 간격 32, 아래 경계선 1 */
@@ -107,6 +109,16 @@ export const clearHumanStyles = `
 }
 .premium-page .services-cards .service-card p,.premium-page .services-split .service-card p{margin:0}
 .premium-page .service-card .service-link{align-self:flex-start;color:var(--accent)}
+/* 3칸 격자에 4개를 넣으면 마지막 줄에 한 칸만 남아 오른쪽이 텅 빕니다.
+   항목 수로 칸 수를 정해 줄이 고르게 차도록 합니다. */
+.premium-page .services-cards[data-count="2"],
+.premium-page .services-cards[data-count="4"],
+.premium-page .services-cards[data-count="5"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* 분할 배치의 첫 칸은 오른쪽 목록 높이에 맞춰 늘어납니다. 항목이 늘면 안쪽이
+   비어 보이므로 내용만큼만 차지하게 둡니다. */
+.premium-page .services-split .service-card:first-child{align-self:start}
+.premium-page .services-cards[data-count="3"],
+.premium-page .services-cards[data-count="6"]{grid-template-columns:repeat(3,minmax(0,1fr))}
 
 /* CH2/Navy/Accordion — 위아래 24, 답변 간격 16, 아래 경계선 1 */
 .premium-page .faq-list details{border:0;border-bottom:1px solid var(--line);background:transparent;padding:0}
@@ -125,9 +137,12 @@ export const clearHumanStyles = `
 .premium-page .site-footer .direct-kakao{color:var(--kakao-ink)}
 
 /* CH2/Navy/Portrait — 3:4 비율, 얼굴·색조 변형 없음 */
-.premium-page .portrait-figure img,.premium-page .about-portrait img,.premium-page .hero-statement-person img{
+.premium-page .portrait-figure img,.premium-page .about-portrait img{
  aspect-ratio:3/4;object-fit:cover;width:100%;height:auto;
 }
+/* 첫 화면의 사진 폭은 아래 '고객 첫 화면' 규칙이 정합니다. 여기서 100%로
+   되돌리면 사진이 단 전체를 차지하고 담당자 카드가 구석으로 밀립니다. */
+.premium-page .hero-statement-person>img{aspect-ratio:3/4;object-fit:cover;height:auto}
 
 /* 제작 화면은 태블릿(768px) 이상에서만 열립니다. 좁은 화면에서는 들어가는 길을
    보여 주지 않고, 눌러서 들어가더라도 제작 화면이 안내만 표시합니다. */

@@ -35,7 +35,10 @@ test('all thirty layout/color combinations show complete copy and actual links',
 });
 test('phone and open chat links also work without JavaScript',async({browser})=>{
  const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:1000}});
- try{const page=await context.newPage();await page.goto('/');await directLinks(page);await expect(page.locator('#contact')).toContainText('자동으로 발송되지 않습니다');}
+ try{const page=await context.newPage();await page.goto('/');await directLinks(page);
+  // 자바스크립트 없이도 번호와 두 연락 버튼이 그대로 보인다.
+  await expect(page.locator('#contact')).toContainText('010-4187-7511');
+  await expect(page.locator('#contact [data-contact-link]')).toHaveCount(2);}
  finally{await context.close();}
 });
 test('keyboard skip, FAQ, mobile menu and floating contact links are usable',async({page})=>{

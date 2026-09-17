@@ -38,7 +38,8 @@ function hero(site: SiteConfig): string {
 function services(site: SiteConfig): string {
   const design = getDesign(site);
   const items = site.specialties.map((item, i) => `<article class="service-card"><span class="section-index" aria-hidden="true">${formatIndex(i)}</span><h3>${e(item.title)}</h3><p>${copy(item.body, item.mobileBody)}</p><a class="service-link" href="${design.hiddenSections.includes('contact') ? '#footer' : '#contact'}" aria-label="${e(item.title)} 문의 방법 보기">${arrow}</a></article>`).join('');
-  return `<section class="section container services-section" id="specialties" aria-labelledby="services-title"><div class="section-heading"><div><p class="eyebrow">상담 분야</p><h2 id="services-title">어떤 내용을<br>확인하고 싶으신가요?</h2></div><p>구체적인 취급 범위는 담당자에게 확인해 주세요.</p></div><div class="service-grid services-${design.services}" data-pattern="services-${design.services}">${items}</div></section>`;
+  // 칸 수를 항목 수에 맞춰 마지막 줄에 한 칸만 남는 모양을 막습니다.
+  return `<section class="section container services-section" id="specialties" aria-labelledby="services-title"><div class="section-heading"><div><p class="eyebrow">상담 분야</p><h2 id="services-title">어떤 내용을<br>확인하고 싶으신가요?</h2></div><p>구체적인 취급 범위는 담당자에게 확인해 주세요.</p></div><div class="service-grid services-${design.services}" data-pattern="services-${design.services}" data-count="${site.specialties.length}">${items}</div></section>`;
 }
 
 function about(site: SiteConfig): string {
@@ -77,7 +78,7 @@ function focus(site: SiteConfig): string {
 }
 
 function contact(site: SiteConfig): string {
-  return `<section class="section contact-section" id="contact" aria-labelledby="contact-title"><div class="container contact-grid"><div class="contact-copy"><p class="eyebrow">연락 방법</p><h2 id="contact-title">궁금한 내용을<br>직접 문의하세요.</h2><p>보험 종류를 미리 고르거나 신청서를 작성할 필요가 없습니다. 상담 범위와 일정을 담당자에게 확인해 주세요.</p><div class="contact-person">${profile(site)}<div><strong>${e(site.agent.name)} ${e(site.agent.title)}</strong><span>${e(site.agent.company)}</span></div></div><p class="support-note">이 페이지는 고객의 상담 내용을 수집하거나 자동 발송하지 않습니다.</p></div>${renderContactForm(site)}</div></section>`;
+  return `<section class="section contact-section" id="contact" aria-labelledby="contact-title"><div class="container contact-grid"><div class="contact-copy"><p class="eyebrow">연락 방법</p><h2 id="contact-title">궁금한 내용을<br>직접 문의하세요.</h2><p>보험 종류를 미리 고르거나 신청서를 작성할 필요가 없습니다. 상담 범위와 일정을 담당자에게 확인해 주세요.</p><div class="contact-person">${profile(site)}<div><strong>${e(site.agent.name)} ${e(site.agent.title)}</strong><span>${e(site.agent.company)}</span></div></div></div>${renderContactForm(site)}</div></section>`;
 }
 
 export function renderCalmPage(site: SiteConfig): string {

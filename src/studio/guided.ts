@@ -72,15 +72,25 @@ function closePreview(): void {
   setPreviewExpanded(false);
   document.querySelector<HTMLButtonElement>('.g-steps [data-action="expand-preview"]')?.focus();
 }
+/**
+ * 미리보기가 어떤 이유로든 다른 주소로 넘어가면 그 문서는 다른 출처가 되어
+ * 읽는 순간 SecurityError가 납니다. 그대로 두면 제작 화면 전체가 멈추므로
+ * 접근은 모두 감싸고, 실패하면 처음부터 다시 그립니다.
+ */
+function readScroll(): number {
+  try { return frame.contentWindow?.scrollY || 0; } catch { return 0; }
+}
 function preview(section?: string): void {
   window.clearTimeout(previewTimer);
   previewTimer = window.setTimeout(() => {
-    const scroll = frame.contentWindow?.scrollY || 0;
+    const scroll = readScroll();
     frame.onload = () => {
       fitPreview();
-      const target = section ? frame.contentDocument?.getElementById(section) : null;
-      if (target) target.scrollIntoView({ behavior: 'auto', block: 'start' });
-      else frame.contentWindow?.scrollTo(0, scroll);
+      try {
+        const target = section ? frame.contentDocument?.getElementById(section) : null;
+        if (target) target.scrollIntoView({ behavior: 'auto', block: 'start' });
+        else frame.contentWindow?.scrollTo(0, scroll);
+      } catch { /* 다른 출처 문서면 위치만 포기하고 화면은 유지합니다. */ }
     };
     frame.srcdoc = renderSitePage(site, new Request(`${location.origin}/`), {studioPreview: true});
   }, 160);
@@ -114,7 +124,7 @@ function renderPanel(): void {
     panel.innerHTML = `<p class="g-kicker">02 · 실제 정보</p><h2 tabindex="-1">실제 정보를 확인해 주세요.</h2><p class="g-muted">고객에게 보이는 정보만 입력합니다. 새로 시작할 때 예시 담당자 정보가 저절로 들어가지는 않습니다.</p><button class="g-btn" type="button" data-action="example-profile">예시 담당자 정보로 채워 보기</button><div class="g-row">${textField('담당자 이름','name',site.agent.name,60,'홍길동')}${textField('직함','title',site.agent.title,80,'보험설계사')}</div>${textField('소속','company',site.agent.company,120,'실제 보험사·GA·지사명')}<div class="g-row">${textField('전화번호','phone',site.contact.phone,32,'010-0000-0000','tel')}${textField('상담 시간','hours',site.contact.availableHours,100,'평일 09:00–18:00')}</div>${textField('카카오톡 오픈채팅 주소','kakao',site.contact.kakaoUrl,2048,'https://open.kakao.com/o/초대코드','url')}${textField('쓰고 싶은 주소 · 선택','requestedDomain',requestedDomain,253,'agent.example.com')}<p class="g-muted">쓰고 싶은 주소는 적어 두는 칸입니다. 여기에 적는다고 주소가 만들어지지는 않습니다.</p><label class="g-field"><span>프로필 사진</span><input id="guided-photo" type="file" accept="image/jpeg,image/png,image/webp"><small>JPG·PNG·WebP, 3MB 이하. 직접 찍었거나 사용해도 되는 사진만 올려 주세요.</small></label><details class="g-advanced-note"><summary>더 적을 내용 · 등록번호·주소·지사</summary>${textField('지사명','branch',site.agent.branch,120)}${textField('설계사 등록번호','registration',site.agent.registrationNumber,80)}${textField('사무실 주소','address',site.contact.officeAddress,240)}</details>`;
   } else {
     const stale = lastArchive && revision !== lastArchiveRevision;
-    panel.innerHTML = `<p class="g-kicker">03 · 확인하고 저장</p><h2 tabindex="-1">내보내기 전에 한 번 더 확인하세요.</h2><dl class="g-summary"><dt>화면 구성</dt><dd>${e(TEMPLATE_META[site.template].name)} · ${e(PALETTES[site.palette || 'navy'].name)}</dd><dt>담당자와 연락</dt><dd>${e(site.agent.name || '아직 비어 있음')} · ${e(site.agent.company || '아직 비어 있음')}<br>${e(site.contact.phone || '아직 비어 있음')} · ${e(site.contact.availableHours || '아직 비어 있음')}</dd><dt>고른 문구</dt><dd>상담 분야 ${site.specialties.length}개 · 상담 과정 ${site.process.length}단계 · 자주 묻는 질문 ${site.faqs.length}개</dd><dt>지금 상태</dt><dd>아직 공개되지 않은 작업본입니다. 저절로 공개되거나 전송되지 않습니다.</dd></dl><section class="g-handoff"><h3>먼저 저장하고, 완성된 화면으로 확인해 보세요.</h3><p>지금까지 입력한 이름·연락처·사진이 그대로 들어간 실제 크기 화면이 열립니다. 고객이 보게 될 모습 그대로입니다.</p><button type="button" class="g-btn g-btn-primary" data-action="save-demo">초안 저장 및 시연</button></section><label class="g-check"><input type="checkbox" data-confirm="scope"${scopeConfirmed ? ' checked' : ''}><span>고른 문구가 실제로 상담하는 범위와 맞는지 확인했습니다.</span></label><label class="g-check"><input type="checkbox" data-confirm="links"${linksConfirmed ? ' checked' : ''}><span>전화번호와 카카오톡 주소가 어디로 연결되는지 확인했습니다.</span></label><label class="g-check"><input type="checkbox" data-confirm="assets"${assetsConfirmed ? ' checked' : ''}><span>사진과 로고를 써도 되는지 확인했습니다.</span></label><section class="g-handoff"><h3>마지막으로 파일로 내보내기</h3><p>세 가지 확인을 마치면 압축 파일(ZIP) 하나가 내려받아집니다. 안에는 인쇄해서 볼 수 있는 화면과, 나중에 이어서 고칠 수 있는 작업 파일이 들어 있습니다.</p><p><strong>내보내도 페이지가 공개되거나 누군가에게 전송되지 않습니다.</strong> 실제로 올리기 전에는 소속 조직의 확인이 필요합니다.</p><p>파일에는 이름·연락처·사진이 들어 있습니다. 전달할 사람에게만 보내 주세요.</p><button type="button" class="g-btn g-btn-primary g-save" data-action="save-zip"${exporting ? ' disabled' : ''}>${exporting ? '파일 만드는 중…' : '파일로 내보내기'}</button></section>${lastArchive ? `<section class="g-result"><p class="g-kicker">파일이 준비되었습니다.</p><h3>${e(lastArchive.fileName)}</h3><p>압축을 풀지 말고 그대로 전달하시면 됩니다.</p><dl><dt>만든 시각</dt><dd>${e(new Date(lastArchive.project.savedAt).toLocaleString('ko-KR'))}</dd><dt>들어 있는 것</dt><dd>인쇄용 화면 ${e(lastArchive.pdfName)}<br>이어서 고칠 작업 파일 ${e(lastArchive.jsonName)}</dd></dl>${stale ? '<p class="g-warning">파일을 만든 뒤에 내용을 고쳤습니다. 지금 내용으로 다시 내보내 주세요.</p>' : ''}<button type="button" class="g-btn" data-action="redownload">다시 내려받기</button></section>` : ''}<p class="g-note">여기의 확인란은 작성자 본인의 점검 기록입니다. 승인 절차를 대신하지 않습니다.</p>`;
+    panel.innerHTML = `<p class="g-kicker">03 · 확인하고 저장</p><h2 tabindex="-1">내보내기 전에 한 번 더 확인하세요.</h2><dl class="g-summary"><dt>화면 구성</dt><dd>${e(TEMPLATE_META[site.template].name)} · ${e(PALETTES[site.palette || 'navy'].name)}</dd><dt>담당자와 연락</dt><dd>${e(site.agent.name || '아직 비어 있음')} · ${e(site.agent.company || '아직 비어 있음')}<br>${e(site.contact.phone || '아직 비어 있음')} · ${e(site.contact.availableHours || '아직 비어 있음')}</dd><dt>고른 문구</dt><dd>상담 분야 ${site.specialties.length}개 · 상담 과정 ${site.process.length}단계 · 자주 묻는 질문 ${site.faqs.length}개</dd><dt>지금 상태</dt><dd>아직 공개되지 않은 작업본입니다. 저절로 공개되거나 전송되지 않습니다.</dd></dl><section class="g-handoff"><h3>먼저 저장하고, 완성된 화면으로 확인해 보세요.</h3><p>지금까지 입력한 이름·연락처·사진이 그대로 들어간 실제 크기 화면이 열립니다. 고객이 보게 될 모습 그대로입니다.</p><button type="button" class="g-btn g-btn-primary" data-action="save-demo">초안 저장 및 시연</button></section><label class="g-check"><input type="checkbox" data-confirm="scope"${scopeConfirmed ? ' checked' : ''}><span>고른 문구가 실제로 상담하는 범위와 맞는지 확인했습니다.</span></label><label class="g-check"><input type="checkbox" data-confirm="links"${linksConfirmed ? ' checked' : ''}><span>전화번호와 카카오톡 주소가 어디로 연결되는지 확인했습니다.</span></label><label class="g-check"><input type="checkbox" data-confirm="assets"${assetsConfirmed ? ' checked' : ''}><span>사진과 로고를 써도 되는지 확인했습니다.</span></label><section class="g-handoff"><h3>마지막으로 파일로 내보내기</h3><p>세 가지 확인을 마치면 압축 파일(ZIP) 하나가 내려받아집니다. 안에는 인쇄해서 볼 수 있는 화면과, 나중에 이어서 고칠 수 있는 작업 파일이 들어 있습니다.</p><p><strong>내보내도 페이지가 공개되거나 누군가에게 전송되지 않습니다.</strong> 실제로 올리기 전에는 소속 조직의 확인이 필요합니다.</p><p>파일에는 이름·연락처·사진이 들어 있습니다. 전달할 사람에게만 보내 주세요.</p><button type="button" class="g-btn g-btn-primary g-save" data-action="save-zip"${exporting ? ' disabled' : ''}>${exporting ? '파일 만드는 중…' : '파일로 내보내기'}</button></section>${lastArchive ? `<section class="g-result"><p class="g-kicker">파일이 준비되었습니다.</p><h3>내려받기 폴더를 확인해 주세요.</h3><p>압축을 풀지 말고 그대로 전달하시면 됩니다. 안에는 인쇄해서 볼 수 있는 화면과, 나중에 이어서 고칠 수 있는 작업 파일이 들어 있습니다.</p>${stale ? '<p class="g-warning">파일을 만든 뒤에 내용을 고쳤습니다. 지금 내용으로 다시 내보내 주세요.</p>' : ''}<button type="button" class="g-btn" data-action="redownload">다시 내려받기</button></section>` : ''}<p class="g-note">여기의 확인란은 작성자 본인의 점검 기록입니다. 승인 절차를 대신하지 않습니다.</p>`;
   }
 }
 function choiceBody(item: {id:string}): string {
@@ -318,4 +328,11 @@ document.addEventListener('change', async event => {
 window.addEventListener('beforeunload', event => { if (dirty && !(remember && stored)) { event.preventDefault(); event.returnValue = ''; } });
 window.addEventListener('pagehide', () => { if (lastArchiveUrl) URL.revokeObjectURL(lastArchiveUrl); });
 new ResizeObserver(fitPreview).observe(document.querySelector('.g-mat')!);
+// 미리보기가 다른 주소로 넘어간 흔적이 보이면 지금 내용으로 다시 그립니다.
+frame.addEventListener('load', () => {
+  if (!frame.srcdoc) return; // 아직 한 번도 그리지 않은 빈 프레임.
+  let ours = false;
+  try { ours = frame.contentDocument?.body?.dataset.studioPreview === 'true'; } catch { ours = false; }
+  if (!ours) { preview(); message('미리보기를 다시 불러왔습니다. 미리보기 안에서는 링크가 열리지 않습니다.'); }
+});
 renderPanel(); preview();
