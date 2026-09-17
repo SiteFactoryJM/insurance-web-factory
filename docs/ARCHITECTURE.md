@@ -12,7 +12,7 @@ site.json → generated registry → site resolver → renderSitePage
 데모 사이트에서만
   /proposal          조직용 제안 범위
   /templates         기존 레이아웃 비교
-  /studio            선택형 제작
+  /studio            4단계 선택형 제작 + PDF/JSON ZIP
   /studio/advanced   자유 편집
 ```
 
@@ -28,9 +28,12 @@ site.json → generated registry → site resolver → renderSitePage
 
 - `src/content/copy-library.ts`: 114개 문구 선택지와 8개 목적별 추천 구성. 사실 확인·법적 승인과 구분합니다.
 - `src/studio/guided-model.ts`: 선택 적용, 실제 정보 보존, 기존 템플릿 override 해제, 게시 상태 초기화.
-- `src/studio/guided.ts`: 선택·검색·미리보기·사실 입력·명시적 초안 보관·JSON 출력.
+- `src/studio/guided.ts`: 4단계 선택·검색·미리보기·사실 입력·명시적 초안 보관·ZIP 출력 상태.
 - `src/render/guided-studio-page.ts`: 기본 편집 화면.
-- `src/studio/project.ts`: 기존 JSON 계약·이미지 서명·용량·원고 길이 검증. 선택형과 자유 편집에서 공유합니다.
+- `src/studio/project.ts`: v1→v2 마이그레이션, JSON 계약·선택 ID·인계 메타데이터·이미지 서명·용량·원고 길이 검증.
+- `src/studio/export/capture.ts`: 공통 렌더러의 PC·모바일 섹션별 캡처.
+- `src/studio/export/pdf.ts`: 한글 임베딩 글꼴, 표지·캡처·전체 원고 PDF.
+- `src/studio/export/archive.ts`: 동일 스냅샷의 PDF 1개와 JSON 1개를 ZIP으로 구성하고 크기를 검증합니다.
 
 목적을 바꾸면 문구·배치·팔레트가 바뀌지만 담당자 이름·소속·전화·오픈채팅 주소는 유지합니다. 실제 후기만 유지하고 예시 후기는 제거합니다. 추천 구성의 실제 배치 값을 JSON에 넣어 자유 편집으로 가져올 때도 구성을 보존합니다.
 
@@ -38,7 +41,7 @@ site.json → generated registry → site resolver → renderSitePage
 
 ## 편집 저장과 게시 경계
 
-JSON 다운로드는 공개가 아닙니다. 내보내기와 불러오기는 `draft`, 검색 비공개, 도메인 초기화, 사실·사진·게시 확인 및 심의 상태 초기화를 적용합니다. 기존 심의번호와 유효기간도 지워 오래된 승인이 새 원고에 붙지 않게 합니다.
+ZIP 다운로드는 공개가 아닙니다. 저장 시작 시 현재 편집 상태를 한 번 복제해 PDF와 JSON이 서로 다른 내용을 담지 않게 합니다. 내보내기와 불러오기는 `draft`, 검색 비공개, 문의 폼 비활성, 도메인 초기화, 사실·사진·게시 확인 및 심의 상태 초기화를 적용합니다. 기존 심의번호와 유효기간도 지워 오래된 승인이 새 원고에 붙지 않게 합니다.
 
 기기 내 초안 보관은 기본 꺼짐입니다. 사용자가 선택한 경우에만 편집 원고·프로필을 브라우저 저장소에 저장합니다. 복원·삭제가 가능하고 계정 동기화나 서버 백업은 아닙니다. 고객용 상담 데이터는 생성하지 않습니다.
 
@@ -46,4 +49,4 @@ JSON 다운로드는 공개가 아닙니다. 내보내기와 불러오기는 `dr
 
 `sections.contactForm`, `consultation.topics`, `hero.primaryCtaLabel`, `contact.formEmail`, `demo.submissionMode`는 이전 제작 파일 파서를 위해 남을 수 있습니다. 이 값으로 신청서나 전송 기능을 다시 활성화할 수 없습니다. `renderContactForm()`이라는 기존 함수명은 직접 연락 패널을 반환하는 호환 이름입니다.
 
-고객 페이지의 동작 버전은 `atelier-guided-v9` / `data-contact-version="direct-v1"`입니다. `scripts/verify-live.mjs`가 이 식별자와 경로·30개 조합·API 410을 확인합니다. 실제 통화 연결과 오픈채팅방의 소유·활성 상태는 담당자 기기에서 별도로 확인해야 합니다.
+고객 페이지의 동작 버전은 `clear-human-v1` / `data-contact-version="direct-v1"`입니다. `scripts/verify-live.mjs`가 이 식별자와 경로·30개 조합·API 410을 확인합니다. 실제 통화 연결과 오픈채팅방의 소유·활성 상태는 담당자 기기에서 별도로 확인해야 합니다.

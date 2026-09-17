@@ -24,8 +24,10 @@
 
 ## 구현 방식
 
-`src/render/fonts.ts`가 선택 이름, family, 실제 제공 굵기, 스타일시트 주소, 라이선스 링크를 한곳에서 관리합니다. Google Fonts 5종은 공식 `fonts.googleapis.com/css2` 스타일시트, Pretendard는 제작자가 안내한 jsDelivr 배포의 고정 버전 `v1.3.9`을 사용합니다. 폰트 바이너리는 이 저장소에 복사하지 않습니다. [Pretendard 공식 웹폰트 사용 안내](https://github.com/orioncactus/pretendard/blob/main/packages/pretendard/README.md)
+`src/render/fonts.ts`가 선택 이름, family, 실제 제공 굵기, 스타일시트 주소, 라이선스 링크를 한곳에서 관리합니다. Google Fonts 5종은 공식 `fonts.googleapis.com/css2` 스타일시트, Pretendard는 제작자가 안내한 jsDelivr 배포의 고정 버전 `v1.3.9`을 사용합니다. [Pretendard 공식 웹폰트 사용 안내](https://github.com/orioncactus/pretendard/blob/main/packages/pretendard/README.md)
+
+검토용 PDF의 한글 표시와 텍스트 추출을 위해 Google Fonts 공식 배포본 `NanumGothic-Regular.ttf`를 `public/assets/fonts/`에 포함합니다. 이 파일은 수정하지 않은 OFL 1.1 원본이며, PDF 안에도 같은 조건으로 임베딩됩니다. 웹 UI의 Noto Sans KR 서브셋은 `@fontsource/noto-sans-kr` 패키지에서 빌드 시 복사합니다.
 
 실제 페이지는 선택한 제목 서체와 공통 본문 서체를 로드합니다. DIY 선택 화면에서는 6종의 실제 글꼴을 비교할 수 있도록 로드합니다. 외부 스타일시트가 차단되거나 네트워크 연결이 없으면 정의한 시스템 대체 서체로 표시됩니다.
 
-JSON 제작 파일에는 서체 ID가 저장되므로 다시 불러오거나 CLI로 개인별 `site.json`을 만들 때 선택이 유지됩니다. PDF에서는 문서에 선택 서체 이름을 표시하고, 제목에 해당 family를 적용합니다. 제작서를 공유해도 폰트 파일 자체를 별도 상품으로 판매하는 방식은 아닙니다.
+JSON 제작 파일에는 서체 ID가 저장되므로 다시 불러오거나 CLI로 개인별 `site.json`을 만들 때 선택이 유지됩니다. PDF에서는 선택 서체 이름을 메타데이터로 보존하고, 본문은 한글 누락을 막기 위해 나눔고딕을 사용합니다. 제작서를 공유해도 폰트 파일 자체를 별도 상품으로 판매하는 방식은 아닙니다.
