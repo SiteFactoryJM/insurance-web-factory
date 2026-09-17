@@ -25,5 +25,5 @@ for(let attempt=1;attempt<=30;attempt++){
  }catch(error){console.log(`Waiting for connected Cloudflare build (${attempt}/30): ${error.message}`);if(attempt<30)await new Promise(resolve=>setTimeout(resolve,10000));}
 }
 assert.ok(verified,'Live deployment not verified. Inspect Cloudflare Builds; do not report deployment success.');
-const summary=`Guided v9 live verification passed: 5 layouts × 6 palettes, phone/open chat, retired API, guided/advanced editors, proposal and privacy.\n${origin}/\n`;
+const summary=`Clear Human live verification passed: 5 layouts × 6 palettes, phone/open chat, retired API, guided/advanced editors, proposal and privacy.\n${origin}/\n`;
 console.log(summary);if(process.env.GITHUB_STEP_SUMMARY)await appendFile(process.env.GITHUB_STEP_SUMMARY,summary);
