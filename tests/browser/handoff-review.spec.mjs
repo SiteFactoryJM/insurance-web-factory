@@ -36,12 +36,13 @@ test('normal contact links permit navigation while automated checks never follow
   }
 });
 
-test('card and split service layouts stay symmetric for three through six items', async ({ page }) => {
+test('list, card and split service layouts stay symmetric with complete and partial rows', async ({ page }) => {
   test.setTimeout(120000);
-  for (const width of [390, 768, 1440]) for (const theme of ['warm-care', 'premium-navy']) for (const count of [3, 4, 5, 6]) {
+  for (const width of [390, 768, 1440]) for (const theme of ['trust-blue', 'warm-care', 'premium-navy']) for (const count of [3, 4, 5, 6, 7, 8]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`/?theme=${theme}`);
     const rows = await page.locator('.service-grid').evaluate((grid, visibleCount) => {
+      while (grid.children.length < visibleCount) grid.append(grid.firstElementChild.cloneNode(true));
       [...grid.children].slice(visibleCount).forEach(card => card.remove());
       grid.dataset.count = String(visibleCount);
       const outer = grid.getBoundingClientRect();
@@ -62,4 +63,30 @@ test('card and split service layouts stay symmetric for three through six items'
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth), `${theme}/${count} at ${width}px page fit`).toBeLessThanOrEqual(width);
   }
+});
+
+test('consumer sections group headings and copy within balanced reading widths', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/');
+  await page.evaluate(() => document.fonts.ready);
+  const layout = await page.evaluate(() => {
+    const box = selector => {
+      const r = document.querySelector(selector).getBoundingClientRect();
+      return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width };
+    };
+    return {
+      headings: ['#specialties', '#process', '#faq'].map(id => box(`${id} .section-heading`)),
+      supports: ['#specialties', '#process'].map(id => ({ title: box(`${id} h2`), copy: box(`${id} .section-support`) })),
+      portrait: box('.portrait-figure'), card: box('.hero-visual .adviser-card'),
+      sections: [box('#specialties'), box('#faq .faq-list'), box('#about .about-copy'), box('#contact .direct-contact-panel')],
+      steps: [...document.querySelectorAll('.process-grid li')].map(el => ({ top: el.getBoundingClientRect().top, width: el.getBoundingClientRect().width })),
+    };
+  });
+  for (const b of [...layout.headings, ...layout.sections]) expect(Math.abs((b.left + b.right) / 2 - 720)).toBeLessThanOrEqual(2);
+  for (const item of layout.supports) expect(item.copy.top - item.title.bottom).toBeLessThanOrEqual(16);
+  for (const [i, width] of [1120, 880, 800, 780].entries()) expect(layout.sections[i].width).toBeLessThanOrEqual(width);
+  expect(Math.abs(layout.portrait.left - layout.card.left)).toBeLessThanOrEqual(1);
+  expect(Math.abs(layout.portrait.width - layout.card.width)).toBeLessThanOrEqual(1);
+  expect(new Set(layout.steps.map(step => Math.round(step.top))).size).toBe(1);
+  expect(Math.max(...layout.steps.map(step => step.width)) - Math.min(...layout.steps.map(step => step.width))).toBeLessThanOrEqual(1);
 });

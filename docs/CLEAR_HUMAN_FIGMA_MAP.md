@@ -27,8 +27,8 @@ Overview 본문이 예고하는 "고객용 60개 화면 프로토타입"과 나�
 | `38:31` | CH2/Navy/Agent Details | `.adviser-card` (`calm-page.ts`의 `adviserCard()`) |
 | `40:22` | CH2/Navy/Field | 제작 화면의 `.g-field` |
 
-수치는 모두 `src/render/clear-human-styles.ts`에 모았다. 이 시트가 마지막 레이어라 앞선
-`styles.ts` · `premium-styles.ts` · `direct-contact-styles.ts`의 값을 덮는다.
+Figma에서 읽은 컴포넌트·팔레트 수치는 `src/render/clear-human-styles.ts`에 모았다. 이 시트가 마지막 레이어라 앞선
+`styles.ts` · `premium-styles.ts` · `direct-contact-styles.ts`의 값을 덮는다. `balanced-v2`는 Figma 파일을 수정한 결과가 아니라, 사용자 요청에 따라 소비자 화면의 폭·타이포그래피·정보 묶음을 조정한 오버라이드다.
 
 ## 읽어 온 토큰
 
@@ -50,10 +50,9 @@ Overview 본문이 예고하는 "고객용 60개 화면 프로토타입"과 나�
 
 여섯 팔레트의 정확한 값은 `src/render/design-system.ts`와 `tests/theme-architecture.test.mjs`가 고정한다.
 
-## 타이포
+## Figma 원본 타이포 기록
 
-Figma의 모든 텍스트 스타일은 Noto Sans KR이다. 본문 글꼴을 Noto Sans KR로 바꾸고
-(`BODY_FONT`), 제목 글꼴만 선택할 수 있게 남겼다.
+아래 표는 Figma에서 읽은 원본 텍스트 스타일 기록이다. `balanced-v2` 코드 토큰 값이 아니며, Figma 파일 자체는 이 작업에서 변경하지 않았다. 본문 글꼴은 Noto Sans KR이고 (`BODY_FONT`), 제목 글꼴만 선택할 수 있게 남겼다.
 
 | 용도 | Figma | 코드 |
 | --- | --- | --- |
@@ -72,4 +71,4 @@ Figma의 모든 텍스트 스타일은 Noto Sans KR이다. 본문 글꼴을 Noto
 - 고객 화면에는 제작 도구의 용어를 노출하지 않는다.
 - 저장은 작업본을 만드는 동작일 뿐 게시·전송·주소 연결이 아니다.
 
-`data-design-version`은 `clear-human-v1`이다.
+`data-design-version`은 `clear-human-v1`으로 호환을 유지한다. 고객 첫 화면에는 `data-typography-version="balanced-v2"`가 추가되어 Figma 원본 토큰과 구분되는 사용자 요청 기반 화면 조정을 식별한다.

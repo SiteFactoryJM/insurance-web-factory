@@ -17,7 +17,7 @@ function adviserCard(site: SiteConfig): string {
   const number = e(site.contact.phone || '연락처 확인 필요');
   return `<div class="adviser-card"><div class="adviser-details"><p class="adviser-role">담당 설계사</p><p class="adviser-name">${e(site.agent.name || '담당자 이름')}</p><p class="adviser-org">${e(site.agent.company || '소속 확인 필요')}<br>${e(site.agent.title || '보험설계사')}</p>${phone ? `<a class="adviser-phone" data-contact-link="phone" href="${e(phone)}">${number}</a>` : `<p class="adviser-phone">${number}</p>`}<p class="adviser-hours">상담 시간 ${e(site.contact.availableHours || '담당자에게 확인')}</p></div></div>`;
 }
-const heading = (kicker: string, title: string, mobile?: string) => `<div class="section-heading"><div><p class="eyebrow">${e(kicker)}</p><h2>${copy(title, mobile)}</h2></div></div>`;
+const heading = (kicker: string, title: string, mobile?: string, description = '') => `<div class="section-heading"><p class="eyebrow">${e(kicker)}</p><h2>${copy(title, mobile)}</h2>${description ? `<p class="section-support">${e(description)}</p>` : ''}</div>`;
 
 function hero(site: SiteConfig): string {
   const design = getDesign(site);
@@ -37,9 +37,9 @@ function hero(site: SiteConfig): string {
 
 function services(site: SiteConfig): string {
   const design = getDesign(site);
-  const items = site.specialties.map((item, i) => `<article class="service-card"><span class="section-index" aria-hidden="true">${formatIndex(i)}</span><h3>${e(item.title)}</h3><p>${copy(item.body, item.mobileBody)}</p><a class="service-link" href="${design.hiddenSections.includes('contact') ? '#footer' : '#contact'}" aria-label="${e(item.title)} 문의 방법 보기">${arrow}</a></article>`).join('');
+  const items = site.specialties.map((item, i) => `<article class="service-card"><span class="section-index" aria-hidden="true">${formatIndex(i)}</span><div class="service-copy"><h3>${e(item.title)}</h3><p>${copy(item.body, item.mobileBody)}</p></div><a class="service-link" href="${design.hiddenSections.includes('contact') ? '#footer' : '#contact'}" aria-label="${e(item.title)} 문의 방법 보기">${arrow}</a></article>`).join('');
   // 칸 수를 항목 수에 맞춰 마지막 줄에 한 칸만 남는 모양을 막습니다.
-  return `<section class="section container services-section" id="specialties" aria-labelledby="services-title"><div class="section-heading"><div><p class="eyebrow">상담 분야</p><h2 id="services-title">어떤 내용을<br>확인하고 싶으신가요?</h2></div><p>구체적인 취급 범위는 담당자에게 확인해 주세요.</p></div><div class="service-grid services-${design.services}" data-pattern="services-${design.services}" data-count="${site.specialties.length}">${items}</div></section>`;
+  return `<section class="section container services-section" id="specialties" aria-labelledby="services-title"><div class="section-heading"><p class="eyebrow">상담 분야</p><h2 id="services-title">어떤 내용을 확인하고 싶으신가요?</h2><p class="section-support">구체적인 취급 범위는 담당자에게 확인해 주세요.</p></div><div class="service-grid services-${design.services}" data-pattern="services-${design.services}" data-count="${site.specialties.length}">${items}</div></section>`;
 }
 
 function about(site: SiteConfig): string {
@@ -55,7 +55,7 @@ function about(site: SiteConfig): string {
 function process(site: SiteConfig): string {
   if (!site.sections.process || !site.process.length) return '';
   const pattern = getDesign(site).process;
-  return `<section class="section container process-section" id="process" aria-labelledby="process-title"><div class="section-heading"><div><p class="eyebrow">상담 과정</p><h2 id="process-title">문의 전 준비부터<br>설명 확인까지.</h2></div><p>구체적인 일정과 진행 방식은 담당자와 협의합니다.</p></div><ol class="process-grid process-${pattern}" data-pattern="process-${pattern}">${site.process.map((p, i) => `<li><span class="process-number">${formatIndex(i)}</span><div><h3>${e(p.title)}</h3><p>${copy(p.body, p.mobileBody)}</p></div></li>`).join('')}</ol></section>`;
+  return `<section class="section container process-section" id="process" aria-labelledby="process-title"><div class="section-heading"><p class="eyebrow">상담 과정</p><h2 id="process-title">문의 전 준비부터 설명 확인까지.</h2><p class="section-support">구체적인 일정과 진행 방식은 담당자와 협의합니다.</p></div><ol class="process-grid process-${pattern}" data-pattern="process-${pattern}">${site.process.map((p, i) => `<li><span class="process-number">${formatIndex(i)}</span><div><h3>${e(p.title)}</h3><p>${copy(p.body, p.mobileBody)}</p></div></li>`).join('')}</ol></section>`;
 }
 
 function reviews(site: SiteConfig): string {
@@ -68,7 +68,7 @@ function reviews(site: SiteConfig): string {
 function faq(site: SiteConfig): string {
   if (!site.sections.faq || !site.faqs.length) return '';
   const pattern = getDesign(site).faq;
-  return `<section class="section container faq-section faq-${pattern}" id="faq" aria-labelledby="faq-title"><div><p class="eyebrow">자주 묻는 질문</p><h2 id="faq-title">연락하기 전에<br>확인해 보세요.</h2></div><div class="faq-list" data-pattern="faq-${pattern}">${site.faqs.map((f, i) => `<details${pattern === 'columns' ? ' open' : ''}><summary><span class="faq-question"><span class="faq-number" aria-hidden="true">${formatIndex(i)}</span>${e(f.question)}</span><span aria-hidden="true">+</span></summary><p>${copy(f.answer, f.mobileAnswer)}</p></details>`).join('')}</div></section>`;
+  return `<section class="section container faq-section faq-${pattern}" id="faq" aria-labelledby="faq-title"><div class="section-heading"><p class="eyebrow">자주 묻는 질문</p><h2 id="faq-title">연락하기 전에 확인해 보세요.</h2></div><div class="faq-list" data-pattern="faq-${pattern}">${site.faqs.map((f, i) => `<details${pattern === 'columns' ? ' open' : ''}><summary><span class="faq-question"><span class="faq-number" aria-hidden="true">${formatIndex(i)}</span>${e(f.question)}</span><span aria-hidden="true">+</span></summary><p>${copy(f.answer, f.mobileAnswer)}</p></details>`).join('')}</div></section>`;
 }
 
 function focus(site: SiteConfig): string {
@@ -78,7 +78,7 @@ function focus(site: SiteConfig): string {
 }
 
 function contact(site: SiteConfig): string {
-  return `<section class="section contact-section" id="contact" aria-labelledby="contact-title"><div class="container contact-grid"><div class="contact-copy"><p class="eyebrow">연락 방법</p><h2 id="contact-title">궁금한 내용을<br>직접 문의하세요.</h2><p>보험 종류를 미리 고르거나 신청서를 작성할 필요가 없습니다. 상담 범위와 일정을 담당자에게 확인해 주세요.</p><div class="contact-person">${profile(site)}<div><strong>${e(site.agent.name)} ${e(site.agent.title)}</strong><span>${e(site.agent.company)}</span></div></div></div>${renderContactForm(site)}</div></section>`;
+  return `<section class="section contact-section" id="contact" aria-labelledby="contact-title"><div class="container contact-grid"><div class="contact-copy"><p class="eyebrow">연락 방법</p><h2 id="contact-title">궁금한 내용을 직접 문의하세요.</h2><p>보험 종류를 미리 고르거나 신청서를 작성할 필요가 없습니다. 상담 범위와 일정을 담당자에게 확인해 주세요.</p><div class="contact-person">${profile(site)}<div><strong>${e(site.agent.name)} ${e(site.agent.title)}</strong><span>${e(site.agent.company)}</span></div></div></div>${renderContactForm(site)}</div></section>`;
 }
 
 export function renderCalmPage(site: SiteConfig): string {
@@ -86,5 +86,5 @@ export function renderCalmPage(site: SiteConfig): string {
   const modules: Record<DesignSectionId, () => string> = { services: () => services(site), about: () => about(site), process: () => process(site), reviews: () => reviews(site), faq: () => faq(site), contact: () => contact(site) };
   const sections = design.sectionOrder.filter(key => !design.hiddenSections.includes(key)).map(key => modules[key]()).join('');
   const location = site.sections.location && site.contact.officeAddress ? `<section class="section container location-section"><p class="eyebrow">찾아오시는 길</p><h2>${e(site.contact.officeAddress)}</h2>${safeUrl(site.contact.mapUrl) ? `<a class="text-link" href="${e(safeUrl(site.contact.mapUrl))}" target="_blank" rel="noopener noreferrer">지도 확인 (새 창) ${arrow}</a>` : ''}</section>` : '';
-  return `<main id="main" tabindex="-1" class="ornament-${design.ornament} density-${design.density}">${hero(site)}${focus(site)}${sections}${location}</main>`;
+  return `<main id="main" tabindex="-1" data-typography-version="balanced-v2" class="ornament-${design.ornament} density-${design.density}">${hero(site)}${focus(site)}${sections}${location}</main>`;
 }
