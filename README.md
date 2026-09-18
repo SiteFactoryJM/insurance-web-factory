@@ -16,7 +16,7 @@
 
 ## 연락 방식
 
-사이트 원본 `sites/<id>/site.json`의 `contact.phone`, `contact.kakaoUrl`, `contact.availableHours`를 사용합니다. 오픈채팅은 `https://open.kakao.com/o/초대코드` 형식만 허용합니다. 다른 도메인, 실행 가능한 URL, 쿼리 전달, 로그인·메시지 API를 사용하지 않습니다. 전화 앱이 없는 PC를 위해 번호를 텍스트로도 표시합니다.
+사이트 원본 `sites/<id>/site.json`의 `contact.phone`, `contact.kakaoUrl`, `contact.availableHours`와 선택 항목인 `contact.email`, `contact.fax`를 사용합니다. 오픈채팅은 `https://open.kakao.com/o/초대코드` 형식만 허용합니다. 이메일은 헤더나 쿼리가 없는 검증된 `mailto:` 링크로, 팩스는 일반 텍스트로 표시합니다. 다른 도메인, 실행 가능한 URL, 쿼리 전달, 로그인·메시지 API를 사용하지 않습니다. 전화 앱이 없는 PC를 위해 번호를 텍스트로도 표시합니다.
 
 대표 샘플의 전화와 오픈채팅 버튼은 **실제 담당자에게 연결**됩니다. 샘플 안내를 유지합니다. 제작 도구의 iframe 미리보기에서는 실제 연결을 막습니다. 메시지를 자동으로 작성하거나 보내지 않습니다.
 
@@ -38,7 +38,7 @@ npm run preview
 
 제작 화면과 고객 페이지는 같은 `renderSitePage()`와 작업 파일 v2 형식을 사용합니다. v1 작업 파일은 불러올 때 v2로 옮기며, 오픈채팅 이외의 카카오 링크는 수정해야 합니다. 새 저장·가져오기는 게시 권한과 기존 심의번호를 초기화한 작업본입니다. 파일 내보내기는 브라우저 안에서만 처리되며 서버 업로드·자동 전송·자동 공개를 하지 않습니다.
 
-디자인 정본은 Figma `보험설계 2026 · Clear Human`의 `CH2/Navy/*` 컴포넌트이며, 수치는 `src/render/clear-human-styles.ts`에 모여 있습니다.
+디자인 정본은 Figma `보험설계 2026 · Clear Human`의 `CH2/Navy/*` 컴포넌트이며, 수치는 `src/render/clear-human-styles.ts`에 모여 있습니다. Figma 원본을 바꾸지 않고 사용자 요청에 따라 반영한 소비자 화면 타이포그래피·폭 조정은 `data-typography-version="balanced-v2"`로 식별하고, `clear-human-v1` 디자인 호환 버전은 유지합니다.
 
 ## 실제 게시
 

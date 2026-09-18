@@ -36,6 +36,8 @@ test("DIY JSON round-trip preserves chosen patterns, mobile copy, footer and cus
   site.agent.businessNumber = "123-45-67890";
   site.hero.image = png;
   site.hero.mobileHeadline = "우리 가족의 다음 선택";
+  site.contact.email = "advisor+vip@example.com";
+  site.contact.fax = "02-1234-5678";
   const project = createProject(site);
   const restored = parseProject(JSON.stringify(project));
   assert.deepEqual(restored, project);
@@ -44,6 +46,8 @@ test("DIY JSON round-trip preserves chosen patterns, mobile copy, footer and cus
   assert.equal(restored.site.hero.mobileHeadline, "우리 가족의 다음 선택");
   assert.equal(restored.site.hero.image, png);
   assert.equal(restored.site.agent.businessNumber, "123-45-67890");
+  assert.equal(restored.site.contact.email, "advisor+vip@example.com");
+  assert.equal(restored.site.contact.fax, "02-1234-5678");
 });
 
 test("all six licensed heading choices survive export, restore and source validation", () => {

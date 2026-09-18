@@ -1,7 +1,7 @@
 import type { ContentCard, FaqItem, SiteConfig } from '../types.js';
 import { COPY_LIBRARY, type PurposeChoice } from '../content/copy-library.js';
 import { getDesign } from '../render/design-system.js';
-import { directPhoneHref, openChatUrl } from '../utils/contact-links.js';
+import { directEmailHref, directPhoneHref, openChatUrl } from '../utils/contact-links.js';
 
 export type CopyGroup = 'heroes' | 'intros' | 'services' | 'processes' | 'faqs' | 'footers';
 const card = (item: ContentCard): ContentCard => ({ title: item.title, body: item.body, ...(item.mobileBody ? {mobileBody: item.mobileBody} : {}) });
@@ -69,7 +69,7 @@ export function blankGuidedSite(example: SiteConfig): SiteConfig {
   out.id = 'new-adviser';
   out.headingFont = 'noto-sans-kr';
   out.agent = { name: '', title: '보험설계사', company: '', branch: '', registrationNumber: '', regions: [], profileImage: '/assets/profile-placeholder.svg', logoImage: '' };
-  out.contact = { phone: '', kakaoUrl: '', availableHours: '', email: '', officeAddress: '' };
+  out.contact = { phone: '', kakaoUrl: '', availableHours: '', email: '', fax: '', officeAddress: '' };
   out.hero = { ...out.hero, image: undefined, trustNote: '계약 조건을 충분히 확인한 뒤 결정하세요.' };
   out.career = []; out.reviews = [];
   out.sections = { career: false, process: true, reviews: false, faq: true, location: false, contactForm: false };
@@ -87,5 +87,7 @@ export function guidedIssues(site: SiteConfig): string[] {
   if (!directPhoneHref(site.contact.phone)) issues.push('연결 가능한 전화번호를 입력해 주세요.');
   if (!openChatUrl(site.contact.kakaoUrl)) issues.push('https://open.kakao.com/o/로 시작하는 오픈채팅 초대 주소를 입력해 주세요.');
   if (!site.contact.availableHours.trim()) issues.push('실제 상담 시간을 입력해 주세요.');
+  if (site.contact.email && !directEmailHref(site.contact.email)) issues.push('이메일 주소를 확인해 주세요.');
+  if (site.contact.fax && !directPhoneHref(site.contact.fax)) issues.push('팩스번호를 숫자와 +, -, 괄호로 입력해 주세요.');
   return issues;
 }

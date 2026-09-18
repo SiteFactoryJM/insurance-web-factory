@@ -5,6 +5,18 @@ export function directPhoneHref(input: unknown): string {
   return /^\+?\d{7,15}$/.test(value) ? `tel:${value}` : '';
 }
 
+/** Build a plain mailto link without headers, query parameters, or control characters. */
+export function directEmailHref(input: unknown): string {
+  if (typeof input !== 'string') return '';
+  const value = input.trim();
+  if (!value || value.length > 254 || /[\r\n?#]/.test(value)) return '';
+  const match = /^([A-Za-z0-9.!#$%&'*+/=^_`{|}~-]+)@([A-Za-z0-9.-]+)$/.exec(value);
+  if (!match || match[1].length > 64 || match[1].startsWith('.') || match[1].endsWith('.') || match[1].includes('..')) return '';
+  const labels = match[2].split('.');
+  if (labels.length < 2 || labels.some(label => !label || label.length > 63 || !/^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$/.test(label))) return '';
+  return `mailto:${encodeURIComponent(match[1])}@${match[2]}`;
+}
+
 /** Accept only a Kakao Open Chat invite, never a redirect or arbitrary website. */
 export function openChatUrl(input: unknown): string {
   if (typeof input !== 'string') return '';

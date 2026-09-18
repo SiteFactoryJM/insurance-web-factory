@@ -19,7 +19,7 @@ site.json → generated registry → site resolver → renderSitePage
 
 ## 직접 연락
 
-`src/utils/contact-links.ts`에서 전화번호와 오픈채팅 초대 주소를 검증합니다. `src/render/shared.ts`의 `renderContactButtons()`를 헤더·첫 화면·연락 영역·푸터·모바일 하단에서 재사용합니다. 서버로 상담 페이로드를 보내지 않습니다. `client-script.ts`는 메뉴·이미지 대체·하단 연락 버튼의 표시와 미리보기 링크 방지만 담당합니다.
+`src/utils/contact-links.ts`에서 전화번호, 선택 이메일, 오픈채팅 초대 주소를 검증합니다. 선택 팩스는 전화번호와 같은 형식으로 검증하되 링크 없이 표시합니다. `src/render/shared.ts`의 `renderContactButtons()`를 헤더·첫 화면·연락 영역·푸터·모바일 하단에서 재사용하며 버튼은 전화와 카카오톡 두 종류로 유지합니다. 이메일은 별도 `data-email-link`의 안전한 `mailto:` 링크입니다. 서버로 상담 페이로드를 보내지 않습니다. `client-script.ts`는 메뉴·이미지 대체·하단 연락 버튼의 표시와 미리보기 링크 방지만 담당합니다.
 
 `handleConsultation()`는 이전 API 주소를 안전하게 종료하는 호환 핸들러입니다. HTTP 410과 안내만 반환합니다. 기존 `Env.DB`, `CONSULTATION_WEBHOOK_URL` 선언 및 마이그레이션은 호환/이력으로 남지만 이 핸들러가 사용하지 않습니다. DB 삭제·보유자료 정리는 별도 운영 정책입니다.
 
@@ -34,7 +34,7 @@ site.json → generated registry → site resolver → renderSitePage
 - `src/studio/export/pdf.ts`: 한글 임베딩 글꼴, 표지·캡처·전체 원고 PDF.
 - `src/studio/export/archive.ts`: 동일 스냅샷의 PDF 1개와 JSON 1개를 ZIP으로 구성하고 크기를 검증합니다.
 
-목적을 바꾸면 문구·배치·팔레트가 바뀌지만 담당자 이름·소속·전화·오픈채팅 주소는 유지합니다. 실제 후기만 유지하고 예시 후기는 제거합니다. 추천 구성의 실제 배치 값을 작업 파일에 넣어 다시 불러올 때도 구성을 보존합니다.
+목적을 바꾸면 문구·배치·팔레트가 바뀌지만 담당자 이름·소속·전화·선택 이메일·선택 팩스·오픈채팅 주소는 유지합니다. 실제 후기만 유지하고 예시 후기는 제거합니다. 추천 구성의 실제 배치 값을 작업 파일에 넣어 다시 불러올 때도 구성을 보존합니다.
 
 문구 선택 시 PC와 모바일 원고가 함께 설정됩니다. 현재 라이브러리는 두 화면에서 완전한 문장을 제공하도록 짧은 원고를 사용하며 임의 잘라내기를 하지 않습니다. 선택한 문구는 화면 구성이나 색상을 바꿔도 유지됩니다.
 
@@ -52,4 +52,4 @@ site.json → generated registry → site resolver → renderSitePage
 
 `src/render/clear-human-styles.ts`가 Figma `CH2/Navy/*` 컴포넌트의 수치를 담습니다. 마지막 스타일 레이어이므로 앞선 시트의 값을 덮어씁니다. 팔레트 토큰은 `paletteStyle()`이 `--surface`, `--on-brand`, `--danger`, `--radius-control`, `--radius-contact`, 카카오 채널 색까지 함께 내보냅니다.
 
-고객 페이지의 동작 버전은 `clear-human-v1` / `data-contact-version="direct-v1"`입니다. `scripts/verify-live.mjs`가 이 식별자와 경로·30개 조합·API 410을 확인합니다. 실제 통화 연결과 오픈채팅방의 소유·활성 상태는 담당자 기기에서 별도로 확인해야 합니다.
+고객 페이지의 동작 버전은 `clear-human-v1` / `data-contact-version="direct-v1"`입니다. 소비자 `<main>`에는 사용자 요청에 따라 반영한 타이포그래피 배치를 식별하는 `data-typography-version="balanced-v2"`가 있으며, 디자인 버전 호환 식별자를 바꾸지 않습니다. `scripts/verify-live.mjs`가 이 식별자와 경로·30개 조합·API 410을 확인합니다. 실제 통화 연결과 오픈채팅방의 소유·활성 상태는 담당자 기기에서 별도로 확인해야 합니다.
