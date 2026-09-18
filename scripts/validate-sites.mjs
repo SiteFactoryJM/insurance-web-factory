@@ -10,6 +10,7 @@ const fonts = new Set(["pretendard", "noto-serif-kr", "noto-sans-kr", "nanum-got
 const statuses = new Set(["draft", "published"]);
 const submissionModes = new Set(["discard", "store", "mailto"]);
 const domainOwners = new Map();
+const canonicalDomainOwners = new Map();
 const seoTitles = new Map();
 const errors = [];
 const warnings = [];
@@ -216,12 +217,19 @@ for (const entry of entries) {
   }
 
   for (const domainValue of site.domains ?? []) {
-    const domain = normalizeDomain(domainValue);
-    if (!domain || !domain.includes(".") || /\s/.test(domain)) errors.push(`[${id}] 도메인 형식이 올바르지 않습니다: ${domainValue}`);
-    else if (domainOwners.has(domain)) errors.push(`[${id}] 도메인이 ${domainOwners.get(domain)}와 중복됩니다: ${domain}`);
-    else domainOwners.set(domain, id);
-  }
+    const exactDomain = String(domainValue ?? "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "").replace(/\.$/, "");
+    const canonical = exactDomain.replace(/^www\./, "");
+    if (!exactDomain || !exactDomain.includes(".") || /\s/.test(exactDomain)) {
+      errors.push(`[${id}] 도메인 형식이 올바르지 않습니다: ${domainValue}`);
+      continue;
+    }
+    if (domainOwners.has(exactDomain)) errors.push(`[${id}] 도메인이 ${domainOwners.get(exactDomain)}와 중복됩니다: ${exactDomain}`);
+    else domainOwners.set(exactDomain, id);
 
+    const canonicalOwner = canonicalDomainOwners.get(canonical);
+    if (canonicalOwner && canonicalOwner !== id) errors.push(`[${id}] 루트/www 도메인 계열이 ${canonicalOwner}와 충돌합니다: ${canonical}`);
+    else canonicalDomainOwners.set(canonical, id);
+  }
   if (site.status === "published" && !site.demo?.enabled) {
     if (!(site.domains ?? []).length) errors.push(`[${id}] published 사이트에는 domains가 필요합니다.`);
     if (!site.compliance?.contentTruthConfirmed) errors.push(`[${id}] 게시 전 기재 내용 사실 확인이 필요합니다.`);
