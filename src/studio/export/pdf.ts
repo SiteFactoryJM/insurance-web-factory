@@ -104,7 +104,7 @@ export async function createReviewPdf(project: StudioProject, captures: PreviewC
 
   const writer = textWriter(pdf, font, project.handoff.draftId);
   writer.heading('전체 원고');
-  writer.write(`담당자: ${site.agent.name} ${site.agent.title}\n소속: ${site.agent.company}${site.agent.branch ? ` · ${site.agent.branch}` : ''}\n전화: ${site.contact.phone}\n상담 시간: ${site.contact.availableHours}\n카카오톡: ${site.contact.kakaoUrl || '미작성'}`);
+  writer.write(`담당자: ${site.agent.name} ${site.agent.title}\n소속: ${site.agent.company}${site.agent.branch ? ` · ${site.agent.branch}` : ''}\n전화: ${site.contact.phone}${site.contact.email ? `\n이메일: ${site.contact.email}` : ''}${site.contact.fax ? `\n팩스: ${site.contact.fax}` : ''}\n상담 시간: ${site.contact.availableHours}\n카카오톡: ${site.contact.kakaoUrl || '미작성'}`);
   writer.heading('첫 화면'); writer.write(`${site.hero.eyebrow || ''}\n${site.hero.headline}\n${site.hero.subheadline}`);
   if (site.hero.mobileHeadline || site.hero.mobileSubheadline) writer.write(`모바일 원고\n${site.hero.mobileHeadline || site.hero.headline}\n${site.hero.mobileSubheadline || site.hero.subheadline}`);
   if (isSectionEnabled(site,'about')) { writer.heading('담당자 소개'); writer.write(`${site.intro.title}\n${site.intro.body}${site.intro.philosophy ? `\n상담 원칙: ${site.intro.philosophy}` : ''}`); }

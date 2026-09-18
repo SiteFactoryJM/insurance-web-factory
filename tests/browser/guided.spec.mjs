@@ -9,7 +9,7 @@ async function start(page){await page.setViewportSize({width:1440,height:1000});
 async function stage(page,n){await page.locator(`button[data-stage="${n}"]`).click();}
 async function purpose(page,id){await stage(page,0);const details=page.locator('#guided-panel details');if(!(await details.evaluate(node=>node.open)))await details.locator('summary').click();await page.locator(`[data-purpose="${id}"]`).click();}
 async function storageOptions(page){const details=page.locator('.g-save-options details');if(!(await details.evaluate(node=>node.open)))await details.locator('summary').click();}
-async function facts(page){await stage(page,1);for(const [name,value] of [['name','검토용 담당자'],['company','검토용 소속'],['phone','010-0000-1234'],['hours','평일 09:00–18:00'],['kakao','https://open.kakao.com/o/TestInvite']])await page.locator(`input[name="${name}"]`).fill(value);}
+async function facts(page){await stage(page,1);for(const [name,value] of [['name','검토용 담당자'],['company','검토용 소속'],['phone','010-0000-1234'],['hours','평일 09:00–18:00'],['email','advisor+vip@example.com'],['fax','02-1234-5678'],['kakao','https://open.kakao.com/o/TestInvite']])await page.locator(`input[name="${name}"]`).fill(value);}
 async function confirm(page){await stage(page,2);for(const input of await page.locator('[data-confirm]').all())await input.check();}
 async function archive(page){
  const pending=page.waitForEvent('download');await page.locator('[data-action="save-zip"]').click();const download=await pending;
@@ -92,10 +92,12 @@ test('profile, chosen copy, layout and phone/chat links survive JSON export/impo
  await start(page);await purpose(page,'new');await facts(page);
  await expect(preview(page).locator('.hero-actions [data-contact-link="phone"]')).toHaveAttribute('href','tel:01000001234');
  await expect(preview(page).locator('.hero-actions [data-contact-link="kakao"]')).toHaveAttribute('href','https://open.kakao.com/o/TestInvite');
+ await expect(preview(page).locator('#contact [data-contact-link]')).toHaveCount(2);await expect(preview(page).locator('#contact [data-email-link]')).toHaveAttribute('href','mailto:advisor%2Bvip@example.com');await expect(preview(page).locator('#contact')).toContainText('팩스');await expect(preview(page).locator('#contact')).toContainText('02-1234-5678');
  const dispatched=await preview(page).locator('.hero-actions [data-contact-link="kakao"]').evaluate(a=>a.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true})));expect(dispatched).toBe(false);
- await confirm(page);const project=await save(page);expect(project.site.status).toBe('draft');expect(project.site.design.hero).toBe('statement');expect(project.site.contact.phone).toBe('010-0000-1234');expect(project.site.compliance.publicationConfirmed).toBe(false);
+ const emailDispatched=await preview(page).locator('#contact [data-email-link]').evaluate(a=>a.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true})));expect(emailDispatched).toBe(false);
+ await confirm(page);const project=await save(page);expect(project.site.status).toBe('draft');expect(project.site.design.hero).toBe('statement');expect(project.site.contact.phone).toBe('010-0000-1234');expect(project.site.contact.email).toBe('advisor+vip@example.com');expect(project.site.contact.fax).toBe('02-1234-5678');expect(project.site.compliance.publicationConfirmed).toBe(false);
  await page.reload();await page.locator('#guided-file').setInputFiles({name:'draft.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(project))});
- await expect(page.locator('#guided-status')).toContainText('불러왔습니다');await stage(page,1);await expect(page.locator('input[name="name"]')).toHaveValue('검토용 담당자');await expect(preview(page).locator('.hero-statement')).toHaveCount(1);
+ await expect(page.locator('#guided-status')).toContainText('불러왔습니다');await stage(page,1);await expect(page.locator('input[name="name"]')).toHaveValue('검토용 담당자');await expect(page.locator('input[name="email"]')).toHaveValue('advisor+vip@example.com');await expect(page.locator('input[name="fax"]')).toHaveValue('02-1234-5678');await expect(preview(page).locator('.hero-statement')).toHaveCount(1);
 });
 test('published rights and unsafe URLs cannot slip through save or import',async({page})=>{
  await start(page);await stage(page,2);await page.locator('[data-action="save-zip"]').click();await expect(page.locator('#guided-errors')).toContainText('담당자 이름');await facts(page);await page.locator('input[name="kakao"]').fill('https://evil.test');await confirm(page);await page.locator('[data-action="save-zip"]').click();await expect(page.locator('#guided-errors')).toContainText('open.kakao.com');
@@ -136,7 +138,7 @@ test('handoff ZIP contains one valid PDF and one v2 JSON snapshot with extractab
  const document=await getDocument({data:result.pdfBytes,disableWorker:true}).promise;let text='';
  for(let pageNumber=1;pageNumber<=document.numPages;pageNumber++){const page=await document.getPage(pageNumber);const content=await page.getTextContent();text+=content.items.map(item=>'str' in item?item.str:'').join(' ');}
  expect(text).toContain('PC 웹페이지 · 연속 보기');expect(text).toContain('모바일 웹페이지 · 연속 보기');expect(text).not.toContain('PC 디자인 · header-1');
- expect(text).toContain('검토용 담당자');expect(text).toContain('검토용 소속');expect(text).toContain('제작 담당자에게 전달');
+ expect(text).toContain('검토용 담당자');expect(text).toContain('검토용 소속');expect(text).toContain('이메일: advisor+vip@example.com');expect(text).toContain('팩스: 02-1234-5678');expect(text).toContain('제작 담당자에게 전달');
  await expect(page.locator('.g-result')).toContainText('파일이 준비되었습니다');
 });
 test('the studio works from tablet width upward and blocks narrower phones',async({page},testInfo)=>{

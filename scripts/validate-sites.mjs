@@ -18,7 +18,15 @@ const isUrl = (value) => {
   if (!value) return true;
   try { const url = new URL(value); return ["http:", "https:"].includes(url.protocol); } catch { return false; }
 };
-const isEmail = (value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value));
+const isEmail = (value) => {
+  if (!value) return true;
+  const text = String(value).trim();
+  if (text.length > 254 || /[\r\n?#]/.test(text)) return false;
+  const match = /^([A-Za-z0-9.!#$%&'*+/=^_`{|}~-]+)@([A-Za-z0-9.-]+)$/.exec(text);
+  if (!match || match[1].length > 64 || match[1].startsWith(".") || match[1].endsWith(".") || match[1].includes("..")) return false;
+  const labels = match[2].split(".");
+  return labels.length >= 2 && labels.every(label => label.length <= 63 && /^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$/.test(label));
+};
 
 // Mirrors the browser helper without depending on an already-compiled build.
 export function isSectionEnabled(site, id) {
@@ -191,6 +199,8 @@ for (const entry of entries) {
   if (!isUrl(site.contact?.instagramUrl)) errors.push(`[${id}] instagramUrl 형식이 올바르지 않습니다.`);
   if (!isUrl(site.contact?.mapUrl)) errors.push(`[${id}] mapUrl 형식이 올바르지 않습니다.`);
   if (!isEmail(site.contact?.email)) errors.push(`[${id}] email 형식이 올바르지 않습니다.`);
+  const fax = site.contact?.fax;
+  if (fax !== undefined && (typeof fax !== "string" || Array.from(fax).length > 32 || (fax.trim() && (!/^[+\d][\d ()-]{5,31}$/.test(fax.trim()) || !/^\+?\d{7,15}$/.test(fax.trim().replace(/[ ()-]/g, "")))))) errors.push(`[${id}] fax 형식이 올바르지 않습니다.`);
   if (!isEmail(site.contact?.formEmail)) errors.push(`[${id}] formEmail 형식이 올바르지 않습니다.`);
   if (site.demo?.submissionMode && !submissionModes.has(site.demo.submissionMode)) errors.push(`[${id}] demo.submissionMode 값이 올바르지 않습니다.`);
   if (site.demo?.submissionMode === "mailto" && !site.contact?.formEmail && !site.contact?.email) errors.push(`[${id}] mailto 제출 방식에는 contact.formEmail 또는 contact.email이 필요합니다.`);

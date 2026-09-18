@@ -1,6 +1,6 @@
 import type { SiteConfig, TemplateId, PaletteId } from '../types.js';
 import { escapeHtml as e } from '../utils/html.js';
-import { directPhoneHref, openChatUrl } from '../utils/contact-links.js';
+import { directEmailHref, directPhoneHref, openChatUrl } from '../utils/contact-links.js';
 import { TEMPLATE_META, PALETTES, paletteId, getDesign } from './design-system.js';
 
 export const arrow = '<span aria-hidden="true">↗</span>';
@@ -39,14 +39,17 @@ export function renderSocialLinks(site: SiteConfig): string { return renderConta
  * (함수 이름은 예전 호출부와의 호환을 위해 남겨 둔 것으로, 입력 폼이 아닙니다.)
  */
 export function renderContactForm(site: SiteConfig): string {
-  return `<div class="direct-contact-panel" data-direct-contact><p class="eyebrow">담당자에게 직접 문의</p><h3>신청서 없이,<br>편한 방법으로 연락하세요.</h3>${renderContactButtons(site)}<dl class="direct-contact-details"><div><dt>전화번호</dt><dd>${e(site.contact.phone || '미입력')}</dd></div><div><dt>상담 시간</dt><dd>${e(site.contact.availableHours || '담당자에게 확인')}</dd></div></dl><p class="support-note">공개 대화방에는 주민등록번호·병력·계약서 원본을 남기지 마세요.</p>${site.demo?.enabled ? '<p class="demo-contact-notice">디자인 예시입니다. 이 페이지의 연락 버튼은 표시된 담당자에게 실제로 연결됩니다.</p>' : ''}</div>`;
+  const email = directEmailHref(site.contact.email);
+  const optional = `${email ? `<div><dt>이메일</dt><dd><a data-email-link href="${e(email)}">${e(site.contact.email!)}</a></dd></div>` : ''}${site.contact.fax?.trim() ? `<div><dt>팩스</dt><dd>${e(site.contact.fax)}</dd></div>` : ''}`;
+  return `<div class="direct-contact-panel" data-direct-contact><p class="eyebrow">담당자에게 직접 문의</p><h3>신청서 없이, 편한 방법으로 연락하세요.</h3>${renderContactButtons(site)}<dl class="direct-contact-details"><div><dt>전화번호</dt><dd>${e(site.contact.phone || '미입력')}</dd></div><div><dt>상담 시간</dt><dd>${e(site.contact.availableHours || '담당자에게 확인')}</dd></div>${optional}</dl><p class="support-note">공개 대화방에는 주민등록번호·병력·계약서 원본을 남기지 마세요.</p>${site.demo?.enabled ? '<p class="demo-contact-notice">디자인 예시입니다. 이 페이지의 연락 버튼은 표시된 담당자에게 실제로 연결됩니다.</p>' : ''}</div>`;
 }
 
 export function renderFooter(site: SiteConfig): string {
   const pattern = getDesign(site).footer;
+  const email = directEmailHref(site.contact.email);
   const business = `<p>${e(site.agent.company || '소속 확인 필요')}${site.agent.branch ? ` · ${e(site.agent.branch)}` : ''}${site.agent.businessNumber ? ` · 사업자등록번호 ${e(site.agent.businessNumber)}` : ''}</p>${site.agent.registrationNumber ? `<p>설계사 등록번호 ${e(site.agent.registrationNumber)}</p>` : ''}${site.contact.officeAddress ? `<p>${e(site.contact.officeAddress)}</p>` : ''}`;
   const note = site.footer?.note ? `<p class="footer-note">${e(site.footer.note)}</p>` : '';
-  return `<footer class="site-footer footer-${pattern}" id="footer" data-pattern="footer-${pattern}"><div class="container"><div class="footer-top"><div class="footer-identity"><h2>${e(site.footer?.heading || `${site.agent.name || '담당자'} 보험상담`)}</h2>${pattern === 'columns' ? note : business + note}</div>${pattern === 'columns' ? `<div class="footer-business">${business}</div>` : ''}<div class="footer-contact"><p>${e(site.contact.phone)}${site.contact.email ? `<br>${e(site.contact.email)}` : ''}<br>상담 시간 ${e(site.contact.availableHours)}</p>${renderContactButtons(site, true)}</div></div><div class="footer-legal"><p>${e(site.compliance.footerDisclaimer)}</p>${site.compliance.advertisingReviewNumber ? `<p>${e(site.compliance.advertisingReviewNumber)}${site.compliance.advertisingReviewExpiresAt ? ` · 유효기간 ${e(site.compliance.advertisingReviewExpiresAt)}` : ''}</p>` : ''}<p>상담 요청은 보험 가입 신청이 아닙니다. 계약 전 상품설명서와 약관을 확인해 주세요.</p><div class="footer-bottom"><p>© ${new Date().getUTCFullYear()} ${e(site.agent.name)} · ${site.demo?.enabled ? '디자인 예시' : '보험 상담 안내'}</p><a href="/privacy">개인정보·외부 연결 안내</a></div></div></div></footer>`;
+  return `<footer class="site-footer footer-${pattern}" id="footer" data-pattern="footer-${pattern}"><div class="container"><div class="footer-top"><div class="footer-identity"><h2>${e(site.footer?.heading || `${site.agent.name || '담당자'} 보험상담`)}</h2>${pattern === 'columns' ? note : business + note}</div>${pattern === 'columns' ? `<div class="footer-business">${business}</div>` : ''}<div class="footer-contact"><p>${e(site.contact.phone)}${email ? `<br><a data-email-link href="${e(email)}">${e(site.contact.email!)}</a>` : ''}${site.contact.fax?.trim() ? `<br>팩스 ${e(site.contact.fax)}` : ''}<br>상담 시간 ${e(site.contact.availableHours)}</p>${renderContactButtons(site, true)}</div></div><div class="footer-legal"><p>${e(site.compliance.footerDisclaimer)}</p>${site.compliance.advertisingReviewNumber ? `<p>${e(site.compliance.advertisingReviewNumber)}${site.compliance.advertisingReviewExpiresAt ? ` · 유효기간 ${e(site.compliance.advertisingReviewExpiresAt)}` : ''}</p>` : ''}<p>상담 요청은 보험 가입 신청이 아닙니다. 계약 전 상품설명서와 약관을 확인해 주세요.</p><div class="footer-bottom"><p>© ${new Date().getUTCFullYear()} ${e(site.agent.name)} · ${site.demo?.enabled ? '디자인 예시' : '보험 상담 안내'}</p><a href="/privacy">개인정보·외부 연결 안내</a></div></div></div></footer>`;
 }
 
 export function renderMobileCta(site: SiteConfig): string {

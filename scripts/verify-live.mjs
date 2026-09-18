@@ -12,14 +12,13 @@ for(let attempt=1;attempt<=30;attempt++){
    assert.ok(html.includes('data-design-version="clear-human-v1"'));assert.ok(html.includes('data-contact-version="direct-v1"'));
    assert.ok(html.includes(`data-layout="${theme}" data-palette="${palette}"`));assert.ok(html.includes('href="tel:01041877511"'));
    assert.ok(html.includes('href="https://open.kakao.com/o/sH6OIpKi"'));assert.ok(!html.includes('data-contact-form'));
-   assert.ok(html.includes('.premium-page .premium-hero:not(.hero-statement)'));
-   assert.ok(html.includes('.premium-page .services-split{grid-template-columns:repeat(2,minmax(0,1fr))'));
+   assert.ok(html.includes('data-typography-version="balanced-v2"'));
    assert.ok(html.includes('.premium-page .adviser-card p,.premium-page .adviser-card span{color:var(--detail)}'));
   }
   const gallery=await get('/templates');shared(gallery);for(const theme of themes)assert.ok(gallery.includes(`href="/?theme=${theme}"`));for(const palette of palettes)assert.ok(gallery.includes(`name="palette" value="${palette}"`));
   const privacy=await get('/privacy');shared(privacy);assert.ok(privacy.includes('오픈채팅'));
   const studio=await get('/studio');assert.ok(studio.includes('id="guided-preview"'));assert.ok(studio.includes('id="guided-bootstrap"'));
-  const bundle=await get('/assets/guided-studio.js');assert.ok(bundle.length>10000);assert.ok(bundle.includes('copy-choice'));
+  const bundle=await get('/assets/guided-studio.js');assert.ok(bundle.length>10000);assert.ok(bundle.includes('copy-choice'));assert.ok(bundle.includes('contact.email'));assert.ok(bundle.includes('contact.fax'));
   assert.ok((await get('/proposal')).includes('보험사'));
   const retired=await fetch(new URL('/api/consultations',origin),{method:'POST',headers:{'content-type':'application/json'},body:'{}',signal:AbortSignal.timeout(15000)});
   assert.equal(retired.status,410);assert.equal((await retired.json()).code,'DIRECT_CONTACT_ONLY');

@@ -40,7 +40,7 @@ export interface SiteConfig {
   intro: { title: string; body: string; mobileTitle?: string; mobileBody?: string; philosophy?: string; };
   specialties: ContentCard[]; process: ContentCard[]; career: string[]; reviews?: ReviewItem[]; faqs: FaqItem[];
   consultation?: { topics: string[] };
-  contact: { phone: string; kakaoUrl?: string; instagramUrl?: string; email?: string; formEmail?: string; officeAddress?: string; mapUrl?: string; availableHours: string; };
+  contact: { phone: string; kakaoUrl?: string; instagramUrl?: string; email?: string; fax?: string; formEmail?: string; officeAddress?: string; mapUrl?: string; availableHours: string; };
   sections: { career: boolean; process: boolean; reviews?: boolean; faq: boolean; location: boolean; contactForm: boolean; };
   seo: { title: string; description: string; ogImage?: string; noIndex?: boolean; };
   compliance: { advertisingReviewStatus: AdvertisingReviewStatus; advertisingReviewNumber?: string; advertisingReviewExpiresAt?: string; footerDisclaimer: string; privacyOfficer: string; privacyRetentionPeriod: string; contentTruthConfirmed: boolean; photoUseConfirmed: boolean; publicationConfirmed: boolean; };

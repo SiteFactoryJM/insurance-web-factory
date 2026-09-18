@@ -1,4 +1,4 @@
-import { directPhoneHref, openChatUrl } from '../utils/contact-links.js';
+import { directEmailHref, directPhoneHref, openChatUrl } from '../utils/contact-links.js';
 import { DESIGN_SECTION_IDS, HEADING_FONT_IDS, PALETTE_IDS, TEMPLATE_IDS, type DesignSectionId, type SiteConfig } from "../types.js";
 import { COPY_LIBRARY } from '../content/copy-library.js';
 import { DESIGN_VERSION } from '../render/design-system.js';
@@ -68,7 +68,7 @@ const urlRule = (optional = true): Rule => ({ ...text(2048, optional), check: va
   try { const url = new URL(value); if (["https:", "http:"].includes(url.protocol) && !url.username && !url.password && !/[\u0000-\u0020<>]/.test(value)) return; } catch { /* invalid URL */ }
   return "http 또는 https 주소를 입력하세요.";
 } });
-const emailRule = { ...text(254, true), check: (value: string) => !value || /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(value) ? undefined : "이메일 주소를 확인하세요." };
+const emailRule = { ...text(254, true), check: (value: string) => !value || directEmailHref(value) ? undefined : "이메일 주소를 확인하세요." };
 
 /** Only raster uploads are accepted. The shipped SVG files are trusted static assets. */
 export function validateImageSource(value: string): string | undefined {
@@ -122,7 +122,9 @@ const siteRule = object({
   reviews: list(object({ quote: text(400), author: text(80), context: text(120, true), isExample: bool(true) }), 0, 12, true), faqs: list(faqRule),
   consultation: object({ topics: list(text(60), 1, 12, false, true) }, true),
   contact: object({ phone: { ...text(32), check: value => directPhoneHref(value) ? undefined : "연결 가능한 전화번호를 숫자와 +, -, 괄호로 입력하세요." },
-    kakaoUrl: urlRule(), instagramUrl: urlRule(), email: emailRule, formEmail: emailRule, officeAddress: text(240, true), mapUrl: urlRule(), availableHours: text(100) }),
+    kakaoUrl: urlRule(), instagramUrl: urlRule(), email: emailRule,
+    fax: { ...text(32, true), check: value => !value || directPhoneHref(value) ? undefined : "팩스번호를 숫자와 +, -, 괄호로 입력하세요." },
+    formEmail: emailRule, officeAddress: text(240, true), mapUrl: urlRule(), availableHours: text(100) }),
   sections: object({ career: bool(), process: bool(), reviews: bool(true), faq: bool(), location: bool(), contactForm: bool() }),
   seo: object({ title: text(120), description: text(300), ogImage: imageRule(true), noIndex: bool(true) }),
   compliance: object({ advertisingReviewStatus: choice(["pending", "approved", "not-required"]), advertisingReviewNumber: text(120, true), advertisingReviewExpiresAt: text(40, true),
