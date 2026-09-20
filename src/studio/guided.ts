@@ -80,19 +80,47 @@ function closePreview(): void {
 function readScroll(): number {
   try { return frame.contentWindow?.scrollY || 0; } catch { return 0; }
 }
+function settlePreview(section: string | undefined, scroll: number): void {
+  fitPreview();
+  try {
+    const target = section ? frame.contentDocument?.getElementById(section) : null;
+    if (target) target.scrollIntoView({ behavior: 'auto', block: 'start' });
+    else frame.contentWindow?.scrollTo(0, scroll);
+  } catch { /* 다른 출처 문서면 위치만 포기하고 화면은 유지합니다. */ }
+}
+/**
+ * 첫 미리보기만 srcdoc으로 로드합니다. 이후에는 같은 Document 안에서 head/body를
+ * 교체합니다. 편집할 때마다 iframe navigation을 반복하면 빠른 레이아웃 비교 중
+ * 접근성 도구와 브라우저가 이전 execution context를 붙잡을 수 있기 때문입니다.
+ * Document 자체를 유지하면 기존 preview용 document event listener도 그대로 살아 있습니다.
+ */
+function patchPreviewDocument(html: string, section: string | undefined, scroll: number): boolean {
+  try {
+    const current = frame.contentDocument;
+    if (!current?.body || current.body.dataset.studioPreview !== 'true') return false;
+    const next = new DOMParser().parseFromString(html, 'text/html');
+    next.body.querySelectorAll('script').forEach(script => script.remove());
+    const nextHead = Array.from(next.head.childNodes).map(node => current.importNode(node, true));
+    current.head.replaceChildren(...nextHead);
+    current.body.replaceWith(current.importNode(next.body, true));
+    current.documentElement.lang = next.documentElement.lang || 'ko';
+    const nextStyle = next.documentElement.getAttribute('style');
+    if (nextStyle) current.documentElement.setAttribute('style', nextStyle);
+    else current.documentElement.removeAttribute('style');
+    settlePreview(section, scroll);
+    return true;
+  } catch {
+    return false;
+  }
+}
 function preview(section?: string): void {
   window.clearTimeout(previewTimer);
   previewTimer = window.setTimeout(() => {
     const scroll = readScroll();
-    frame.onload = () => {
-      fitPreview();
-      try {
-        const target = section ? frame.contentDocument?.getElementById(section) : null;
-        if (target) target.scrollIntoView({ behavior: 'auto', block: 'start' });
-        else frame.contentWindow?.scrollTo(0, scroll);
-      } catch { /* 다른 출처 문서면 위치만 포기하고 화면은 유지합니다. */ }
-    };
-    frame.srcdoc = renderSitePage(site, new Request(`${location.origin}/`), {studioPreview: true});
+    const html = renderSitePage(site, new Request(`${location.origin}/`), {studioPreview: true});
+    if (patchPreviewDocument(html, section, scroll)) return;
+    frame.onload = () => settlePreview(section, scroll);
+    frame.srcdoc = html;
   }, 160);
 }
 function changed(section?: string): void {
