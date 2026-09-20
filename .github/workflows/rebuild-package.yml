@@ -1,0 +1,30 @@
+name: Rebuild source package
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run check
+      - name: Create source ZIP
+        run: |
+          mkdir -p out
+          git archive --format=zip --output=out/insurance-web-factory-figma-clear-human.zip HEAD
+      - uses: actions/upload-artifact@v4
+        with:
+          name: insurance-web-factory-figma-clear-human
+          path: out/insurance-web-factory-figma-clear-human.zip
+          retention-days: 7
