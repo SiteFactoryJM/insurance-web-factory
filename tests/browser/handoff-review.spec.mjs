@@ -92,41 +92,59 @@ test('consumer sections group headings and copy within balanced reading widths',
 });
 
 
-test('adviser principles, header title and service rules stay consistent', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto('/?theme=warm-care');
-  await page.evaluate(() => document.fonts.ready);
+test('intro principle stays concise and service rules are consistent across all five themes', async ({ page }) => {
+  test.setTimeout(120000);
+  const themes = ['trust-blue', 'warm-care', 'premium-navy', 'clean-minimal', 'local-friendly'];
 
+  for (const theme of themes) {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto(`/?theme=${theme}`);
+    await page.evaluate(() => document.fonts.ready);
+
+    const cards = page.locator('.service-grid .service-card');
+    expect(await cards.count(), `${theme} service card count`).toBeGreaterThanOrEqual(3);
+    const rules = await cards.evaluateAll(items => items.map(el => {
+      const style = getComputedStyle(el);
+      const accent = getComputedStyle(el, '::after');
+      return {
+        top: style.borderTopWidth,
+        left: style.borderLeftWidth,
+        right: style.borderRightWidth,
+        bottom: style.borderBottomWidth,
+        accent: accent.borderTopWidth,
+        opacity: Number(accent.opacity),
+        overflow: el.scrollWidth > el.clientWidth,
+      };
+    }));
+    expect(rules.every(rule => rule.top === '1px' && rule.left === '0px' && rule.right === '0px' && rule.bottom === '0px'), `${theme} baseline rules`).toBe(true);
+    expect(rules.every(rule => rule.accent === '3px' && rule.opacity === 0 && !rule.overflow), `${theme} accent rules`).toBe(true);
+
+    await cards.first().hover();
+    await expect.poll(() => cards.first().evaluate(el => Number(getComputedStyle(el, '::after').opacity))).toBeGreaterThan(0.9);
+
+    if (theme === 'premium-navy') {
+      const surfaces = await cards.evaluateAll(items => items.slice(0,2).map(el => getComputedStyle(el).backgroundColor));
+      expect(new Set(surfaces).size, 'premium-navy first card should not become a boxed exception').toBe(1);
+    }
+  }
+
+  await page.goto('/?theme=warm-care');
   const headerRole = (await page.locator('.brand-service').textContent())?.trim();
   expect(headerRole).toBeTruthy();
   expect(headerRole).not.toBe('보험상담');
 
-  const principles = page.locator('.adviser-principles');
-  await expect(principles).toBeVisible();
-  await expect(principles.locator('.adviser-principles-list > li')).toHaveCount(4);
-  expect(await principles.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
-
-  await page.goto('/?theme=clean-minimal');
-  const cards = page.locator('.services-cards .service-card');
-  expect(await cards.count()).toBeGreaterThanOrEqual(4);
-  const defaultRule = await cards.first().evaluate(el => {
-    const style = getComputedStyle(el);
-    const accent = getComputedStyle(el, '::after');
-    return { borderTopWidth: style.borderTopWidth, accentOpacity: accent.opacity, accentWidth: accent.borderTopWidth };
-  });
-  expect(defaultRule.borderTopWidth).toBe('1px');
-  expect(Number(defaultRule.accentOpacity)).toBe(0);
-  expect(defaultRule.accentWidth).toBe('3px');
-
-  await cards.first().hover();
-  await expect.poll(() => cards.first().evaluate(el => Number(getComputedStyle(el, '::after').opacity))).toBeGreaterThan(0.9);
+  const principle = page.locator('.adviser-principle');
+  await expect(principle).toBeVisible();
+  await expect(principle.locator('h3')).toHaveCount(1);
+  await expect(principle.locator('.adviser-principle-body')).toHaveCount(1);
+  expect(await principle.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
 
   await page.setViewportSize({ width: 390, height: 1000 });
   await page.goto('/?theme=warm-care');
-  const mobilePrinciples = await page.locator('.adviser-principles-list').evaluate(el => ({
-    columns: getComputedStyle(el).gridTemplateColumns,
+  const mobile = await page.locator('.adviser-principle').evaluate(el => ({
     overflow: el.scrollWidth > el.clientWidth,
+    copyDisplay: getComputedStyle(el.querySelector('.adviser-principle-copy')).display,
   }));
-  expect(mobilePrinciples.overflow).toBe(false);
-  expect(mobilePrinciples.columns.split(' ').length).toBe(1);
+  expect(mobile.overflow).toBe(false);
+  expect(mobile.copyDisplay).toBe('block');
 });
