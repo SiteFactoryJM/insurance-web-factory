@@ -83,7 +83,7 @@ export async function createReviewPdf(project: StudioProject, captures: PreviewC
   ['이 문서는 화면과 문구를 눈으로 확인하는 인쇄본입니다.', '내보내기만으로는 누구에게도 전송되거나 공개되지 않습니다.', '받은 압축 파일은 풀지 말고 그대로 제작 담당자에게 전달해 주세요.'].forEach((line,index) => cover.drawText(line,{x:margin+20,y:210-index*27,size:10.5,font,color:color(palette.ink)}));
 
   for (const capture of captures) {
-    const image = await pdf.embedPng(capture.png);
+    const image = await pdf.embedJpg(capture.png);
     const availableWidth = A4[0] - margin * 2;
     const contentTop = A4[1] - 58, contentBottom = 38;
     const availableHeight = contentTop - contentBottom;

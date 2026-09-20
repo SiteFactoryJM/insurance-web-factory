@@ -35,16 +35,20 @@ async function captureDevice(site: SiteConfig, device: PreviewCapture['device'],
     const page = frame.contentDocument;
     if (!page) throw new Error('출력용 페이지를 준비하지 못했습니다.');
     page.documentElement.style.scrollBehavior = 'auto';
+    page.body.dataset.exportCapture = 'true';
+    const captureStyle = page.createElement('style');
+    captureStyle.textContent = '*{animation:none!important;transition:none!important;caret-color:transparent!important}';
+    page.head.append(captureStyle);
     page.querySelectorAll<HTMLDetailsElement>('#faq details').forEach(details => { details.open = true; });
     await ready(page);
     const target = page.body;
     const height = Math.max(page.documentElement.scrollHeight, target.scrollHeight);
     if (height <= 1) throw new Error(`${device} 디자인을 캡처하지 못했습니다.`);
-    const canvas = await html2canvas(target, {
-      backgroundColor: '#ffffff', logging: false, scale: width <= 390 ? 1.5 : 1,
+    const canvas = await waitFor(html2canvas(target, {
+      backgroundColor: '#ffffff', logging: false, scale: width <= 390 ? 1 : .75,
       useCORS: true, width, height, windowWidth: width, windowHeight: height, scrollX: 0, scrollY: 0,
-    });
-    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
+    }), `${device} 디자인 캡처 시간이 초과되었습니다.`, 30000);
+    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', .9));
     if (!blob) throw new Error('디자인 캡처 이미지를 만들지 못했습니다.');
     const scaleY = canvas.height / height;
     const breakpoints = [...page.querySelectorAll<HTMLElement>('header,#main>*,#main article,#main li,#main details,#main p,#main h1,#main h2,#main h3,footer')]
