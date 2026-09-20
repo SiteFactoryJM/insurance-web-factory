@@ -19,7 +19,7 @@ const heading = (kicker: string, title: string, mobile?: string, description = '
 
 function heroVisual(site: SiteConfig): string {
   if (site.template === 'trust-blue') {
-    return `<div class="hero-visual hero-portrait-only"><figure class="portrait-figure">${profile(site, '', true)}</figure><p class="portrait-caption">${e(site.agent.name || '담당자')} ${e(site.agent.title)} · ${e(site.agent.company)}</p></div>`;
+    return `<div class="hero-visual hero-portrait-only"><figure class="portrait-figure">${profile(site, '', true)}</figure><p class="portrait-caption">${e(site.agent.name || '담당자')} ${e(site.agent.title)} · ${e(site.agent.company)}</p>${adviserCard(site)}</div>`;
   }
   if (site.template === 'warm-care') {
     return `<div class="hero-visual hero-profile-stack"><figure class="portrait-figure">${profile(site, '', true)}</figure>${adviserCard(site)}</div>`;
@@ -60,7 +60,7 @@ function about(site: SiteConfig): string {
 
   let layout = '';
   if (site.template === 'trust-blue') {
-    layout = `<div class="about-copy-column">${intro}${aboutBody(site, false)}</div>${adviserCard(site)}`;
+    layout = `<div class="about-copy-column">${intro}${aboutBody(site)}</div>`;
   } else if (pattern === 'profile') {
     layout = `${image}<div class="about-profile-copy">${intro}${aboutBody(site)}</div>`;
   } else if (site.template === 'premium-navy') {
