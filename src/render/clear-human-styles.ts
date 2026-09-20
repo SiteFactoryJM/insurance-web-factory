@@ -364,7 +364,7 @@ body[data-layout="trust-blue"] .process-timeline li{display:block;min-height:210
 body[data-layout="trust-blue"] .process-timeline li>div{display:block}
 body[data-layout="trust-blue"] .process-timeline li h3{margin-top:24px}
 @media(min-width:651px){
-  .premium-page #specialties{width:min(1120px,calc(100% - 96px));margin-inline:auto}
+  .premium-page #main #specialties{width:min(1120px,calc(100% - 96px));margin-left:auto;margin-right:auto}
   .premium-page #specialties>.container{width:100%}
 }
 
