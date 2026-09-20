@@ -147,7 +147,7 @@ p{overflow-wrap:anywhere}.g-skip{position:absolute;left:16px;top:-100px;z-index:
 /* Tablet: one work surface at a time, while keeping all hooks and full preview. */
 @media(max-width:1179px){
   .g-top{padding-inline:24px}.g-top nav{display:none}.g-scope{white-space:normal;text-align:right}
-  .g-layout{height:auto;min-height:calc(100vh - 180px);display:block;padding:16px 24px 24px;overflow:visible}
+  .g-layout{height:auto;min-height:calc(100vh - 180px);flex:0 0 auto;display:block;padding:16px 24px 24px;overflow:visible}
   .g-steps{position:sticky;top:0;z-index:40;height:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px 0;background:var(--canvas)}
   .g-step-label,.g-step-safety{grid-column:1/-1}.g-steps .g-bigview{grid-column:1/-1}
   .g-steps button{text-align:center;padding:0 10px}
