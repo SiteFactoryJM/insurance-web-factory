@@ -4,7 +4,8 @@ import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { createProject, createStudioExample, parseProject, validateProjectSite, validateImageSource, isSectionEnabled, MAX_PROJECT_BYTES, MAX_IMAGE_BYTES } from "../.preview-dist/studio/project.js";
-import { HEADING_FONT_IDS } from "../.preview-dist/types.js";
+import { HEADING_FONT_IDS, INTRO_PRINCIPLE_LAYOUT_IDS } from "../.preview-dist/types.js";
+import { COPY_LIBRARY } from "../.preview-dist/content/copy-library.js";
 import { BODY_FONT, HEADING_FONTS, fontStylesheetLinks, headingFont, headingFontStyle } from "../.preview-dist/render/fonts.js";
 import { importStudioProject } from "../scripts/import-studio.mjs";
 import { validateContentLengths, validateDesignConfiguration, validateSectionContent } from "../scripts/validate-sites.mjs";
@@ -48,6 +49,18 @@ test("DIY JSON round-trip preserves chosen patterns, mobile copy, footer and cus
   assert.equal(restored.site.agent.businessNumber, "123-45-67890");
   assert.equal(restored.site.contact.email, "advisor+vip@example.com");
   assert.equal(restored.site.contact.fax, "02-1234-5678");
+});
+
+test("sixteen intro choices keep distinct principle copy and layouts", () => {
+  assert.equal(COPY_LIBRARY.intros.length, 16);
+  assert.equal(INTRO_PRINCIPLE_LAYOUT_IDS.length, 16);
+  assert.equal(new Set(COPY_LIBRARY.intros.map(item => item.principleTitle)).size, 16);
+  assert.equal(new Set(COPY_LIBRARY.intros.map(item => item.principleBody)).size, 16);
+  assert.deepEqual(COPY_LIBRARY.intros.map(item => item.principleLayout), [...INTRO_PRINCIPLE_LAYOUT_IDS]);
+  for (const item of COPY_LIBRARY.intros) {
+    assert.ok(item.principleTitle.length <= 80);
+    assert.ok(item.principleBody.length <= 240);
+  }
 });
 
 test("all six licensed heading choices survive export, restore and source validation", () => {
