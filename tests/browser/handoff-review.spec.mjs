@@ -119,8 +119,7 @@ test('adviser principles, header title and service rules stay consistent', async
   expect(defaultRule.accentWidth).toBe('3px');
 
   await cards.first().hover();
-  const hoverOpacity = await cards.first().evaluate(el => Number(getComputedStyle(el, '::after').opacity));
-  expect(hoverOpacity).toBeGreaterThan(0.9);
+  await expect.poll(() => cards.first().evaluate(el => Number(getComputedStyle(el, '::after').opacity))).toBeGreaterThan(0.9);
 
   await page.setViewportSize({ width: 390, height: 1000 });
   await page.goto('/?theme=warm-care');
