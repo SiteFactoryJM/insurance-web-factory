@@ -341,6 +341,7 @@ body[data-layout="local-friendly"] .contact-section .contact-grid{grid-template-
 /* Compatibility / accessibility guardrails for legacy layers and export capture. */
 .premium-page .site-footer p,.premium-page .site-footer dt,.premium-page .site-footer dd,.premium-page .site-footer a{color:var(--muted)}
 .premium-page .site-footer h2,.premium-page .site-footer strong{color:var(--ink)}
+.premium-page .site-footer .footer-note{color:var(--muted)}
 .premium-page .about-section .adviser-card p,.premium-page .about-section .adviser-card a{color:var(--on-brand)}
 .premium-page .about-section .adviser-card .adviser-role,.premium-page .about-section .adviser-card .adviser-org,.premium-page .about-section .adviser-card .adviser-hours{color:var(--detail)}
 .premium-page .services-split .service-card:first-child{grid-row:auto;display:grid;grid-template-columns:44px minmax(0,1fr);grid-template-rows:auto 1fr;gap:10px 16px;justify-content:initial;min-height:190px;padding:28px;background:var(--paper);border:1px solid var(--line)}
