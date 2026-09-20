@@ -71,7 +71,7 @@ p{overflow-wrap:anywhere}.g-skip{position:absolute;left:16px;top:-100px;z-index:
 .g-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:0 24px;border:1px solid var(--control);border-radius:var(--radius);background:#fff;text-decoration:none;font-size:1.125rem;line-height:28px;font-weight:700}
 .g-btn-primary{background:var(--brand);border-color:var(--brand);color:#fff}.g-btn-primary:hover{background:var(--brand-hover);border-color:var(--brand-hover)}
 .g-tools{display:flex;flex-wrap:wrap;gap:12px}
-.g-check{display:flex;align-items:flex-start;gap:10px;margin:16px 0}.g-check input{width:20px;height:20px;min-height:0;flex:0 0 20px;margin-top:4px;accent-color:var(--brand)}
+.g-check{display:flex;align-items:flex-start;gap:10px;margin:16px 0}.g-check input{width:24px;height:24px;min-width:24px;min-height:24px;flex:0 0 24px;margin-top:1px;accent-color:var(--brand)}
 .g-check small{display:block;color:var(--muted);font-size:.9375rem;line-height:1.6}
 
 /* Palette = 3x2 Figma buttons. Layout = five stacked options. */
@@ -100,7 +100,7 @@ p{overflow-wrap:anywhere}.g-skip{position:absolute;left:16px;top:-100px;z-index:
 .g-copy-search .g-field{margin:0}.g-copy-search #choice-help{grid-column:1/-1;margin:0}
 .g-choice-list{display:grid;gap:10px;max-height:460px;overflow:auto;overscroll-behavior:contain;padding:4px}
 .g-choice{display:flex;gap:12px;align-items:flex-start;padding:16px;border:1px solid var(--line);background:#fff;cursor:pointer}
-.g-choice input{width:19px;height:19px;min-height:0;flex:0 0 19px;margin-top:4px;accent-color:var(--brand)}
+.g-choice input{width:24px;height:24px;min-width:24px;min-height:24px;flex:0 0 24px;margin-top:1px;accent-color:var(--brand)}
 .g-choice strong{display:block;margin-bottom:5px;white-space:pre-line}.g-choice p{margin:0;color:var(--muted);font-size:1rem;line-height:26px;white-space:pre-line}
 .g-choice:has(input:checked){background:var(--soft);border-color:var(--brand)}
 .g-tag{display:inline-block;margin-bottom:6px;padding:1px 7px;border:1px solid var(--control);color:var(--brand);font-size:.875rem}
