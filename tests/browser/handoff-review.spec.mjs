@@ -90,3 +90,44 @@ test('consumer sections group headings and copy within balanced reading widths',
   expect(new Set(layout.steps.map(step => Math.round(step.top))).size).toBe(1);
   expect(Math.max(...layout.steps.map(step => step.width)) - Math.min(...layout.steps.map(step => step.width))).toBeLessThanOrEqual(1);
 });
+
+
+test('adviser principles, header title and service rules stay consistent', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/?theme=warm-care');
+  await page.evaluate(() => document.fonts.ready);
+
+  const headerRole = (await page.locator('.brand-service').textContent())?.trim();
+  expect(headerRole).toBeTruthy();
+  expect(headerRole).not.toBe('보험상담');
+
+  const principles = page.locator('.adviser-principles');
+  await expect(principles).toBeVisible();
+  await expect(principles.locator('.adviser-principles-list > li')).toHaveCount(4);
+  expect(await principles.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+
+  await page.goto('/?theme=clean-minimal');
+  const cards = page.locator('.services-cards .service-card');
+  expect(await cards.count()).toBeGreaterThanOrEqual(4);
+  const defaultRule = await cards.first().evaluate(el => {
+    const style = getComputedStyle(el);
+    const accent = getComputedStyle(el, '::after');
+    return { borderTopWidth: style.borderTopWidth, accentOpacity: accent.opacity, accentWidth: accent.borderTopWidth };
+  });
+  expect(defaultRule.borderTopWidth).toBe('1px');
+  expect(Number(defaultRule.accentOpacity)).toBe(0);
+  expect(defaultRule.accentWidth).toBe('3px');
+
+  await cards.first().hover();
+  const hoverOpacity = await cards.first().evaluate(el => Number(getComputedStyle(el, '::after').opacity));
+  expect(hoverOpacity).toBeGreaterThan(0.9);
+
+  await page.setViewportSize({ width: 390, height: 1000 });
+  await page.goto('/?theme=warm-care');
+  const mobilePrinciples = await page.locator('.adviser-principles-list').evaluate(el => ({
+    columns: getComputedStyle(el).gridTemplateColumns,
+    overflow: el.scrollWidth > el.clientWidth,
+  }));
+  expect(mobilePrinciples.overflow).toBe(false);
+  expect(mobilePrinciples.columns.split(' ').length).toBe(1);
+});

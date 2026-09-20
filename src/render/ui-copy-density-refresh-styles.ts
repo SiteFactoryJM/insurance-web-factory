@@ -18,26 +18,41 @@ export const uiCopyDensityRefreshStyles = `
 .premium-page #main .cases-badge{font-size:1rem;line-height:1.35}
 .premium-page #main .cases-item:hover{transform:none;box-shadow:none}
 
-/* Clean Minimal: only interior rules, no boxed outer cards. */
-.theme-clean-minimal #main .services-cards[data-count="6"]{
- display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:0;
-}
-.theme-clean-minimal #main .services-cards[data-count="6"] .service-card:nth-child(n){
- grid-column:auto!important;width:auto;min-height:0!important;justify-self:stretch;
- padding:26px 30px!important;border:0!important;background:transparent!important;
- box-shadow:none!important;transform:none!important;overflow:visible;
-}
-.theme-clean-minimal #main .services-cards[data-count="6"] .service-card:nth-child(3n+2),
-.theme-clean-minimal #main .services-cards[data-count="6"] .service-card:nth-child(3n+3){
- border-left:1px solid var(--line)!important;
-}
-.theme-clean-minimal #main .services-cards[data-count="6"] .service-card:nth-child(n+4){
+/* Service topics: consistent hairline first, stronger top rule only on hover/focus.
+   These are informational cards, so the state does not add lift, pointer cues, or shadow. */
+.premium-page #main .services-cards[data-count] .service-card,
+.premium-page #main .services-split[data-count] .service-card,
+.premium-page #main .services-split[data-count] .service-card:first-child{
+ position:relative;overflow:hidden;
  border-top:1px solid var(--line)!important;
+ box-shadow:none!important;transform:none!important;
 }
-.theme-clean-minimal #main .services-cards[data-count="6"] .service-card::after{display:none}
-.theme-clean-minimal #main .services-cards[data-count="6"] .service-card:hover,
-.theme-clean-minimal #main .services-cards[data-count="6"] .service-card:focus-within{
- background:transparent!important;border-color:var(--line)!important;box-shadow:none!important;transform:none!important;
+.premium-page #main .service-card::after{
+ display:block!important;
+ left:0;right:0;top:0;
+ border-top:3px solid var(--accent);
+ opacity:0;transform:scaleX(.86);transform-origin:center;
+ transition:opacity .18s ease,transform .2s ease;
+ pointer-events:none;
+}
+.premium-page #main .service-card:hover::after,
+.premium-page #main .service-card:focus-within::after{
+ opacity:1;transform:scaleX(1);
+}
+.premium-page #main .service-card:hover,
+.premium-page #main .service-card:focus-within{
+ transform:none!important;box-shadow:none!important;
+}
+.theme-clean-minimal #main .services-cards[data-count]{
+ gap:18px 24px;border-top:0;
+}
+.theme-clean-minimal #main .services-cards[data-count] .service-card:nth-child(n){
+ min-height:0!important;
+ padding:24px 4px!important;
+ border-left:0!important;border-right:0!important;border-bottom:0!important;
+ border-top:1px solid var(--line)!important;
+ background:transparent!important;
+ box-shadow:none!important;transform:none!important;overflow:hidden;
 }
 
 /* About stays editorial; identity facts now live where the user can act on them. */
@@ -46,6 +61,47 @@ export const uiCopyDensityRefreshStyles = `
 }
 .premium-page #main .about-editorial .about-copy>p{max-width:46rem}
 .premium-page #main .about-editorial .agent-meta{max-width:46rem;margin:18px auto 0}
+
+/* Adviser principles: typography-led trust content, not another boxed card section. */
+.premium-page #main .adviser-principles{
+ margin-top:30px;padding-top:24px;border-top:1px solid var(--line);
+}
+.premium-page #main .adviser-principles-intro{max-width:46rem}
+.premium-page #main .adviser-principles-intro .eyebrow{
+ margin:0 0 8px;font-size:var(--ch-small);line-height:var(--ch-small-lh);
+}
+.premium-page #main .adviser-principles-intro h3{
+ margin:0;max-width:42rem;
+ font-size:clamp(1.25rem,2vw,1.5rem);line-height:1.5;
+ font-weight:700;letter-spacing:-.025em;text-wrap:balance;
+}
+.premium-page #main .adviser-principles-intro>p:last-child{
+ margin:10px 0 0;max-width:44rem;
+ font-size:var(--ch-body);line-height:1.7;color:var(--muted);
+}
+.premium-page #main .adviser-principles-list{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:18px 22px;margin:24px 0 0;padding:0;list-style:none;
+}
+.premium-page #main .adviser-principles-list li{
+ display:grid;grid-template-columns:28px minmax(0,1fr);
+ gap:12px;align-items:start;min-width:0;
+ padding:14px 0 0;border-top:1px solid var(--line);
+}
+.premium-page #main .principle-index{
+ padding-top:2px;font-size:var(--ch-small);line-height:1.5;
+ font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;
+}
+.premium-page #main .adviser-principles-list h4{
+ margin:0;font-size:1.1875rem;line-height:1.5;
+ font-weight:700;letter-spacing:-.02em;color:var(--ink);text-wrap:balance;
+}
+.premium-page #main .adviser-principles-list p{
+ margin:6px 0 0;font-size:1.0625rem;line-height:1.7;
+ color:var(--muted);text-wrap:pretty;
+}
+.premium-page #main .about-profile .about-copy{margin-top:24px}
+.premium-page #main .about-profile .adviser-principles{margin-top:28px}
 
 /* Contact panel becomes the single factual identity block. */
 .premium-page #main .direct-contact-details .contact-identity dd{
@@ -73,10 +129,6 @@ export const uiCopyDensityRefreshStyles = `
 }
 
 @media(max-width:900px) and (min-width:651px){
- .theme-clean-minimal #main .services-cards[data-count="6"]{grid-template-columns:repeat(2,minmax(0,1fr))}
- .theme-clean-minimal #main .services-cards[data-count="6"] .service-card:nth-child(n){border:0!important;padding:24px 26px!important}
- .theme-clean-minimal #main .services-cards[data-count="6"] .service-card:nth-child(even){border-left:1px solid var(--line)!important}
- .theme-clean-minimal #main .services-cards[data-count="6"] .service-card:nth-child(n+3){border-top:1px solid var(--line)!important}
 }
 
 @media(max-width:650px){
@@ -87,14 +139,15 @@ export const uiCopyDensityRefreshStyles = `
  }
  .premium-page #main .cases-copy h3{font-size:1.0625rem}
  .premium-page #main .cases-item p{font-size:1rem}
- .theme-clean-minimal #main .services-cards[data-count="6"]{grid-template-columns:minmax(0,1fr)}
- .theme-clean-minimal #main .services-cards[data-count="6"] .service-card:nth-child(n){
-  border:0!important;padding:22px 4px!important;
- }
- .theme-clean-minimal #main .services-cards[data-count="6"] .service-card+ .service-card{
-  border-top:1px solid var(--line)!important;
- }
  .theme-clean-minimal #main .hero-statement .hero-topics{width:100%}
+}
+
+@media(max-width:650px){
+ .premium-page #main .adviser-principles{margin-top:24px;padding-top:20px}
+ .premium-page #main .adviser-principles-list{grid-template-columns:minmax(0,1fr);gap:14px;margin-top:20px}
+ .premium-page #main .adviser-principles-list li{padding-top:13px}
+ .premium-page #main .adviser-principles-list h4{font-size:1.125rem}
+ .premium-page #main .adviser-principles-list p{font-size:1rem}
 }
 
 @media(max-width:380px){
