@@ -46,33 +46,17 @@ function services(site: SiteConfig): string {
   return `<section class="section container services-section" id="specialties" aria-labelledby="services-title"><div class="section-heading"><p class="eyebrow">상담 분야</p><h2 id="services-title">어떤 상담이 필요하신가요?</h2><p class="section-support">지금 필요한 항목부터 골라 보세요.</p></div><div class="service-grid services-${design.services}" data-pattern="services-${design.services}" data-count="${site.specialties.length}">${items}</div></section>`;
 }
 
-function consultationPrinciples(): string {
-  const items = [
-    {
-      title: '이해를 먼저 확인합니다',
-      body: '상품설명서와 약관을 기준으로 보장 범위와 납입 조건을 차분히 살펴봅니다.',
-    },
-    {
-      title: '유지 가능성을 함께 봅니다',
-      body: '현재 지출과 납입 기간을 함께 놓고 장기 유지에 필요한 조건을 점검합니다.',
-    },
-    {
-      title: '가입 후 확인할 절차도 안내합니다',
-      body: '계약 변경·갱신·보험금 청구 시 필요한 서류와 확인 순서를 안내합니다.',
-    },
-    {
-      title: '결정은 충분히 이해한 뒤',
-      body: '상담은 가입 신청과 별개이며, 설명과 관련 서류를 확인한 뒤 최종 결정하실 수 있도록 돕습니다.',
-    },
-  ];
-  return `<div class="adviser-principles" aria-labelledby="adviser-principles-title"><div class="adviser-principles-intro"><p class="eyebrow">상담 원칙</p><h3 id="adviser-principles-title">한 번의 가입보다, 이해하고 다시 확인할 수 있는 상담을 지향합니다.</h3><p>가입 전에는 조건을 충분히 이해할 수 있도록 함께 살펴보고, 가입 후에는 변경·갱신·보험금 청구처럼 확인이 필요한 절차를 차분히 안내합니다.</p></div><ol class="adviser-principles-list">${items.map((item, i) => `<li><span class="principle-index" aria-hidden="true">${formatIndex(i)}</span><div><h4>${e(item.title)}</h4><p>${e(item.body)}</p></div></li>`).join('')}</ol></div>`;
+function consultationPrinciple(site: SiteConfig): string {
+  const title = site.intro.principleTitle?.trim() || '설명보다 먼저, 이해할 내용을 정리합니다.';
+  const body = site.intro.principleBody?.trim() || '계약 조건을 확인하고 이해되지 않은 내용은 다시 질문한 뒤 결정할 수 있도록 안내합니다.';
+  const layout = site.intro.principleLayout || '01';
+  return `<aside class="adviser-principle principle-layout-${e(layout)}" aria-labelledby="adviser-principle-title"><div class="adviser-principle-copy"><p class="eyebrow">상담 원칙</p><h3 id="adviser-principle-title">${e(title)}</h3><p class="adviser-principle-body">${e(body)}</p></div></aside>`;
 }
-
 function about(site: SiteConfig): string {
   const pattern = getDesign(site).about;
   const extraFacts = `${site.agent.registrationNumber ? `<p><strong>설계사 등록번호</strong> ${e(site.agent.registrationNumber)}</p>` : ''}${site.agent.regions.length ? `<p><strong>상담 지역</strong> ${e(site.agent.regions.join(' · '))}</p>` : ''}`;
-  const body = `<div class="about-copy"><p>${copy(site.intro.body, site.intro.mobileBody)}</p>${site.sections.career && site.career.length ? `<ul class="career-list">${site.career.map(c => `<li>${e(c)}</li>`).join('')}</ul>` : ''}${extraFacts ? `<div class="agent-meta">${extraFacts}</div>` : ''}${consultationPrinciples()}</div>`;
-  const intro = `<div class="about-heading"><p class="eyebrow">담당자 소개</p><h2 id="about-title">${copy(naturalHeading(site.intro.title), naturalHeading(site.intro.mobileTitle))}</h2>${site.intro.philosophy ? `<p class="philosophy">${e(site.intro.philosophy)}</p>` : ''}</div>`;
+  const body = `<div class="about-copy"><p>${copy(site.intro.body, site.intro.mobileBody)}</p>${site.sections.career && site.career.length ? `<ul class="career-list">${site.career.map(c => `<li>${e(c)}</li>`).join('')}</ul>` : ''}${extraFacts ? `<div class="agent-meta">${extraFacts}</div>` : ''}${consultationPrinciple(site)}</div>`;
+  const intro = `<div class="about-heading"><p class="eyebrow">담당자 소개</p><h2 id="about-title">${copy(naturalHeading(site.intro.title), naturalHeading(site.intro.mobileTitle))}</h2>${site.intro.philosophy && !site.intro.principleTitle ? `<p class="philosophy">${e(site.intro.philosophy)}</p>` : ''}</div>`;
   const image = `<figure class="about-portrait">${profile(site)}<figcaption>${e(site.agent.name)} · ${e(site.agent.title)}</figcaption></figure>`;
   const layout = pattern === 'profile' ? `${image}<div>${intro}${body}</div>` : pattern === 'quote' ? `<div class="about-quote">${intro}<blockquote>${e(site.intro.philosophy || site.intro.title)}</blockquote>${body}</div>` : `${intro}${body}`;
   return `<section class="section about-section" id="about" aria-labelledby="about-title"><div class="container about-grid about-${pattern}" data-pattern="about-${pattern}">${layout}</div></section>`;
