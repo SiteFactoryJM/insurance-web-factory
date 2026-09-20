@@ -128,9 +128,6 @@ export const uiCopyDensityRefreshStyles = `
  max-width:40rem;margin:12px auto 0;text-align:center;
 }
 
-@media(max-width:900px) and (min-width:651px){
-}
-
 @media(max-width:650px){
  .premium-page #main .cases-section{padding-block:36px}
  .premium-page #main .cases-item{
@@ -158,5 +155,6 @@ export const uiCopyDensityRefreshStyles = `
 
 @media(prefers-reduced-motion:reduce){
  .premium-page #main .cases-track{animation:none!important}
+ .premium-page #main .service-card::after{transition:none!important}
 }
 `;
