@@ -75,7 +75,7 @@ export const clearHumanStyles = `
 .premium-page .design-controls{z-index:70}
 
 /* Header = Figma 88px identity / nav / contact. */
-.premium-page .site-header{position:relative;z-index:50;background:var(--surface);border-bottom:1px solid color-mix(in srgb,var(--line) 65%,transparent)}
+.premium-page .site-header{position:relative;z-index:50;background:var(--surface);border-bottom:1px solid var(--line)}
 .premium-page .header-inner{min-height:88px;display:flex;align-items:center;justify-content:space-between;gap:32px;padding-block:12px}
 .premium-page .brand{display:flex;align-items:center;gap:12px;min-width:0;text-decoration:none;color:var(--ink)}
 .premium-page .brand>span{display:flex;min-width:0;flex-direction:column}
@@ -338,6 +338,32 @@ body[data-layout="local-friendly"] .hero-copy{padding-top:32px}
 body[data-layout="local-friendly"] .services-cards .service-card{border-top:0;border-bottom:1px solid var(--line)}
 body[data-layout="local-friendly"] .contact-section .contact-grid{grid-template-columns:1fr 1fr}
 
+/* Compatibility / accessibility guardrails for legacy layers and export capture. */
+.premium-page .site-footer p,.premium-page .site-footer dt,.premium-page .site-footer dd,.premium-page .site-footer a{color:var(--muted)}
+.premium-page .site-footer h2,.premium-page .site-footer strong{color:var(--ink)}
+.premium-page .about-section .adviser-card p,.premium-page .about-section .adviser-card a{color:var(--on-brand)}
+.premium-page .about-section .adviser-card .adviser-role,.premium-page .about-section .adviser-card .adviser-org,.premium-page .about-section .adviser-card .adviser-hours{color:var(--detail)}
+.premium-page .services-split .service-card:first-child{grid-row:auto;display:grid;grid-template-columns:44px minmax(0,1fr);grid-template-rows:auto 1fr;gap:10px 16px;justify-content:initial;min-height:190px;padding:28px;background:var(--paper);border:1px solid var(--line)}
+.premium-page .services-split .service-card:first-child .section-index{grid-column:1;grid-row:1}
+.premium-page .services-split .service-card:first-child .service-copy{grid-column:2;grid-row:1/3}
+.premium-page .services-split .service-card:first-child .service-link{grid-column:1;grid-row:2;align-self:end}
+.premium-page #main .section-heading{margin-left:auto;margin-right:auto}
+.premium-page .faq-list{width:min(880px,100%);margin-inline:auto}
+body[data-layout="trust-blue"] .hero-portrait-only .adviser-card{width:100%}
+body[data-layout="trust-blue"] .about-editorial{display:block}
+body[data-layout="trust-blue"] .about-copy-column{width:min(800px,100%);margin-inline:auto}
+body[data-layout="trust-blue"] .contact-grid{grid-template-columns:1fr}
+body[data-layout="trust-blue"] .contact-copy{width:min(780px,100%);margin-inline:auto}
+body[data-layout="trust-blue"] .direct-contact-panel{width:min(780px,100%);margin-inline:auto}
+body[data-layout="trust-blue"] .process-timeline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;border-top:0}
+body[data-layout="trust-blue"] .process-timeline li{display:block;min-height:210px;padding:24px 0;border-top:1px solid var(--line);border-bottom:0}
+body[data-layout="trust-blue"] .process-timeline li>div{display:block}
+body[data-layout="trust-blue"] .process-timeline li h3{margin-top:24px}
+@media(min-width:651px){
+  .premium-page #specialties{width:min(1120px,calc(100% - 96px));margin-inline:auto}
+  .premium-page #specialties>.container{width:100%}
+}
+
 /* Tablet */
 @media(max-width:1100px){
   .premium-page #main .container,.premium-page .site-header>.container,.premium-page .site-footer>.container,.premium-page .sample-bar>.container{width:min(100% - 48px,900px)}
@@ -432,6 +458,12 @@ body[data-layout="local-friendly"] .contact-section .contact-grid{grid-template-
   .premium-page .agent-facts{grid-template-columns:1fr}
   .premium-page .agent-facts>div{grid-template-columns:110px 1fr}
   .premium-page .process-timeline,.premium-page .process-steps{display:flex;flex-direction:column;border-top:0;gap:0}
+  body[data-layout="trust-blue"] .process-timeline{display:flex;flex-direction:column;gap:0}
+  body[data-layout="trust-blue"] .process-timeline li{display:block;min-height:150px;padding:24px 0;border-top:0;border-bottom:1px solid var(--line)}
+  .premium-page .services-split .service-card:first-child{display:grid;width:100%;grid-template-columns:1fr 44px;grid-template-rows:auto auto auto;gap:8px 12px;min-height:183px;padding:24px 0;border:0;border-bottom:1px solid var(--line);background:transparent}
+  .premium-page .services-split .service-card:first-child .section-index{grid-column:1;grid-row:1}
+  .premium-page .services-split .service-card:first-child .service-copy{display:block;grid-column:1;grid-row:2/4}
+  .premium-page .services-split .service-card:first-child .service-link{grid-column:2;grid-row:1/4;align-self:center}
   .premium-page .process-timeline li,.premium-page .process-steps li{
     display:block;min-height:150px;padding:24px 0;border:0;border-bottom:1px solid var(--line);background:transparent;
   }
@@ -455,7 +487,7 @@ body[data-layout="local-friendly"] .contact-section .contact-grid{grid-template-
   .premium-page .footer-bottom{align-items:flex-start;flex-direction:column}
   .premium-page .mobile-cta{
     position:fixed;z-index:80;left:0;right:0;bottom:0;display:block;padding:15px 24px calc(15px + env(safe-area-inset-bottom));
-    background:color-mix(in srgb,var(--surface) 96%,transparent);border-top:1px solid var(--line);backdrop-filter:blur(12px);
+    background:var(--surface);border-top:1px solid var(--line);backdrop-filter:blur(12px);
   }
   .premium-page .mobile-cta .direct-contact-actions{display:flex;flex-wrap:nowrap;gap:12px}
   .premium-page .mobile-cta .button{flex:1 1 0;min-width:0;min-height:58px;padding-inline:10px}
