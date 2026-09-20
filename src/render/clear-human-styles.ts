@@ -339,6 +339,14 @@ body[data-layout="local-friendly"] .services-cards .service-card{border-top:0;bo
 body[data-layout="local-friendly"] .contact-section .contact-grid{grid-template-columns:1fr 1fr}
 
 /* Compatibility / accessibility guardrails for legacy layers and export capture. */
+.premium-page .premium-hero{display:block;grid-template-columns:none;gap:0;border:0;text-align:left}
+.premium-page .faq-section{display:block;grid-template-columns:none;gap:0}
+.premium-page #main .section-heading{
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:0;
+  width:min(900px,100%);margin-left:auto;margin-right:auto;text-align:left;
+}
+.premium-page #main .section-heading .section-support{margin:12px 0 0}
+
 .premium-page .site-footer p,.premium-page .site-footer dt,.premium-page .site-footer dd{color:var(--muted)}
 .premium-page .site-footer a:not(.button){color:var(--ink)}
 .premium-page .site-footer h2,.premium-page .site-footer strong{color:var(--ink)}
