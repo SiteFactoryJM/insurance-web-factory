@@ -48,15 +48,13 @@ function services(site: SiteConfig): string {
 
 function about(site: SiteConfig): string {
   const pattern = getDesign(site).about;
-  const mainFacts = `<dl class="agent-facts"><div><dt>담당자</dt><dd>${e(site.agent.name || '담당자 확인 필요')}</dd></div><div><dt>직함</dt><dd>${e(site.agent.title || '보험설계사')}</dd></div><div><dt>소속</dt><dd>${e(site.agent.company || '소속 확인 필요')}${site.agent.branch ? ` · ${e(site.agent.branch)}` : ''}</dd></div><div><dt>상담 시간</dt><dd>${e(site.contact.availableHours || '담당자에게 확인')}</dd></div></dl>`;
   const extraFacts = `${site.agent.registrationNumber ? `<p><strong>설계사 등록번호</strong> ${e(site.agent.registrationNumber)}</p>` : ''}${site.agent.regions.length ? `<p><strong>상담 지역</strong> ${e(site.agent.regions.join(' · '))}</p>` : ''}`;
-  const body = `<div class="about-copy"><p>${copy(site.intro.body, site.intro.mobileBody)}</p>${site.sections.career && site.career.length ? `<ul class="career-list">${site.career.map(c => `<li>${e(c)}</li>`).join('')}</ul>` : ''}${mainFacts}${extraFacts ? `<div class="agent-meta">${extraFacts}</div>` : ''}</div>`;
+  const body = `<div class="about-copy"><p>${copy(site.intro.body, site.intro.mobileBody)}</p>${site.sections.career && site.career.length ? `<ul class="career-list">${site.career.map(c => `<li>${e(c)}</li>`).join('')}</ul>` : ''}${extraFacts ? `<div class="agent-meta">${extraFacts}</div>` : ''}</div>`;
   const intro = `<div class="about-heading"><p class="eyebrow">담당자 소개</p><h2 id="about-title">${copy(naturalHeading(site.intro.title), naturalHeading(site.intro.mobileTitle))}</h2>${site.intro.philosophy ? `<p class="philosophy">${e(site.intro.philosophy)}</p>` : ''}</div>`;
   const image = `<figure class="about-portrait">${profile(site)}<figcaption>${e(site.agent.name)} · ${e(site.agent.title)}</figcaption></figure>`;
   const layout = pattern === 'profile' ? `${image}<div>${intro}${body}</div>` : pattern === 'quote' ? `<div class="about-quote">${intro}<blockquote>${e(site.intro.philosophy || site.intro.title)}</blockquote>${body}</div>` : `${intro}${body}`;
   return `<section class="section about-section" id="about" aria-labelledby="about-title"><div class="container about-grid about-${pattern}" data-pattern="about-${pattern}">${layout}</div></section>`;
 }
-
 function process(site: SiteConfig): string {
   if (!site.sections.process || !site.process.length) return '';
   const pattern = getDesign(site).process;
@@ -105,9 +103,8 @@ function casesTicker(site: SiteConfig): string {
     { title: '가족 계약 한눈에 정리', body: '흩어진 계약을 한 장으로 모아 정리합니다.' },
   ];
   const repeated = [...items, ...items];
-  return `<section class="section cases-section" id="cases" aria-labelledby="cases-title"><div class="container">${heading('상담 포인트', '많이 확인하는 내용을 먼저 훑어보세요.', undefined, '자주 고르는 질문을 카드로 정리해 어떤 내용을 확인하는지 한눈에 볼 수 있습니다.')}<div class="cases-marquee" aria-label="상담 포인트가 흐르는 안내 영역"><ul class="cases-track">${repeated.map((item, i) => `<li class="cases-item"><span class="cases-badge">${String((i % items.length) + 1).padStart(2, '0')}</span><div class="cases-copy"><h3>${e(item.title)}</h3><p>${e(item.body)}</p></div></li>`).join('')}</ul></div></div></section>`;
+  return `<section class="section cases-section" id="cases" aria-labelledby="cases-title"><div class="container">${heading('상담 포인트', '많이 확인하는 내용을 먼저 훑어보세요.', undefined, '자주 고르는 질문을 카드로 정리해 어떤 내용을 확인하는지 한눈에 볼 수 있습니다.')}<div class="cases-marquee" aria-label="상담 포인트가 흐르는 안내 영역"><ul class="cases-track">${repeated.map((item, i) => `<li class="cases-item"${i >= items.length ? ' aria-hidden="true"' : ''}><span class="cases-badge">${String((i % items.length) + 1).padStart(2, '0')}</span><div class="cases-copy"><h3>${e(item.title)}</h3><p>${e(item.body)}</p></div></li>`).join('')}</ul></div></div></section>`;
 }
-
 function contact(site: SiteConfig): string {
   return `<section class="section contact-section" id="contact" aria-labelledby="contact-title"><div class="container contact-grid"><div class="contact-copy"><p class="eyebrow">연락 방법</p><h2 id="contact-title">편한 방법으로 바로 문의하세요.</h2><p>전화와 카카오톡 오픈채팅 중 편한 방법을 선택하세요.</p></div>${renderContactForm(site)}</div></section>`;
 }

@@ -6,11 +6,12 @@ import { styles } from './styles.js';
 import { premiumStyles } from './premium-styles.js';
 import { directContactStyles } from './direct-contact-styles.js';
 import { clearHumanStyles } from './clear-human-styles.js';
+import { uiCopyDensityRefreshStyles } from './ui-copy-density-refresh-styles.js';
 import { fontStylesheetLinks, headingFontStyle } from './fonts.js';
 import { renderThemePage } from './templates/index.js';
 import { DESIGN_VERSION, TEMPLATE_META, PALETTES, paletteId, paletteStyle, resolveDesign, getDesign } from './design-system.js';
-/** `clearHumanStyles` is last: it carries the Figma component measurements. */
-const pageStyles = () => `<style>${styles}${premiumStyles}${directContactStyles}${clearHumanStyles}</style>`;
+/** The density refresh is intentionally last so layout polish can refine the Figma-compatible base without changing tokens. */
+const pageStyles = () => `<style>${styles}${premiumStyles}${directContactStyles}${clearHumanStyles}${uiCopyDensityRefreshStyles}</style>`;
 function renderHead(site: SiteConfig, request: Request): string {
   const url = new URL(request.url);
   const canonical = `${site.domains[0] ? `https://${site.domains[0]}` : url.origin}${url.pathname}`;

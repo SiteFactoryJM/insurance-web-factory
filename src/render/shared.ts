@@ -40,10 +40,12 @@ export function renderSocialLinks(site: SiteConfig): string { return renderConta
  */
 export function renderContactForm(site: SiteConfig): string {
   const email = directEmailHref(site.contact.email);
+  const company = `${site.agent.company || '소속 확인 필요'}${site.agent.branch ? ` · ${site.agent.branch}` : ''}`;
+  const role = site.agent.title || '보험설계사';
+  const identity = `<div class="contact-identity"><dt>담당자</dt><dd>${e(site.agent.name || '담당자 확인 필요')}</dd></div><div class="contact-identity"><dt>소속 · 직함</dt><dd>${e(company)} · ${e(role)}</dd></div>`;
   const optional = `${email ? `<div><dt>이메일</dt><dd><a data-email-link href="${e(email)}">${e(site.contact.email!)}</a></dd></div>` : ''}${site.contact.fax?.trim() ? `<div><dt>팩스</dt><dd>${e(site.contact.fax)}</dd></div>` : ''}`;
-  return `<div class="direct-contact-panel" data-direct-contact><p class="eyebrow">담당자에게 직접 문의</p><h3>전화 또는 오픈채팅으로 연락하세요.</h3>${renderContactButtons(site)}<dl class="direct-contact-details"><div><dt>전화번호</dt><dd>${e(site.contact.phone || '미입력')}</dd></div><div><dt>상담 시간</dt><dd>${e(site.contact.availableHours || '담당자에게 확인')}</dd></div>${optional}</dl><p class="support-note">공개 대화방에는 주민등록번호·병력·계약서 원본을 남기지 마세요.</p>${site.demo?.enabled ? '<p class="demo-contact-notice">디자인 예시입니다. 이 페이지의 연락 버튼은 표시된 담당자에게 실제로 연결됩니다.</p>' : ''}</div>`;
+  return `<div class="direct-contact-panel" data-direct-contact><p class="eyebrow">담당자에게 직접 문의</p><h3>전화 또는 오픈채팅으로 연락하세요.</h3>${renderContactButtons(site)}<dl class="direct-contact-details">${identity}<div><dt>전화번호</dt><dd>${e(site.contact.phone || '미입력')}</dd></div><div><dt>상담 시간</dt><dd>${e(site.contact.availableHours || '담당자에게 확인')}</dd></div>${optional}</dl><p class="support-note">공개 대화방에는 주민등록번호·병력·계약서 원본을 남기지 마세요.</p>${site.demo?.enabled ? '<p class="demo-contact-notice">디자인 예시입니다. 이 페이지의 연락 버튼은 표시된 담당자에게 실제로 연결됩니다.</p>' : ''}</div>`;
 }
-
 export function renderFooter(site: SiteConfig): string {
   const pattern = getDesign(site).footer;
   const email = directEmailHref(site.contact.email);
