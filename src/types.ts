@@ -6,6 +6,8 @@ export const HEADING_FONT_IDS = ["pretendard", "noto-serif-kr", "noto-sans-kr", 
 export type HeadingFont = (typeof HEADING_FONT_IDS)[number];
 export type PublishStatus = "draft" | "published";
 export type AdvertisingReviewStatus = "pending" | "approved" | "not-required";
+export const INTRO_PRINCIPLE_LAYOUT_IDS = ["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16"] as const;
+export type IntroPrincipleLayout = (typeof INTRO_PRINCIPLE_LAYOUT_IDS)[number];
 export const DESIGN_SECTION_IDS = ["services", "about", "process", "reviews", "faq", "contact"] as const;
 export type DesignSectionId = (typeof DESIGN_SECTION_IDS)[number];
 export interface SiteDesign {
@@ -37,7 +39,7 @@ export interface SiteConfig {
   contentBrief?: { purpose?: string; targetAudience?: string; primaryAction?: string; };
   agent: { name: string; title: string; company: string; branch?: string; registrationNumber?: string; businessNumber?: string; careerYears?: number; regions: string[]; profileImage: string; logoImage?: string; };
   hero: { eyebrow?: string; headline: string; subheadline: string; mobileHeadline?: string; mobileSubheadline?: string; primaryCtaLabel: string; secondaryCtaLabel: string; trustNote?: string; image?: string; };
-  intro: { title: string; body: string; mobileTitle?: string; mobileBody?: string; philosophy?: string; };
+  intro: { title: string; body: string; mobileTitle?: string; mobileBody?: string; philosophy?: string; principleTitle?: string; principleBody?: string; principleLayout?: IntroPrincipleLayout; };
   specialties: ContentCard[]; process: ContentCard[]; career: string[]; reviews?: ReviewItem[]; faqs: FaqItem[];
   consultation?: { topics: string[] };
   contact: { phone: string; kakaoUrl?: string; instagramUrl?: string; email?: string; fax?: string; formEmail?: string; officeAddress?: string; mapUrl?: string; availableHours: string; };

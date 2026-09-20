@@ -30,7 +30,7 @@ export function applyCopy(site: SiteConfig, group: CopyGroup, ids: string[]): Si
       mobileSubheadline: h.mobileSubheadline, eyebrow: h.eyebrow, primaryCtaLabel: '전화로 문의하기', secondaryCtaLabel: '상담 분야 보기' };
   } else if (group === 'intros') {
     const h = COPY_LIBRARY.intros.find(item => item.id === ids[0])!;
-    out.intro = { title: h.title, mobileTitle: h.mobileTitle, body: h.body, mobileBody: h.mobileBody, philosophy: h.philosophy };
+    out.intro = { title: h.title, mobileTitle: h.mobileTitle, body: h.body, mobileBody: h.mobileBody, philosophy: h.philosophy, principleTitle: h.principleTitle, principleBody: h.principleBody, principleLayout: h.principleLayout };
   } else if (group === 'services') {
     if (ids.length < 3 || ids.length > 6) throw new Error('상담 분야는 3~6개를 골라 주세요.');
     out.specialties = ids.map(id => card(COPY_LIBRARY.services.find(item => item.id === id)!));

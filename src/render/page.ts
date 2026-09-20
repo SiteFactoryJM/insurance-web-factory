@@ -6,11 +6,12 @@ import { styles } from './styles.js';
 import { premiumStyles } from './premium-styles.js';
 import { directContactStyles } from './direct-contact-styles.js';
 import { clearHumanStyles } from './clear-human-styles.js';
+import { uiCopyDensityRefreshStyles } from './ui-copy-density-refresh-styles.js';
 import { fontStylesheetLinks, headingFontStyle } from './fonts.js';
 import { renderThemePage } from './templates/index.js';
 import { DESIGN_VERSION, TEMPLATE_META, PALETTES, paletteId, paletteStyle, resolveDesign, getDesign } from './design-system.js';
-/** `clearHumanStyles` is last: it carries the Figma component measurements. */
-const pageStyles = () => `<style>${styles}${premiumStyles}${directContactStyles}${clearHumanStyles}</style>`;
+/** The density refresh is intentionally last so layout polish can refine the Figma-compatible base without changing tokens. */
+const pageStyles = () => `<style>${styles}${premiumStyles}${directContactStyles}${clearHumanStyles}${uiCopyDensityRefreshStyles}</style>`;
 function renderHead(site: SiteConfig, request: Request): string {
   const url = new URL(request.url);
   const canonical = `${site.domains[0] ? `https://${site.domains[0]}` : url.origin}${url.pathname}`;
@@ -18,7 +19,7 @@ function renderHead(site: SiteConfig, request: Request): string {
   const robots = site.seo.noIndex || site.status !== 'published' || url.pathname !== '/' ? 'noindex,nofollow' : 'index,follow,max-image-preview:large';
   const instagram = safeUrl(site.contact.instagramUrl);
   const data = {'@context':'https://schema.org','@type':'Person',name:site.agent.name,jobTitle:site.agent.title,worksFor:{'@type':'Organization',name:site.agent.company},telephone:site.contact.phone,email:site.contact.email||undefined,sameAs:instagram?[instagram]:undefined,areaServed:site.agent.regions,url:canonical};
-  return `<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>${e(url.pathname === '/privacy' ? `개인정보·외부 연결 안내 | ${site.agent.name}` : site.seo.title)}</title><meta name="description" content="${e(site.seo.description)}"><meta name="robots" content="${robots}"><link rel="canonical" href="${e(canonical)}"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><meta name="theme-color" content="${PALETTES[paletteId(site)].accent}"><meta property="og:type" content="website"><meta property="og:locale" content="ko_KR"><meta property="og:title" content="${e(site.seo.title)}"><meta property="og:description" content="${e(site.seo.description)}"><meta property="og:url" content="${e(canonical)}">${og ? `<meta property="og:image" content="${e(og)}">` : ''}<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>${fontStylesheetLinks([site.headingFont])}<script type="application/ld+json">${jsonForHtml(data)}</script>`;
+  return `<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>${e(url.pathname === '/privacy' ? `개인정보·외부 연결 안내 | ${site.agent.name}` : site.seo.title)}</title><meta name="description" content="${e(site.seo.description)}"><meta name="robots" content="${robots}"><link rel="canonical" href="${e(canonical)}"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><meta name="theme-color" content="${PALETTES[paletteId(site)].accent}"><meta property="og:type" content="website"><meta property="og:locale" content="ko_KR"><meta property="og:title" content="${e(site.seo.title)}"><meta property="og:description" content="${e(site.seo.description)}"><meta property="og:url" content="${e(canonical)}">${og ? `<meta property="og:image" content="${e(og)}">` : ''}<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>${fontStylesheetLinks(['noto-sans-kr'])}<script type="application/ld+json">${jsonForHtml(data)}</script>`;
 }
 export function renderSitePage(rawSite: SiteConfig, request: Request, options: {studioPreview?: boolean} = {}): string {
   const site = resolveDesign(rawSite,request), palette = paletteId(site);

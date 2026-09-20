@@ -130,7 +130,7 @@ function renderPanel(): void {
 }
 function choiceBody(item: {id:string}): string {
   if (group === 'heroes') return library.heroes.find(h => h.id === item.id)!.subheadline;
-  if (group === 'intros') return library.intros.find(h => h.id === item.id)!.body;
+  if (group === 'intros') { const h = library.intros.find(h => h.id === item.id)!; return `${h.body}${h.principleTitle ? ` · 상담 원칙: ${h.principleTitle}` : ''}`; }
   if (group === 'services') return library.services.find(h => h.id === item.id)!.body;
   if (group === 'faqs') return library.faqs.find(h => h.id === item.id)!.answer;
   if (group === 'processes') return library.processes.find(h => h.id === item.id)!.items.map(h => h.title).join(' → ');

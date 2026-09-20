@@ -1,5 +1,5 @@
 import { directEmailHref, directPhoneHref, openChatUrl } from '../utils/contact-links.js';
-import { DESIGN_SECTION_IDS, HEADING_FONT_IDS, PALETTE_IDS, TEMPLATE_IDS, type DesignSectionId, type SiteConfig } from "../types.js";
+import { DESIGN_SECTION_IDS, HEADING_FONT_IDS, INTRO_PRINCIPLE_LAYOUT_IDS, PALETTE_IDS, TEMPLATE_IDS, type DesignSectionId, type SiteConfig } from "../types.js";
 import { COPY_LIBRARY } from '../content/copy-library.js';
 import { DESIGN_VERSION } from '../render/design-system.js';
 
@@ -117,7 +117,7 @@ const siteRule = object({
     careerYears: { type: "number", min: 0, max: 100, optional: true }, regions: list(text(80), 0, 12), profileImage: imageRule(), logoImage: imageRule(true) }),
   hero: object({ eyebrow: text(80, true), headline: text(40), subheadline: text(120), mobileHeadline: text(24, true, 1), mobileSubheadline: text(60, true, 1),
     primaryCtaLabel: text(24), secondaryCtaLabel: text(24), trustNote: text(240, true), image: imageRule(true) }),
-  intro: object({ title: text(40), body: text(400), mobileTitle: text(24, true, 1), mobileBody: text(100, true, 1), philosophy: text(160, true) }),
+  intro: object({ title: text(40), body: text(400), mobileTitle: text(24, true, 1), mobileBody: text(100, true, 1), philosophy: text(160, true), principleTitle: text(80, true), principleBody: text(240, true), principleLayout: choice(INTRO_PRINCIPLE_LAYOUT_IDS, true) }),
   specialties: list(cardRule, 3), process: list(cardRule), career: list(text(160), 0, 20),
   reviews: list(object({ quote: text(400), author: text(80), context: text(120, true), isExample: bool(true) }), 0, 12, true), faqs: list(faqRule),
   consultation: object({ topics: list(text(60), 1, 12, false, true) }, true),
@@ -226,7 +226,9 @@ function exactHero(site: SiteConfig): string | null {
 function exactIntro(site: SiteConfig): string | null {
   return COPY_LIBRARY.intros.find(item => item.title === site.intro.title && item.body === site.intro.body
     && (item.mobileTitle || '') === (site.intro.mobileTitle || '') && (item.mobileBody || '') === (site.intro.mobileBody || '')
-    && (item.philosophy || '') === (site.intro.philosophy || ''))?.id || null;
+    && (item.philosophy || '') === (site.intro.philosophy || '')
+    && (item.principleTitle || '') === (site.intro.principleTitle || '') && (item.principleBody || '') === (site.intro.principleBody || '')
+    && (item.principleLayout || '') === (site.intro.principleLayout || ''))?.id || null;
 }
 function exactCards<T extends {id:string;title:string;body:string;mobileBody?:string}>(source: T[], values: SiteConfig['specialties']): string[] | null {
   const result = values.map(value => source.find(item => item.title === value.title && item.body === value.body && (item.mobileBody || '') === (value.mobileBody || ''))?.id);

@@ -44,7 +44,11 @@ export function validateSectionContent(site) {
     if (typeof value !== "string" || (active && !value.trim())) issues.push(`${label}: ${active ? "비어 있지 않은" : "올바른"} 문자열이어야 합니다.`);
   };
   if (!site.intro || typeof site.intro !== "object" || Array.isArray(site.intro)) issues.push("intro는 소개 설정 객체여야 합니다.");
-  else for (const key of ["title", "body", "mobileTitle", "mobileBody", "philosophy"]) checkText(site.intro[key], `intro.${key}`, isSectionEnabled(site, "about") && key !== "philosophy", ["title", "body"].includes(key));
+  else {
+    for (const key of ["title", "body", "mobileTitle", "mobileBody", "philosophy", "principleTitle", "principleBody"]) checkText(site.intro[key], `intro.${key}`, isSectionEnabled(site, "about") && !["philosophy","principleTitle","principleBody"].includes(key), ["title", "body"].includes(key));
+    if (site.intro.principleLayout !== undefined && !/^([0][1-9]|1[0-6])$/.test(site.intro.principleLayout)) issues.push("intro.principleLayout: 01~16 중 하나여야 합니다.");
+    for (const key of Object.keys(site.intro)) if (!["title","body","mobileTitle","mobileBody","philosophy","principleTitle","principleBody","principleLayout"].includes(key)) issues.push(`intro.${key}: 지원하지 않는 항목입니다.`);
+  }
   for (const [field, section, min, fields, optionalFields] of [
     ["specialties", "services", 3, ["title", "body"], ["mobileBody"]],
     ["process", "process", 3, ["title", "body"], ["mobileBody"]],
@@ -125,7 +129,7 @@ export function validateContentLengths(site) {
     if (Array.isArray(items)) items.forEach((item, index) => checkObject(item, `${prefix}[${index}]`, { question: 100, answer: 240, mobileAnswer: 80 }));
   };
   checkObject(site.hero, "hero", headlineLimits);
-  checkObject(site.intro, "intro", { title: 40, body: 400, mobileTitle: 24, mobileBody: 100 });
+  checkObject(site.intro, "intro", { title: 40, body: 400, mobileTitle: 24, mobileBody: 100, philosophy: 160, principleTitle: 80, principleBody: 240 });
   checkObject(site.contentBrief, "contentBrief", { purpose: 100, targetAudience: 80, primaryAction: 60 });
   cards(site.specialties, "specialties");
   cards(site.process, "process");

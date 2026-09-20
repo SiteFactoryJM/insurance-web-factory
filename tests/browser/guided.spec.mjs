@@ -64,11 +64,11 @@ test('links inside the large preview scroll it instead of killing the frame',asy
 test('all five layout choices change the visible page structure while keeping its palette',async({page})=>{
  await start(page);
  const layouts={
-  'trust-blue':{hero:'hero-portrait',services:'services-list',about:'about-editorial',sections:['home','specialties','about','process','faq','contact']},
-  'warm-care':{hero:'hero-portrait',services:'services-cards',about:'about-profile',sections:['home','about','specialties','faq','process','contact']},
-  'premium-navy':{hero:'hero-statement',services:'services-split',about:'about-editorial',sections:['home','specialties','process','about','faq','contact']},
-  'clean-minimal':{hero:'hero-statement',services:'services-cards',about:'about-editorial',sections:['home','specialties','process','faq','about','contact']},
-  'local-friendly':{hero:'hero-editorial',services:'services-cards',about:'about-editorial',sections:['home','specialties','contact','faq','about','process']},
+  'trust-blue':{hero:'hero-portrait',services:'services-list',about:'about-editorial',sections:['home','cases','specialties','about','process','faq','contact']},
+  'warm-care':{hero:'hero-portrait',services:'services-cards',about:'about-profile',sections:['home','cases','about','specialties','faq','process','contact']},
+  'premium-navy':{hero:'hero-statement',services:'services-split',about:'about-editorial',sections:['home','cases','specialties','process','about','faq','contact']},
+  'clean-minimal':{hero:'hero-statement',services:'services-cards',about:'about-editorial',sections:['home','cases','specialties','process','faq','about','contact']},
+  'local-friendly':{hero:'hero-editorial',services:'services-cards',about:'about-editorial',sections:['home','cases','specialties','contact','faq','about','process']},
  };
  for(const [id,expected] of Object.entries(layouts)){
   await page.locator(`[data-template="${id}"]`).click();
