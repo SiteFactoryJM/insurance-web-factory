@@ -399,6 +399,11 @@ html{scroll-behavior:smooth}
  .premium-page #main .premium-hero:not(.hero-statement) .hero-actions{padding-top:8px;transform:translateY(10px)}
  .premium-page #main .premium-hero:not(.hero-statement) .hero-note{margin-top:24px;transform:translateY(10px)}
 }
+@media(min-width:901px){
+ .premium-page #main .hero-copy-brand-watermark .hero-description{margin-top:132px}
+ .premium-page #main .hero-topics{margin-top:18px}
+ .premium-page #main .premium-hero:not(.hero-statement) .hero-actions{margin-top:24px;padding-top:0}
+}
 .premium-page #main .hero-visual{position:relative}
 .premium-page #main .portrait-figure,.premium-page #main .hero-scene{position:relative;z-index:1;background:transparent;box-shadow:none}
 .premium-page #main .portrait-figure::before,.premium-page #main .hero-scene::before{display:none}
