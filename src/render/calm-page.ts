@@ -27,11 +27,11 @@ function hero(site: SiteConfig): string {
   const pattern = design.hero;
   const coreTopics = site.specialties.slice(0, 3).map(item => ({ label: item.title, tone: 'base' }));
   const extraTopics = [
-    { label: '청구서비스', tone: 'claim' },
-    { label: '청구 금액 확인', tone: 'amount' },
-    { label: '부지급된 보험금 확인', tone: 'unpaid' },
-    { label: '자동차사고', tone: 'auto' },
-    { label: '배상책임사고', tone: 'liability' },
+    { label: '청구서비스', tone: 'base' },
+    { label: '청구 금액 확인', tone: 'base' },
+    { label: '부지급된 보험금 확인', tone: 'base' },
+    { label: '자동차사고', tone: 'base' },
+    { label: '배상책임사고', tone: 'base' },
   ];
   const topicChips = [...coreTopics, ...extraTopics].map(item => `<span class="topic-chip topic-${item.tone}">${e(item.label)}</span>`).join('');
   const heroLogo = site.agent.logoImage ? `<div class="hero-brand-logo"><img src="${e(site.agent.logoImage)}" alt="${e(site.agent.company || '소속')} 로고" width="600" height="225"></div>` : '';
