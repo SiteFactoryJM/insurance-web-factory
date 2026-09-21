@@ -16,6 +16,7 @@ export const directContactStyles = `
 .premium-page .section{padding-block:4.5rem}.premium-page .section-heading{margin-bottom:2rem}.premium-page .trust-strip p{line-height:1.6}
 body:not([data-studio-preview=true]) .preview-contact-notice{display:none}body[data-studio-preview=true] .demo-contact-notice{display:none}
 body[data-studio-preview=true] .direct-contact-actions a,body[data-studio-preview=true] .floating-contact-dock a{cursor:default}
+body[data-export-capture="true"] .floating-contact-dock{display:none!important}
 
 @media(max-width:650px){.premium-page{padding-bottom:calc(72px + env(safe-area-inset-bottom))}.premium-page .section{padding-block:3rem}.direct-contact-panel{padding:1.25rem}.direct-contact-actions{gap:.6rem}.direct-contact-panel .direct-contact-actions .button{flex:1 1 100%}.premium-page .direct-mobile-cta{padding:.6rem 1rem calc(.6rem + env(safe-area-inset-bottom));background:var(--paper);border-top:1px solid var(--line)}.direct-mobile-cta .direct-contact-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}.direct-mobile-cta .direct-contact-actions:has(>a:only-child){grid-template-columns:1fr}.premium-page .direct-mobile-cta .button{width:100%;font-size:1rem;padding:.75rem .4rem}.premium-page .hero-actions{display:block}.premium-page .hero-actions>.text-link{margin-top:1rem}.premium-page .hero-actions .direct-contact-actions .button{flex:1 1 auto}}
 @media(max-width:650px){.direct-contact-details>div{grid-template-columns:minmax(0,1fr);gap:.3rem}}
