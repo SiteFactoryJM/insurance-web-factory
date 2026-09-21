@@ -120,18 +120,6 @@ export const uiCopyDensityRefreshStyles = `
 .premium-page #main .insurance-scope-item p{
  margin:4px 0 0;font-size:.9rem;line-height:1.55;color:var(--muted);text-wrap:pretty;overflow-wrap:anywhere;
 }
-.premium-page #main .insurance-scope-all-note{
- display:flex;align-items:center;gap:14px;width:min(100%,62rem);margin:14px auto 0;padding:17px 20px;
- border:1px solid var(--line);border-radius:14px;background:var(--tint);color:var(--ink);text-align:left;
-}
-.premium-page #main .insurance-scope-all-note>svg{flex:0 0 auto;color:var(--accent)}
-.premium-page #main .insurance-scope-all-note div{min-width:0}
-.premium-page #main .insurance-scope-all-note strong{
- display:block;font-size:1rem;line-height:1.5;font-weight:700;color:var(--ink);
-}
-.premium-page #main .insurance-scope-all-note p{
- margin:2px 0 0;font-size:.9rem;line-height:1.55;color:var(--muted);
-}
 @media(min-width:901px){
  .premium-page #main .insurance-scope-popular .insurance-scope-group-support{
   white-space:nowrap;letter-spacing:-.045em;
@@ -139,7 +127,6 @@ export const uiCopyDensityRefreshStyles = `
 }
 @media(max-width:900px){
  .premium-page #main .insurance-scope-directory{grid-template-columns:1fr;width:min(100%,44rem);gap:14px}
- .premium-page #main .insurance-scope-all-note{width:min(100%,44rem)}
  .premium-page #main .insurance-scope-popular-list{grid-template-columns:repeat(2,minmax(0,1fr))}
  .premium-page #main .insurance-scope-other-list{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
@@ -164,9 +151,6 @@ export const uiCopyDensityRefreshStyles = `
  .premium-page #main .insurance-scope-popular-list .insurance-scope-item:last-child:nth-child(odd){
   grid-column:1/-1;width:calc(50% - 4.5px);justify-self:center;
  }
- .premium-page #main .insurance-scope-all-note{margin-top:12px;padding:14px 15px;border-radius:12px}
- .premium-page #main .insurance-scope-all-note strong{font-size:.9375rem}
- .premium-page #main .insurance-scope-all-note p{display:none}
 }
 @media(max-width:360px){
  .premium-page #main .insurance-scope-group{padding-inline:11px}

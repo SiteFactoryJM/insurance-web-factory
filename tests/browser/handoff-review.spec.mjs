@@ -184,7 +184,7 @@ test('insurance scope uses the approved split directory and compact mobile items
     await expect(section.locator('.insurance-scope-heading .section-support')).toContainText('이 외 모든 보험 종류도 상담 가능합니다.');
     await expect(section.locator('.insurance-scope-popular h3')).toHaveText('많이 찾는 상담');
     await expect(section.locator('.insurance-scope-other h3')).toHaveText('그 외 상담 가능한 보험');
-    await expect(section.locator('.insurance-scope-all-note')).toContainText('목록에 없어도 상담 가능합니다.');
+    await expect(section.locator('.insurance-scope-all-note')).toHaveCount(0);
     await expect(section.locator('.insurance-scope-arrow')).toHaveCount(0);
 
     const topics = await section.locator('.insurance-scope-item h4').allTextContents();
@@ -235,10 +235,8 @@ test('insurance scope uses the approved split directory and compact mobile items
     await page.goto(`/?palette=${palette}`);
     const appearance = await page.locator('#insurance-scope').evaluate(section => {
       const directory = section.querySelector('.insurance-scope-directory');
-      const note = section.querySelector('.insurance-scope-all-note');
       const icon = section.querySelector('.insurance-scope-icon');
       const directoryBox = directory.getBoundingClientRect();
-      const noteBox = note.getBoundingClientRect();
       const probe = document.createElement('span');
       probe.style.color = 'var(--accent)';
       section.append(probe);
@@ -246,13 +244,11 @@ test('insurance scope uses the approved split directory and compact mobile items
       probe.remove();
       return {
         directoryCenter: directoryBox.left + directoryBox.width / 2,
-        noteCenter: noteBox.left + noteBox.width / 2,
         iconUsesAccent: getComputedStyle(icon).color === expectedAccent,
         overflow: section.scrollWidth > section.clientWidth,
       };
     });
     expect(Math.abs(appearance.directoryCenter - 720), `${palette} directory centering`).toBeLessThanOrEqual(2);
-    expect(Math.abs(appearance.noteCenter - appearance.directoryCenter), `${palette} note centering`).toBeLessThanOrEqual(2);
     expect(appearance.iconUsesAccent, `${palette} icon accent token`).toBe(true);
     expect(appearance.overflow, `${palette} scope overflow`).toBe(false);
   }
