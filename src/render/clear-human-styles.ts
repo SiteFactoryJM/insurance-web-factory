@@ -392,7 +392,7 @@ export const clearHumanStyles = `
  background:linear-gradient(90deg,rgba(255,255,255,.74) 0%,rgba(255,255,255,.44) 43%,rgba(255,255,255,.08) 100%);
 }
 .premium-page #main .recruit-watermark{
- position:absolute;z-index:0;top:-34px;right:-40px;width:min(72vw,1080px);height:auto;max-width:none;
+ position:absolute;z-index:0;top:-34px;right:clamp(1.5rem,5vw,5rem);width:min(76vw,1120px);height:auto;max-width:none;
  opacity:.31;mix-blend-mode:multiply;pointer-events:none;user-select:none;
  filter:saturate(.9) contrast(1.08);
 }
@@ -411,7 +411,7 @@ export const clearHumanStyles = `
 .premium-page #main .recruit-support strong{font-weight:800;color:var(--ink)}
 
 .premium-page #main .recruit-panel{
- display:grid;grid-template-columns:minmax(0,1.58fr) minmax(14.5rem,.86fr) minmax(18.5rem,.98fr);
+ display:grid;grid-template-columns:minmax(0,1.46fr) minmax(16.5rem,1.02fr) minmax(18rem,.9fr);
  min-width:0;overflow:hidden;border:1px solid rgba(124,132,140,.24);border-radius:16px;
  background:rgba(255,255,255,.86);box-shadow:0 18px 44px rgba(29,36,45,.07);
  backdrop-filter:blur(2px);
@@ -437,7 +437,7 @@ export const clearHumanStyles = `
 
 /* 가운데는 별도 배경 없이 제목과 체크 항목의 여백/구분선만으로 정리합니다. */
 .premium-page #main .recruit-fit{
- display:flex;flex-direction:column;justify-content:flex-start;padding:46px 32px 38px;border-right:1px solid var(--line);
+ display:flex;flex-direction:column;justify-content:flex-start;padding:46px 24px 38px;border-right:1px solid var(--line);
  background:transparent;
 }
 .premium-page #main .recruit-intro-mark{display:block;width:22px;height:2px;margin:0 0 22px;background:var(--ink)}
@@ -448,19 +448,19 @@ export const clearHumanStyles = `
  display:grid;gap:0;list-style:none;margin:28px 0 0;padding:0;border-top:1px solid var(--line);
 }
 .premium-page #main .recruit-fit li{
- display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;align-items:start;
- padding:15px 0;border-bottom:1px solid var(--line);
- font-family:var(--ch-font);font-size:1.08rem;line-height:1.62;font-weight:500;color:#4f5966;
+ display:grid;grid-template-columns:20px minmax(0,1fr);gap:11px;align-items:start;
+ padding:16px 2px;border-bottom:1px solid var(--line);
+ font-family:var(--ch-font);font-size:1.1rem;line-height:1.62;font-weight:500;color:#4f5966;
 }
 .premium-page #main .recruit-check{
  display:block;width:auto;height:auto;padding-top:1px;
  background:none;color:currentColor;font-size:1rem;font-weight:800;line-height:1.5;
 }
 
-/* 연락 영역은 세로 중앙 정렬 + 옅은 톤으로 묶어 남는 공간을 의도적인 여백으로 보이게 합니다. */
+/* 연락 영역은 패널의 바탕색을 그대로 사용하고, 정렬과 구분선만으로 밀도를 잡습니다. */
 .premium-page #main .recruit-contact{
  display:flex;flex-direction:column;justify-content:center;padding:38px 30px 34px;
- background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(249,247,242,.72));
+ background:transparent;
 }
 .premium-page #main .recruit-contact-person{
  display:grid;grid-template-columns:56px minmax(0,1fr);gap:15px;align-items:center;margin:0 0 22px;
@@ -496,11 +496,11 @@ export const clearHumanStyles = `
 
 @media(max-width:980px){
  .premium-page #main .recruit-heading{margin-left:0}
- .premium-page #main .recruit-watermark{top:30px;right:-180px;width:1100px;opacity:.2}
+ .premium-page #main .recruit-watermark{top:30px;right:-60px;width:1060px;opacity:.2}
  .premium-page #main .recruit-panel{grid-template-columns:1fr}
  .premium-page #main .recruit-list,.premium-page #main .recruit-fit{border-right:0;border-bottom:1px solid var(--line)}
  .premium-page #main .recruit-list{padding:18px 36px}
- .premium-page #main .recruit-fit{padding:32px 36px 28px}
+ .premium-page #main .recruit-fit{padding:32px 28px 28px}
  .premium-page #main .recruit-fit ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:1px solid var(--line)}
  .premium-page #main .recruit-fit li{padding:14px 12px;border-bottom:0;border-right:1px solid var(--line)}
  .premium-page #main .recruit-fit li:last-child{border-right:0}
@@ -508,7 +508,7 @@ export const clearHumanStyles = `
 }
 @media(max-width:650px){
  .premium-page #main .recruit-section{padding-block:46px 50px}
- .premium-page #main .recruit-watermark{top:30px;right:-420px;width:930px;opacity:.16}
+ .premium-page #main .recruit-watermark{top:30px;right:-220px;width:900px;opacity:.16}
  .premium-page #main .recruit-heading{margin-bottom:24px}
  .premium-page #main .recruit-heading h2{font-size:clamp(2rem,9vw,2.4rem)}
  .premium-page #main .recruit-lead{font-size:1.14rem}
@@ -519,7 +519,7 @@ export const clearHumanStyles = `
  .premium-page #main .recruit-number{font-size:1.12rem}
  .premium-page #main .recruit-list h3{font-size:1.12rem}
  .premium-page #main .recruit-list p{font-size:.98rem}
- .premium-page #main .recruit-fit{padding:28px 24px 24px}
+ .premium-page #main .recruit-fit{padding:28px 20px 24px}
  .premium-page #main .recruit-intro-mark{margin-bottom:18px}
  .premium-page #main .recruit-fit h3{font-size:1.4rem}
  .premium-page #main .recruit-fit ul{grid-template-columns:1fr;margin-top:20px}
