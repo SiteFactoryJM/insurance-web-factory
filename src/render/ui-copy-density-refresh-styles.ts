@@ -221,7 +221,7 @@ export const uiCopyDensityRefreshStyles = `
 }
 
 
-/* Service topics: one baseline rule contract across all five themes./* Service topics: one baseline rule contract across all five themes.
+/* Service topics: one baseline rule contract across all five themes.
    Theme personality stays in surface/accent treatment, not irregular borders. */
 .premium-page #main .service-grid{border-top:0!important}
 .premium-page #main .service-card,
@@ -448,13 +448,6 @@ export const uiCopyDensityRefreshStyles = `
 }
 
 @media(max-width:650px){
- .premium-page #main .cases-section{padding-block:36px}
- .premium-page #main .cases-item{
-  width:252px;min-width:252px;min-height:0!important;
-  grid-template-columns:40px minmax(0,1fr);gap:10px;padding:16px;
- }
- .premium-page #main .cases-copy h3{font-size:1.0625rem}
- .premium-page #main .cases-item p{font-size:1rem}
  .theme-clean-minimal #main .hero-statement .hero-topics{width:100%}
 }
 
@@ -482,7 +475,6 @@ export const uiCopyDensityRefreshStyles = `
 }
 
 @media(prefers-reduced-motion:reduce){
- .premium-page #main .cases-track{animation:none!important}
  .premium-page #main .service-card::after{transition:none!important}
 }
 `;
