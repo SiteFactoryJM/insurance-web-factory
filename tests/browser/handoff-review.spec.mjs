@@ -64,7 +64,7 @@ test('desktop portrait heroes align the main logo with the photo top and center 
     const geometry = await page.locator('.premium-hero').evaluate(hero => {
       const visual = hero.querySelector('.hero-visual').getBoundingClientRect();
       const copy = hero.querySelector('.hero-copy').getBoundingClientRect();
-      const logo = hero.querySelector('.hero-brand-logo').getBoundingClientRect();
+      const logo = hero.querySelector('.hero-brand-feature').getBoundingClientRect();
       return {
         topDelta: Math.abs(logo.top - visual.top),
         centerDelta: Math.abs((logo.left + logo.width / 2) - (copy.left + copy.width / 2)),
@@ -85,7 +85,7 @@ test('all five hero layouts show Instagram instead of the service shortcut and k
     const instagram = page.locator('.hero-actions [data-contact-link="instagram"]');
     await expect(instagram).toHaveText(/인스타그램/);
     await expect(instagram).toHaveClass(/direct-instagram/);
-    await expect(page.locator('.hero-brand-logo img')).toBeVisible();
+    await expect(page.locator('.hero-brand-feature img')).toBeVisible();
     await expect(page.locator('.hero-topics')).toContainText('청구서비스');
     await expect(page.locator('.hero-topics')).toContainText('청구 금액 확인');
     await expect(page.locator('.hero-topics')).toContainText('부지급된 보험금 확인');
