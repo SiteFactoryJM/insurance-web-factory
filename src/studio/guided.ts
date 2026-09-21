@@ -256,8 +256,8 @@ document.addEventListener('click', async event => {
       const choice = BRAND_CHOICES.find(item => item.id === target.dataset.brandLayout);
       if (!choice) throw new Error('로고 연출 선택을 확인해 주세요.');
       site.hero.brandLayout = choice.id;
-      site.hero.brandTagline = choice.tagline;
-      site.hero.brandSubline = choice.subline;
+      if (choice.tagline) site.hero.brandTagline = choice.tagline; else delete site.hero.brandTagline;
+      if (choice.subline) site.hero.brandSubline = choice.subline; else delete site.hero.brandSubline;
       changed('home'); renderPanel();
       message(`${choice.name}을 적용했습니다. 로고 이미지와 담당자 정보는 그대로입니다.`);
     }
