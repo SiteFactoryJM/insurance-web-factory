@@ -24,7 +24,7 @@ export function renderHeader(site: SiteConfig): string {
   const hidden = getDesign(site).hiddenSections;
   const headerLogo = site.agent.logoMarkImage || site.agent.logoImage;
   const links = `${!hidden.includes('about') ? '<a href="#about">담당자 소개</a>' : ''}${!hidden.includes('services') ? '<a href="#specialties">상담 분야</a>' : ''}${site.sections.faq && !hidden.includes('faq') ? '<a href="#faq">자주 묻는 질문</a>' : ''}<a href="${hidden.includes('contact') ? '#footer' : '#contact'}">연락 방법</a>`;
-  return `<header class="site-header"><div class="container header-inner"><a class="brand" href="/" aria-label="${e(site.agent.name)} 보험상담 홈">${headerLogo ? `<img class="brand-logo" src="${e(headerLogo)}" alt="${e(site.agent.company)} 로고" width="72" height="72">` : ''}<span><strong>${e(site.agent.name || '담당자 이름')} <span class="brand-service">${e(site.agent.title || '보험설계사')}</span></strong><span class="brand-sub">${e(site.agent.company)}</span></span></a><nav class="desktop-nav" aria-label="주요 메뉴">${links}</nav><div class="header-tools">${renderContactButtons(site, true)}<details class="mobile-menu"><summary>메뉴</summary><nav aria-label="모바일 메뉴">${links}</nav></details></div></div></header>`;
+  return `<header class="site-header"><div class="container header-inner"><a class="brand" href="/" aria-label="${e(site.agent.name)} 보험상담 홈">${headerLogo ? `<img class="brand-logo" src="${e(headerLogo)}" alt="${e(site.agent.company)} 로고" width="80" height="80">` : ''}<span><strong>${e(site.agent.name || '담당자 이름')} <span class="brand-service">${e(site.agent.title || '보험설계사')}</span></strong><span class="brand-sub">${e(site.agent.company)}</span></span></a><nav class="desktop-nav" aria-label="주요 메뉴">${links}</nav><div class="header-tools"><details class="mobile-menu"><summary>메뉴</summary><nav aria-label="모바일 메뉴">${links}</nav></details></div></div></header>`;
 }
 
 /**
@@ -66,8 +66,11 @@ export function renderFooter(site: SiteConfig): string {
 }
 
 export function renderMobileCta(site: SiteConfig): string {
-  if (!directPhoneHref(site.contact.phone) && !openChatUrl(site.contact.kakaoUrl)) return '';
-  return `<div class="mobile-cta direct-mobile-cta" data-mobile-cta aria-label="바로 연락하기">${renderContactButtons(site, true)}</div>`;
+  const phone = directPhoneHref(site.contact.phone);
+  const kakao = openChatUrl(site.contact.kakaoUrl);
+  const instagram = instagramProfileUrl(site.contact.instagramUrl);
+  if (!phone && !kakao && !instagram) return '';
+  return `<nav class="floating-contact-dock" data-floating-contact aria-label="빠른 연락">${phone ? `<a class="floating-contact-link floating-phone" data-contact-link="phone" href="${e(phone)}" aria-label="${e(site.agent.name || '담당자')}에게 전화하기" title="전화">${phoneIcon}</a>` : ''}${kakao ? `<a class="floating-contact-link floating-kakao" data-contact-link="kakao" href="${e(kakao)}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer" aria-label="카카오톡 오픈채팅 열기 (새 창)" title="카카오톡 오픈채팅">${chatIcon}</a>` : ''}${instagram ? `<a class="floating-contact-link floating-instagram" data-contact-link="instagram" href="${e(instagram)}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer" aria-label="인스타그램 프로필 열기 (새 창)" title="인스타그램">${instagramIcon}</a>` : ''}</nav>`;
 }
 export function formatIndex(index: number): string { return String(index + 1).padStart(2, '0'); }
 export function renderReviewNotice(): string { return '<p class="review-notice">게시 동의와 사실 확인을 마친 후기만 제공합니다.</p>'; }
