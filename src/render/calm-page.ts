@@ -22,6 +22,37 @@ function naturalHeading(value?: string): string {
   return (value || '').replace(/\s*\n\s*/g, ' ').replace(/\s{2,}/g, ' ').trim();
 }
 
+const BRAND_PRESENTATION_COPY = {
+  'soft-panel': {
+    tagline: '사람을 먼저 생각하는 보험의 기준, 해온',
+    subline: 'LIFE INSURANCE FOR A BRIGHTER TOMORROW',
+  },
+  'gold-wave': {
+    tagline: '당신의 오늘이 더 나은 내일이 되도록',
+    subline: 'LIFE, ALWAYS WITH YOU',
+  },
+  watermark: {
+    tagline: '',
+    subline: '',
+  },
+} as const;
+
+function heroBrandFeature(site: SiteConfig): string {
+  const layout = site.hero.brandLayout || 'soft-panel';
+  const fallback = BRAND_PRESENTATION_COPY[layout] || BRAND_PRESENTATION_COPY['soft-panel'];
+  const tagline = site.hero.brandTagline?.trim() || fallback.tagline;
+  const subline = site.hero.brandSubline?.trim() || fallback.subline;
+  const logo = site.agent.logoImage?.trim() || '';
+  const mark = site.agent.logoMarkImage?.trim() || logo;
+  if (!logo && !mark) return '';
+  if (layout === 'watermark') {
+    const primary = logo || mark;
+    return `<div class="hero-brand-feature hero-brand-watermark" data-brand-layout="watermark"><div class="brand-watermark-art" aria-hidden="true">${mark ? `<img class="brand-watermark-mark" src="${e(mark)}" alt="">` : ''}</div><img class="brand-watermark-wordmark" src="${e(primary)}" alt="${e(site.agent.company || '소속')} 로고"></div>`;
+  }
+  const featureClass = layout === 'gold-wave' ? 'hero-brand-gold-wave' : 'hero-brand-soft-panel';
+  return `<div class="hero-brand-feature ${featureClass}" data-brand-layout="${e(layout)}"><div class="brand-panel-logo"><img src="${e(logo || mark)}" alt="${e(site.agent.company || '소속')} 로고"></div><span class="brand-panel-divider" aria-hidden="true"></span><div class="brand-panel-copy">${tagline ? `<p>${e(tagline)}</p>` : ''}${subline ? `<span>${e(subline)}</span>` : ''}</div><span class="brand-panel-wave" aria-hidden="true"></span></div>`;
+}
+
 function hero(site: SiteConfig): string {
   const design = getDesign(site);
   const pattern = design.hero;
@@ -34,8 +65,8 @@ function hero(site: SiteConfig): string {
     { label: '배상책임사고', tone: 'base' },
   ];
   const topicChips = [...coreTopics, ...extraTopics].map(item => `<span class="topic-chip topic-${item.tone}">${e(item.label)}</span>`).join('');
-  const heroLogo = site.agent.logoImage ? `<div class="hero-brand-logo"><img src="${e(site.agent.logoImage)}" alt="${e(site.agent.company || '소속')} 로고" width="600" height="225"></div>` : '';
-  const lead = `<div class="hero-copy">${heroLogo}<p class="eyebrow"><span class="small-line" aria-hidden="true"></span>${e(site.hero.eyebrow || '보험 상담 안내')}</p><h1 id="hero-title">${copy(naturalHeading(site.hero.headline || '가입한 보험, 무엇부터 확인할까요?'), naturalHeading(site.hero.mobileHeadline))}</h1><p class="hero-description">${copy(site.hero.subheadline, site.hero.mobileSubheadline)}</p>${topicChips ? `<div class="hero-topics" aria-label="주요 상담 분야">${topicChips}</div>` : ''}<div class="hero-actions">${renderContactButtons(site)}</div><p class="hero-note">상담은 가입 신청과 별개입니다.${site.hero.trustNote ? `<br>${e(site.hero.trustNote)}` : ''}</p></div>`;
+  const heroBrand = heroBrandFeature(site);
+  const lead = `<div class="hero-copy">${heroBrand}<p class="eyebrow"><span class="small-line" aria-hidden="true"></span>${e(site.hero.eyebrow || '보험 상담 안내')}</p><h1 id="hero-title">${copy(naturalHeading(site.hero.headline || '가입한 보험, 무엇부터 확인할까요?'), naturalHeading(site.hero.mobileHeadline))}</h1><p class="hero-description">${copy(site.hero.subheadline, site.hero.mobileSubheadline)}</p>${topicChips ? `<div class="hero-topics" aria-label="주요 상담 분야">${topicChips}</div>` : ''}<div class="hero-actions">${renderContactButtons(site)}</div><p class="hero-note">상담은 가입 신청과 별개입니다.${site.hero.trustNote ? `<br>${e(site.hero.trustNote)}` : ''}</p></div>`;
   let visual: string;
   if (pattern === 'editorial') {
     visual = `<div class="hero-visual"><figure class="hero-scene"><img src="${e(site.hero.image || site.agent.profileImage || '/assets/profile-placeholder.svg')}" alt="${site.hero.image ? '' : e(`${site.agent.name || '담당자'} 프로필`)}" width="1536" height="1024" fetchpriority="high"></figure>${adviserCard(site)}</div>`;
