@@ -34,7 +34,7 @@ for(const preset of library.presets)test(`purpose/${preset.id}: real identity is
 });
 test('blank project does not silently copy a real advisor identity',()=>{
  const s=blankGuidedSite(raw);for(const v of [s.agent.name,s.agent.company,s.contact.phone,s.contact.kakaoUrl,s.contact.instagramUrl,s.contact.availableHours,s.contact.email,s.contact.fax])assert.equal(v,'');
- assert.equal(guidedIssues(s).length,5);assert.equal(s.agent.profileImage,'/assets/profile-placeholder.svg');assert.deepEqual(s.career,[]);assert.deepEqual(s.reviews,[]);
+ assert.equal(guidedIssues(s).length,5);assert.equal(s.agent.profileImage,'/assets/profile-placeholder.svg');assert.equal(s.agent.logoImage,'');assert.equal(s.agent.logoMarkImage,'');assert.deepEqual(s.career,[]);assert.deepEqual(s.reviews,[]);
 });
 test('invalid and duplicate selection is rejected without changing the source',()=>{
  const before=JSON.stringify(raw);for(const ids of [[],['missing'],['hero-01','hero-01']])assert.throws(()=>applyCopy(raw,'heroes',ids));
