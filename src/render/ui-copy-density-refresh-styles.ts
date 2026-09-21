@@ -667,18 +667,26 @@ export const uiCopyDensityRefreshStyles = `
   width:min(72vw,18.25rem);
   margin-inline:auto;
  }
- .premium-page #main .about-profile-content{padding:0}
- .premium-page #main .about-profile-heading{text-align:center}
+ .premium-page #main .about-profile-content{
+  width:100%;
+  padding-inline:1rem;
+ }
+ .premium-page #main .about-profile-heading{
+  width:100%;
+  max-width:29.5rem;
+  margin-inline:auto;
+  text-align:center;
+ }
  .premium-page #main .about-profile-heading h2{
   max-width:29rem;
   margin-inline:auto;
   font-size:clamp(1.75rem,7vw,2.15rem);
  }
  .premium-page #main .about-profile-copy{
-  width:calc(100% - 2rem);
+  width:100%;
   max-width:29.5rem;
   margin:18px auto 0;
-  padding-inline:8px;
+  padding-inline:0;
  }
  .premium-page #main .about-profile-values{
   width:min(100%,29rem);
