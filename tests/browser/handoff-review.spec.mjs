@@ -167,7 +167,7 @@ test('consumer sections group headings and copy within balanced reading widths',
 });
 
 
-test('insurance scope distributes representative topics evenly with subtle accessible motion', async ({ page }) => {
+test('insurance scope stays dense on desktop, shorter on mobile, and uses subtle accessible motion', async ({ page }) => {
   const expectedTopics = [
     '실손의료비', '암보험', '뇌심장보험', '수술보험', '치아보험',
     '태아보험', '자동차보험', '운전자보험', '상해보험', '배상책임',
@@ -184,10 +184,7 @@ test('insurance scope distributes representative topics evenly with subtle acces
     expect(await page.locator('#specialties + #insurance-scope').count(), `scope order at ${width}px`).toBe(1);
     await expect(section.locator('.insurance-scope-heading .eyebrow')).toHaveText('대표 15가지 상담 분야');
     await expect(section.locator('.insurance-scope-heading .section-support')).toContainText('이 외 모든 보험 종류도 상담 가능합니다.');
-    await expect(section.locator('.insurance-scope-badge')).toContainText('대표 상담');
-    await expect(section.locator('.insurance-scope-badge')).toContainText('15');
     await expect(section.locator('.insurance-scope-all-note')).toContainText('15가지는 대표 예시입니다');
-    await expect(section.locator('.insurance-scope-all-note')).toContainText('그 외 모든 보험 종류도 상담 가능합니다.');
 
     const topics = await section.locator('.insurance-scope-topic span').allTextContents();
     expect(topics.map(label => label.trim())).toEqual(expectedTopics);
@@ -196,12 +193,15 @@ test('insurance scope distributes representative topics evenly with subtle acces
       const grid = el.querySelector('.insurance-scope-topics');
       const note = el.querySelector('.insurance-scope-all-note');
       const spans = [...el.querySelectorAll('.insurance-scope-topic span')];
-      const topicBoxes = [...el.querySelectorAll('.insurance-scope-topic')].map(topic => ({
+      const topicEls = [...el.querySelectorAll('.insurance-scope-topic')];
+      const tops = [...new Set(topicEls.map(topic => Math.round(topic.getBoundingClientRect().top)))];
+      const topicBoxes = topicEls.map(topic => ({
         width: topic.getBoundingClientRect().width,
         overflow: topic.scrollWidth > topic.clientWidth,
       }));
       return {
         columns: getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length,
+        rowCount: tops.length,
         noteAlign: getComputedStyle(note).textAlign,
         animationNames: spans.map(span => getComputedStyle(span).animationName),
         animationDurations: spans.map(span => parseFloat(getComputedStyle(span).animationDuration)),
@@ -210,11 +210,13 @@ test('insurance scope distributes representative topics evenly with subtle acces
       };
     });
 
-    const expectedColumns = width <= 650 ? 2 : width <= 900 ? 3 : 12;
+    const expectedColumns = width <= 350 ? 2 : width <= 900 ? 3 : 5;
+    const expectedRows = width <= 350 ? 8 : width <= 900 ? 5 : 3;
     expect(layout.columns, `scope columns at ${width}px`).toBe(expectedColumns);
+    expect(layout.rowCount, `scope rows at ${width}px`).toBe(expectedRows);
     expect(layout.noteAlign, `scope note alignment at ${width}px`).toBe('center');
     expect(layout.animationNames.every(name => name === 'insurance-scope-float'), `scope animation at ${width}px`).toBe(true);
-    expect(layout.animationDurations.every(duration => duration >= 6.8), `scope animation speed at ${width}px`).toBe(true);
+    expect(layout.animationDurations.every(duration => duration >= 4.5 && duration <= 5.6), `scope animation speed at ${width}px`).toBe(true);
     expect(layout.topicBoxes.every(topic => topic.width > 0 && !topic.overflow), `scope topic fit at ${width}px`).toBe(true);
     expect(layout.overflow, `scope overflow at ${width}px`).toBe(false);
     expect(await page.evaluate(() => document.documentElement.scrollWidth), `page overflow at ${width}px`).toBeLessThanOrEqual(width);
