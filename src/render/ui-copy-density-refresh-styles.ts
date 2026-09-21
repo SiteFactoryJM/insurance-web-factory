@@ -646,7 +646,7 @@ export const uiCopyDensityRefreshStyles = `
 }
 
 @media(min-width:801px){
- .premium-page #main .about-profile-heading,
+ .premium-page #main .about-profile .about-profile-heading,
  .premium-page #main .about-profile-lead,
  .premium-page #main .about-profile-message{
   margin-left:24px;
