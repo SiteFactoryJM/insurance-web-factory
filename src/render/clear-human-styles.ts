@@ -56,9 +56,9 @@ export const clearHumanStyles = `
 .premium-page .direct-phone:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
 .premium-page .direct-kakao{background:var(--kakao);color:var(--kakao-ink);border-color:var(--kakao-line)}
 .premium-page .direct-kakao:hover{background:var(--kakao-hover);color:var(--kakao-ink);border-color:var(--kakao-line)}
-.premium-page .direct-instagram{background:linear-gradient(135deg,#833AB4 0%,#C13584 48%,#E1306C 72%,#F77737 100%);color:#fff;border-color:#C13584}
-.premium-page .direct-instagram:hover{background:linear-gradient(135deg,#6F2F9B 0%,#A92D72 48%,#C92B61 72%,#DD642F 100%);color:#fff;border-color:#A92D72}
-.premium-page .brand-logo{width:56px;height:56px;object-fit:contain;flex:0 0 auto}
+.premium-page .direct-instagram{background:linear-gradient(135deg,#76596F 0%,#966278 48%,#AE6C76 72%,#BE7968 100%);color:#fff;border-color:#966278}
+.premium-page .direct-instagram:hover{background:linear-gradient(135deg,#684E62 0%,#85566A 48%,#9A6068 72%,#AA6B5C 100%);color:#fff;border-color:#85566A}
+.premium-page .brand-logo{width:72px;height:72px;object-fit:contain;flex:0 0 auto}
 .premium-page .site-footer .direct-phone{border-color:#B9C4CE;background:transparent;color:#fff}
 .premium-page .site-footer .direct-phone:hover{background:#243347;border-color:#B9C4CE}
 
@@ -317,7 +317,7 @@ export const clearHumanStyles = `
  .premium-page #main .contact-person{margin-top:20px}
  .premium-page #main .direct-contact-panel{padding:22px 18px}
  .premium-page #main .direct-contact-panel>.direct-contact-actions,.premium-page #main .direct-contact-panel>.direct-contact-actions:has(>a:nth-child(3)){grid-template-columns:minmax(0,1fr)}
- .premium-page .brand-logo{width:44px;height:44px}
+ .premium-page .brand-logo{width:54px;height:54px}
  .premium-page .footer-brand-end{align-items:flex-start}
  .premium-page .footer-brand-logo{width:76px;height:76px}
  .premium-page #main .direct-contact-details{grid-template-columns:minmax(0,1fr)}
@@ -348,11 +348,6 @@ html{scroll-behavior:smooth}
 
 .premium-page #main .hero-topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;max-width:40rem}
 .premium-page #main .hero-topics span{display:inline-flex;align-items:center;min-height:34px;max-width:100%;padding:5px 11px;border:1px solid var(--line);background:var(--tint);color:var(--ink);font-size:.9375rem;line-height:1.45;font-weight:600;overflow-wrap:anywhere}
-.premium-page #main .hero-topics .topic-claim{background:#FFF2D7;border-color:#E9C36F;color:#664D16}
-.premium-page #main .hero-topics .topic-amount{background:#E8F5EE;border-color:#9BC9AE;color:#285E3D}
-.premium-page #main .hero-topics .topic-unpaid{background:#FBEAEC;border-color:#E6A7AE;color:#7A3039}
-.premium-page #main .hero-topics .topic-auto{background:#EAF3FB;border-color:#A6C9E7;color:#315F83}
-.premium-page #main .hero-topics .topic-liability{background:#F1ECFA;border-color:#C3AFE6;color:#5A4382}
 .premium-page #main .hero-actions{margin-top:24px}
 .premium-page #main .hero-visual{position:relative}
 .premium-page #main .portrait-figure,.premium-page #main .hero-scene{position:relative;z-index:1;background:transparent;box-shadow:none}
