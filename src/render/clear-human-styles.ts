@@ -83,7 +83,7 @@ export const clearHumanStyles = `
 .premium-page #main .hero-brand-soft-panel .brand-panel-wave{right:-68px;bottom:-118px;width:290px;height:290px;border:34px solid rgba(220,181,112,.10);border-radius:50%;box-shadow:0 0 0 34px rgba(220,181,112,.055),0 0 0 68px rgba(220,181,112,.035)}
 .premium-page #main .hero-brand-gold-wave .brand-panel-wave{left:-8%;right:-8%;bottom:-112px;height:175px;border-top:1px solid rgba(212,168,92,.45);border-radius:50% 50% 0 0 / 100% 100% 0 0;transform:rotate(-2deg);box-shadow:0 -18px 0 rgba(226,194,132,.075),0 -36px 0 rgba(226,194,132,.045)}
 .premium-page #main .hero-copy-brand-watermark{position:relative;isolation:isolate;overflow:visible;padding-inline:0}
-.premium-page #main .hero-watermark-zone{position:static;margin:0 0 4px;padding:34px 0 24px}
+.premium-page #main .hero-watermark-zone{position:static;margin:0 0 4px;padding:42px 0 24px}
 .premium-page #main .hero-watermark-zone>.hero-brand-watermark{
  position:absolute;top:-26px;right:clamp(-8.5rem,-8vw,-3rem);bottom:-18px;left:clamp(-4.5rem,-5vw,-2rem);
  z-index:0;width:auto;height:auto;min-height:0;margin:0;pointer-events:none;
@@ -95,7 +95,7 @@ export const clearHumanStyles = `
 .premium-page #main .hero-watermark-zone>.eyebrow,.premium-page #main .hero-watermark-zone>h1,
 .premium-page #main .hero-copy-brand-watermark>.hero-description,.premium-page #main .hero-copy-brand-watermark>.hero-topics,
 .premium-page #main .hero-copy-brand-watermark>.hero-actions,.premium-page #main .hero-copy-brand-watermark>.hero-note{position:relative;z-index:1}
-.premium-page #main .hero-copy-brand-watermark .hero-description{margin-top:48px}
+.premium-page #main .hero-copy-brand-watermark .hero-description{margin-top:54px}
 .premium-page #main .premium-hero:not(.hero-statement) .hero-copy>.eyebrow{margin-top:auto}
 .premium-page #main .hero-description{max-width:36rem;margin-top:16px;font-size:var(--ch-body);line-height:var(--ch-body-lh)}
 .premium-page #main .hero-actions{margin-top:22px;gap:12px 20px}
@@ -391,10 +391,14 @@ html{scroll-behavior:smooth}
 .premium-page #main .section-heading .section-support{max-width:44rem;font-size:1.125rem;line-height:1.6667}
 .premium-page #main .section-heading::after{content:"";display:block;width:48px;height:2px;margin:18px auto 0;background:var(--accent)}
 
-.premium-page #main .hero-topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;max-width:40rem}
+.premium-page #main .hero-topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px;max-width:40rem}
 .premium-page #main .hero-topics span{display:inline-flex;align-items:center;min-height:34px;max-width:100%;padding:5px 11px;border:1px solid var(--line);background:var(--tint);color:var(--ink);font-size:.9375rem;line-height:1.45;font-weight:600;overflow-wrap:anywhere}
 .premium-page #main .premium-hero:not(.hero-statement) .hero-actions{margin-top:auto;padding-top:24px}
 .premium-page #main .hero-actions{margin-top:28px}
+@media(min-width:651px){
+ .premium-page #main .premium-hero:not(.hero-statement) .hero-actions{padding-top:8px}
+ .premium-page #main .premium-hero:not(.hero-statement) .hero-note{margin-top:24px}
+}
 .premium-page #main .hero-visual{position:relative}
 .premium-page #main .portrait-figure,.premium-page #main .hero-scene{position:relative;z-index:1;background:transparent;box-shadow:none}
 .premium-page #main .portrait-figure::before,.premium-page #main .hero-scene::before{display:none}
