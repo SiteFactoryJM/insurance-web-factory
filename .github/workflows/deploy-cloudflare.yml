@@ -1,20 +1,28 @@
 name: Deploy Cloudflare demo
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: deploy-cloudflare-demo
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 22
-      - run: npm install
+          cache: npm
+      - run: npm ci
       - run: npm run check
       - name: Check Cloudflare credentials
         env:
@@ -30,6 +38,13 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
+      - name: Verify deployed Worker
+        env:
+          LIVE_URL: ${{ steps.deploy.outputs.deployment-url }}
+        shell: bash
+        run: |
+          test -n "$LIVE_URL" || { echo "::error::Wrangler did not return deployment-url"; exit 1; }
+          node scripts/verify-live.mjs
       - name: Publish deployment URL
         env:
           DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
