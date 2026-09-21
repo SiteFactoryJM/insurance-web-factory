@@ -58,7 +58,7 @@ export const clearHumanStyles = `
 .premium-page .direct-kakao:hover{background:var(--kakao-hover);color:var(--kakao-ink);border-color:var(--kakao-line)}
 .premium-page .direct-instagram{background:linear-gradient(135deg,#833AB4 0%,#C13584 48%,#E1306C 72%,#F77737 100%);color:#fff;border-color:#C13584}
 .premium-page .direct-instagram:hover{background:linear-gradient(135deg,#6F2F9B 0%,#A92D72 48%,#C92B61 72%,#DD642F 100%);color:#fff;border-color:#A92D72}
-.premium-page .brand-logo{width:3.5rem;height:3.5rem;object-fit:contain;flex:0 0 auto}
+.premium-page .brand-logo{width:56px;height:56px;object-fit:contain;flex:0 0 auto}
 .premium-page .site-footer .direct-phone{border-color:#B9C4CE;background:transparent;color:#fff}
 .premium-page .site-footer .direct-phone:hover{background:#243347;border-color:#B9C4CE}
 
@@ -100,6 +100,8 @@ export const clearHumanStyles = `
 .premium-page .adviser-card .adviser-phone:hover{text-decoration:underline}
 .premium-page #main .hero-statement{max-width:56rem;grid-template-columns:1fr;gap:24px;padding-block:48px;text-align:center}
 .premium-page #main .hero-statement .hero-copy,.premium-page #main .hero-statement .hero-description{margin-inline:auto}
+.premium-page #main .hero-statement .hero-brand-logo{margin-inline:auto}
+.premium-page #main .hero-statement .hero-brand-logo img{margin-inline:auto;object-position:center}
 .premium-page #main .hero-statement .hero-actions{justify-content:center}
 .premium-page #main .hero-statement-person{
  display:flex;flex-flow:row wrap;align-items:stretch;justify-content:center;gap:0;
@@ -245,7 +247,7 @@ export const clearHumanStyles = `
 .premium-page .site-footer .footer-legal p{color:#CBD3DC}
 .premium-page .site-footer .direct-kakao{color:var(--kakao-ink)}
 .premium-page .footer-brand-end{display:flex;flex-direction:column;align-items:flex-end;gap:.75rem}
-.premium-page .footer-brand-logo{display:block;width:5.5rem;height:5.5rem;object-fit:contain}
+.premium-page .footer-brand-logo{display:block;width:88px;height:88px;object-fit:contain}
 
 .gallery-page #main .gallery-header{max-width:52rem;margin-inline:auto;text-align:center}
 .gallery-page #main .gallery-header>p{max-width:42rem;margin-inline:auto}
@@ -315,9 +317,9 @@ export const clearHumanStyles = `
  .premium-page #main .contact-person{margin-top:20px}
  .premium-page #main .direct-contact-panel{padding:22px 18px}
  .premium-page #main .direct-contact-panel>.direct-contact-actions,.premium-page #main .direct-contact-panel>.direct-contact-actions:has(>a:nth-child(3)){grid-template-columns:minmax(0,1fr)}
- .premium-page .brand-logo{width:2.9rem;height:2.9rem}
+ .premium-page .brand-logo{width:44px;height:44px}
  .premium-page .footer-brand-end{align-items:flex-start}
- .premium-page .footer-brand-logo{width:4.75rem;height:4.75rem}
+ .premium-page .footer-brand-logo{width:76px;height:76px}
  .premium-page #main .direct-contact-details{grid-template-columns:minmax(0,1fr)}
  .premium-page #main .direct-contact-details>div{padding:12px 0}
  .premium-page #main .direct-contact-details>div:nth-child(even){border-left:0}
