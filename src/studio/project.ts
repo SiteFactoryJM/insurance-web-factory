@@ -1,5 +1,5 @@
 import { directEmailHref, directPhoneHref, instagramProfileUrl, openChatUrl } from '../utils/contact-links.js';
-import { DESIGN_SECTION_IDS, HEADING_FONT_IDS, INTRO_PRINCIPLE_LAYOUT_IDS, PALETTE_IDS, TEMPLATE_IDS, type DesignSectionId, type SiteConfig } from "../types.js";
+import { DESIGN_SECTION_IDS, HEADING_FONT_IDS, HERO_BRAND_LAYOUT_IDS, INTRO_PRINCIPLE_LAYOUT_IDS, PALETTE_IDS, TEMPLATE_IDS, type DesignSectionId, type SiteConfig } from "../types.js";
 import { COPY_LIBRARY } from '../content/copy-library.js';
 import { DESIGN_VERSION } from '../render/design-system.js';
 
@@ -116,7 +116,8 @@ const siteRule = object({
   agent: object({ name: text(60), title: text(80), company: text(120), branch: text(120, true), registrationNumber: text(80, true), businessNumber: text(80, true),
     careerYears: { type: "number", min: 0, max: 100, optional: true }, regions: list(text(80), 0, 12), profileImage: imageRule(), logoImage: imageRule(true), logoMarkImage: imageRule(true) }),
   hero: object({ eyebrow: text(80, true), headline: text(40), subheadline: text(120), mobileHeadline: text(24, true, 1), mobileSubheadline: text(60, true, 1),
-    primaryCtaLabel: text(24), secondaryCtaLabel: text(24), trustNote: text(240, true), image: imageRule(true) }),
+    primaryCtaLabel: text(24), secondaryCtaLabel: text(24), trustNote: text(240, true), image: imageRule(true),
+    brandLayout: choice(HERO_BRAND_LAYOUT_IDS, true), brandTagline: text(80, true), brandSubline: text(100, true) }),
   intro: object({ title: text(40), body: text(400), mobileTitle: text(24, true, 1), mobileBody: text(100, true, 1), philosophy: text(160, true), principleTitle: text(80, true), principleBody: text(240, true), principleLayout: choice(INTRO_PRINCIPLE_LAYOUT_IDS, true) }),
   specialties: list(cardRule, 3), process: list(cardRule), career: list(text(160), 0, 20),
   reviews: list(object({ quote: text(400), author: text(80), context: text(120, true), isExample: bool(true) }), 0, 12, true), faqs: list(faqRule),
