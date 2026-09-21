@@ -212,6 +212,79 @@ export const clearHumanStyles = `
 }
 .premium-page #main .about-quote .about-copy{margin-top:0}
 
+/* 담당자 소개 다음 약속 패널: 팔레트의 ink/accent/detail만 사용합니다. */
+.premium-page #main .promise-section{padding-top:0}
+.premium-page #main .promise-panel{
+ position:relative;overflow:hidden;
+ padding:clamp(2.25rem,4vw,3.25rem) clamp(1.75rem,4.5vw,3.5rem);
+ border:1px solid var(--accent);border-radius:clamp(1.25rem,2.5vw,1.875rem);
+ background:var(--ink);color:var(--on-brand);
+}
+.premium-page #main .promise-heading{margin:0 0 1.75rem}
+.premium-page #main .promise-eyebrow{
+ margin:0 0 .625rem;
+ font-size:var(--ch-small);line-height:var(--ch-small-lh);
+ font-weight:600;letter-spacing:.01em;color:var(--detail);
+}
+.premium-page #main .promise-heading h2{
+ max-width:none;margin:0;
+ font-size:clamp(2rem,3.2vw,2.625rem);line-height:1.35;
+ color:var(--on-brand);text-wrap:balance;
+}
+.premium-page #main .promise-grid{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ column-gap:clamp(2rem,5vw,4rem);row-gap:0;
+}
+.premium-page #main .promise-item{
+ display:grid;grid-template-columns:2.5rem minmax(0,1fr);
+ align-items:start;gap:1rem;
+ min-width:0;padding:1.5rem 0 1.625rem;
+ border-top:1px solid var(--accent);
+}
+.premium-page #main .promise-check{
+ position:relative;display:block;
+ width:2.5rem;height:2.5rem;margin-top:.125rem;
+ border-radius:50%;background:var(--accent);
+}
+.premium-page #main .promise-check::after{
+ content:"";position:absolute;
+ left:50%;top:47%;
+ width:.55rem;height:1rem;
+ border-right:3px solid var(--on-brand);
+ border-bottom:3px solid var(--on-brand);
+ transform:translate(-50%,-58%) rotate(45deg);
+}
+.premium-page #main .promise-copy{min-width:0}
+.premium-page #main .promise-copy h3{
+ margin:0;color:var(--on-brand);
+ font-size:1.375rem;line-height:1.5;
+}
+.premium-page #main .promise-copy p{
+ margin:.375rem 0 0;
+ color:var(--detail);
+ font-size:1.125rem;line-height:1.7;
+}
+@media(max-width:900px){
+ .premium-page #main .promise-panel{padding:2.25rem 2rem}
+ .premium-page #main .promise-grid{column-gap:2rem}
+}
+@media(max-width:650px){
+ .premium-page #main .promise-panel{
+  padding:2rem 1.375rem 1.625rem;
+  border-radius:1.25rem;
+ }
+ .premium-page #main .promise-heading{margin-bottom:1.25rem}
+ .premium-page #main .promise-heading h2{font-size:clamp(1.75rem,8vw,2rem)}
+ .premium-page #main .promise-grid{grid-template-columns:minmax(0,1fr)}
+ .premium-page #main .promise-item{
+  grid-template-columns:2.25rem minmax(0,1fr);
+  gap:.875rem;padding:1.25rem 0 1.375rem;
+ }
+ .premium-page #main .promise-check{width:2.25rem;height:2.25rem}
+ .premium-page #main .promise-copy h3{font-size:1.25rem}
+ .premium-page #main .promise-copy p{font-size:1.0625rem;line-height:1.68}
+}
+
 /* 상담 과정: timeline도 3개의 동등한 단계 패널로 읽습니다. */
 .premium-page #main .process-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
 .premium-page #main .process-grid li{display:flex;flex-direction:column;min-width:0;gap:14px;padding:24px 0 0;border-top:1px solid var(--input)}
