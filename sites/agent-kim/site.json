@@ -14,7 +14,8 @@
     "registrationNumber": "",
     "regions": [],
     "profileImage": "/sites/agent-kim/studio-profile-c1e991dbf3e0446a.png",
-    "logoImage": "/assets/haeon-logo-horizontal.svg"
+    "logoImage": "/assets/haeon-logo-horizontal.svg",
+    "logoMarkImage": "/assets/haeon-logo-stacked.svg"
   },
   "hero": {
     "eyebrow": "보험 상담 안내",
