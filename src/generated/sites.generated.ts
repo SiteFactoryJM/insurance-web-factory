@@ -18,7 +18,8 @@ export const siteConfigs = {
       "registrationNumber": "",
       "regions": [],
       "profileImage": "/sites/demo-agent/lee-yunbok-profile.webp",
-      "logoImage": ""
+      "logoImage": "/assets/haeon-logo-horizontal.svg",
+      "logoMarkImage": "/assets/haeon-logo-stacked.svg"
     },
     "hero": {
       "eyebrow": "보험 상담 안내",
