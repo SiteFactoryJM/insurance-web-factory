@@ -167,12 +167,10 @@ test('consumer sections group headings and copy within balanced reading widths',
 });
 
 
-test('insurance scope stays dense on desktop, shorter on mobile, and uses subtle accessible motion', async ({ page }) => {
-  const expectedTopics = [
-    '실손의료비', '암보험', '뇌심장보험', '수술보험', '치아보험',
-    '태아보험', '자동차보험', '운전자보험', '상해보험', '배상책임',
-    '화재보험', '치매보험', '간병보험', '펫보험', '여행자보험',
-  ];
+test('insurance scope uses the approved split directory and compact mobile items', async ({ page }) => {
+  const popular = ['실손의료비', '암보험', '뇌심장보험', '치아보험', '자동차보험'];
+  const other = ['수술보험', '태아보험', '운전자보험', '상해보험', '배상책임', '화재보험', '치매보험', '간병보험', '펫보험', '여행자보험'];
+  const expectedTopics = [...popular, ...other];
 
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
@@ -184,41 +182,39 @@ test('insurance scope stays dense on desktop, shorter on mobile, and uses subtle
     expect(await page.locator('#specialties + #insurance-scope').count(), `scope order at ${width}px`).toBe(1);
     await expect(section.locator('.insurance-scope-heading .eyebrow')).toHaveText('대표 15가지 상담 분야');
     await expect(section.locator('.insurance-scope-heading .section-support')).toContainText('이 외 모든 보험 종류도 상담 가능합니다.');
-    await expect(section.locator('.insurance-scope-all-note')).toContainText('15가지는 대표 예시입니다');
+    await expect(section.locator('.insurance-scope-popular h3')).toHaveText('많이 찾는 상담');
+    await expect(section.locator('.insurance-scope-other h3')).toHaveText('그 외 상담 가능한 보험');
+    await expect(section.locator('.insurance-scope-all-note')).toContainText('목록에 없어도 상담 가능합니다.');
+    await expect(section.locator('.insurance-scope-arrow')).toHaveCount(0);
 
-    const topics = await section.locator('.insurance-scope-topic span').allTextContents();
+    const topics = await section.locator('.insurance-scope-item h4').allTextContents();
     expect(topics.map(label => label.trim())).toEqual(expectedTopics);
 
     const layout = await section.evaluate(el => {
-      const grid = el.querySelector('.insurance-scope-topics');
-      const note = el.querySelector('.insurance-scope-all-note');
-      const spans = [...el.querySelectorAll('.insurance-scope-topic span')];
-      const topicEls = [...el.querySelectorAll('.insurance-scope-topic')];
-      const tops = [...new Set(topicEls.map(topic => Math.round(topic.getBoundingClientRect().top)))];
-      const topicBoxes = topicEls.map(topic => ({
-        width: topic.getBoundingClientRect().width,
-        overflow: topic.scrollWidth > topic.clientWidth,
-      }));
+      const directory = el.querySelector('.insurance-scope-directory');
+      const popularList = el.querySelector('.insurance-scope-popular-list');
+      const otherList = el.querySelector('.insurance-scope-other-list');
+      const directoryBox = directory.getBoundingClientRect();
+      const descriptions = [...el.querySelectorAll('.insurance-scope-item p')];
+      const items = [...el.querySelectorAll('.insurance-scope-item')];
       return {
-        columns: getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length,
-        rowCount: tops.length,
-        noteAlign: getComputedStyle(note).textAlign,
-        animationNames: spans.map(span => getComputedStyle(span).animationName),
-        animationDurations: spans.map(span => parseFloat(getComputedStyle(span).animationDuration)),
-        topicBoxes,
+        directoryColumns: getComputedStyle(directory).gridTemplateColumns.split(' ').filter(Boolean).length,
+        popularColumns: getComputedStyle(popularList).gridTemplateColumns.split(' ').filter(Boolean).length,
+        otherColumns: getComputedStyle(otherList).gridTemplateColumns.split(' ').filter(Boolean).length,
+        directoryWidth: directoryBox.width,
+        descriptionsVisible: descriptions.every(node => getComputedStyle(node).display !== 'none'),
+        itemsFit: items.every(node => node.scrollWidth <= node.clientWidth),
         overflow: el.scrollWidth > el.clientWidth,
       };
     });
 
-    const expectedColumns = width <= 350 ? 2 : width <= 900 ? 3 : 5;
-    const expectedRows = width <= 350 ? 8 : width <= 900 ? 5 : 3;
-    expect(layout.columns, `scope columns at ${width}px`).toBe(expectedColumns);
-    expect(layout.rowCount, `scope rows at ${width}px`).toBe(expectedRows);
-    expect(layout.noteAlign, `scope note alignment at ${width}px`).toBe('center');
-    expect(layout.animationNames.every(name => name === 'insurance-scope-float'), `scope animation at ${width}px`).toBe(true);
-    expect(layout.animationDurations.every(duration => duration >= 4.5 && duration <= 5.6), `scope animation speed at ${width}px`).toBe(true);
-    expect(layout.topicBoxes.every(topic => topic.width > 0 && !topic.overflow), `scope topic fit at ${width}px`).toBe(true);
+    expect(layout.directoryColumns, `directory columns at ${width}px`).toBe(width <= 900 ? 1 : 2);
+    expect(layout.popularColumns, `popular columns at ${width}px`).toBe(width <= 900 ? 2 : 1);
+    expect(layout.otherColumns, `other columns at ${width}px`).toBe(2);
+    expect(layout.descriptionsVisible, `description visibility at ${width}px`).toBe(width > 650);
+    expect(layout.itemsFit, `scope item fit at ${width}px`).toBe(true);
     expect(layout.overflow, `scope overflow at ${width}px`).toBe(false);
+    if (width === 1440) expect(layout.directoryWidth, 'desktop scope width').toBeLessThanOrEqual(994);
     expect(await page.evaluate(() => document.documentElement.scrollWidth), `page overflow at ${width}px`).toBeLessThanOrEqual(width);
   }
 
@@ -226,37 +222,28 @@ test('insurance scope stays dense on desktop, shorter on mobile, and uses subtle
   for (const palette of ['navy', 'forest', 'teal', 'charcoal', 'stone', 'slate']) {
     await page.goto(`/?palette=${palette}`);
     const appearance = await page.locator('#insurance-scope').evaluate(section => {
-      const cloud = section.querySelector('.insurance-scope-cloud');
-      const accentTopic = section.querySelector('.insurance-scope-topic.is-accent');
-      const badge = section.querySelector('.insurance-scope-badge');
-      const cloudBox = cloud.getBoundingClientRect();
-      const noteBox = section.querySelector('.insurance-scope-all-note').getBoundingClientRect();
+      const directory = section.querySelector('.insurance-scope-directory');
+      const note = section.querySelector('.insurance-scope-all-note');
+      const icon = section.querySelector('.insurance-scope-icon');
+      const directoryBox = directory.getBoundingClientRect();
+      const noteBox = note.getBoundingClientRect();
       const probe = document.createElement('span');
       probe.style.color = 'var(--accent)';
       section.append(probe);
       const expectedAccent = getComputedStyle(probe).color;
       probe.remove();
       return {
-        cloudCenter: cloudBox.left + cloudBox.width / 2,
+        directoryCenter: directoryBox.left + directoryBox.width / 2,
         noteCenter: noteBox.left + noteBox.width / 2,
-        accentMatches: getComputedStyle(accentTopic).color === expectedAccent,
-        badgeUsesTint: getComputedStyle(badge).backgroundColor !== getComputedStyle(cloud).backgroundColor,
+        iconUsesAccent: getComputedStyle(icon).color === expectedAccent,
         overflow: section.scrollWidth > section.clientWidth,
       };
     });
-    expect(Math.abs(appearance.cloudCenter - 720), `${palette} cloud centering`).toBeLessThanOrEqual(2);
-    expect(Math.abs(appearance.noteCenter - appearance.cloudCenter), `${palette} note centering`).toBeLessThanOrEqual(2);
-    expect(appearance.accentMatches, `${palette} accent token`).toBe(true);
-    expect(appearance.badgeUsesTint, `${palette} tint token`).toBe(true);
+    expect(Math.abs(appearance.directoryCenter - 720), `${palette} directory centering`).toBeLessThanOrEqual(2);
+    expect(Math.abs(appearance.noteCenter - appearance.directoryCenter), `${palette} note centering`).toBeLessThanOrEqual(2);
+    expect(appearance.iconUsesAccent, `${palette} icon accent token`).toBe(true);
     expect(appearance.overflow, `${palette} scope overflow`).toBe(false);
   }
-
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/');
-  await expect.poll(() => page.locator('.insurance-scope-topic span').first().evaluate(
-    span => getComputedStyle(span).animationName
-  )).toBe('none');
-  await page.emulateMedia({ reducedMotion: 'no-preference' });
 });
 
 test('intro principle stays concise and service rules are consistent across all five themes', async ({ page }) => {

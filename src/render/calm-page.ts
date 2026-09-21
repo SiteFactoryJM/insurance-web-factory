@@ -4,6 +4,7 @@ import { responsiveCopy as copy } from './copy.js';
 import { getDesign } from './design-system.js';
 import { formatIndex, renderContactButtons, renderContactForm } from './shared.js';
 import { directPhoneHref } from '../utils/contact-links.js';
+import { icon } from '../utils/icons.js';
 
 const profile = (site: SiteConfig, className = '', eager = false) => `<img class="${className}" src="${e(site.agent.profileImage || '/assets/profile-placeholder.svg')}" alt="${e(site.agent.name || '담당자')} 프로필" width="600" height="800" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'}>`;
 
@@ -82,33 +83,33 @@ function hero(site: SiteConfig): string {
 }
 
 const INSURANCE_SCOPE_TOPICS = [
-  '실손의료비',
-  '암보험',
-  '뇌심장보험',
-  '수술보험',
-  '치아보험',
-  '태아보험',
-  '자동차보험',
-  '운전자보험',
-  '상해보험',
-  '배상책임',
-  '화재보험',
-  '치매보험',
-  '간병보험',
-  '펫보험',
-  '여행자보험',
+  { title: '실손의료비', description: '의료비 보장 범위와 청구 관련 내용을 확인합니다.', icon: 'medical', popular: true },
+  { title: '암보험', description: '진단비·치료 관련 보장 내용을 함께 확인합니다.', icon: 'cancer', popular: true },
+  { title: '뇌심장보험', description: '뇌·심장 질환 관련 보장 범위를 살펴봅니다.', icon: 'heartPulse', popular: true },
+  { title: '수술보험', description: '수술 관련 보장 항목과 조건을 확인합니다.', icon: 'surgery', popular: false },
+  { title: '치아보험', description: '치료 항목별 보장 내용을 함께 살펴봅니다.', icon: 'tooth', popular: true },
+  { title: '태아보험', description: '출생 전후 필요한 보장 내용을 확인합니다.', icon: 'baby', popular: false },
+  { title: '자동차보험', description: '차량 사고와 보상 관련 내용을 확인합니다.', icon: 'car', popular: true },
+  { title: '운전자보험', description: '운전 중 사고 관련 보장 범위를 살펴봅니다.', icon: 'steering', popular: false },
+  { title: '상해보험', description: '일상 중 상해 관련 보장 내용을 확인합니다.', icon: 'bandage', popular: false },
+  { title: '배상책임', description: '일상 속 배상책임 관련 내용을 살펴봅니다.', icon: 'liability', popular: false },
+  { title: '화재보험', description: '화재와 재산 피해 관련 보장을 확인합니다.', icon: 'fire', popular: false },
+  { title: '치매보험', description: '치매 관련 진단·돌봄 보장 내용을 살펴봅니다.', icon: 'brain', popular: false },
+  { title: '간병보험', description: '간병이 필요한 상황의 보장 내용을 확인합니다.', icon: 'care', popular: false },
+  { title: '펫보험', description: '반려동물 치료 관련 보장 내용을 확인합니다.', icon: 'paw', popular: false },
+  { title: '여행자보험', description: '여행 중 발생할 수 있는 위험 보장을 살펴봅니다.', icon: 'travel', popular: false },
 ] as const;
 
-function insuranceScope(): string {
-  const topics = INSURANCE_SCOPE_TOPICS.map((item, index) => {
-    const emphasis = index % 2 === 0 ? ' is-emphasis' : '';
-    const accent = index % 3 === 0 ? ' is-accent' : '';
-    return `<li class="insurance-scope-topic${emphasis}${accent}"><span>${e(item)}</span></li>`;
-  }).join('');
-
-  return `<section class="section insurance-scope-section" id="insurance-scope" aria-labelledby="insurance-scope-title" data-pattern="topic-cloud"><div class="container"><div class="section-heading insurance-scope-heading"><p class="eyebrow">대표 15가지 상담 분야</p><h2 id="insurance-scope-title">보험 이름이 떠오르면, 그대로 말씀해 주세요.</h2><p class="section-support">아래는 자주 문의받는 대표 15가지입니다. 이 외 모든 보험 종류도 상담 가능합니다.</p></div><div class="insurance-scope-cloud"><div class="insurance-scope-badge" aria-label="대표 상담 분야 ${INSURANCE_SCOPE_TOPICS.length}가지"><span>대표 상담</span><strong>${INSURANCE_SCOPE_TOPICS.length}</strong></div><ul class="insurance-scope-topics" aria-label="대표 보험 상담 분야">${topics}</ul><div class="insurance-scope-all-note"><span class="insurance-scope-note-mark" aria-hidden="true"></span><p>15가지는 대표 예시입니다 · 그 외 모든 보험 종류도 상담 가능합니다.</p></div></div></div></section>`;
+function insuranceScopeItem(item: (typeof INSURANCE_SCOPE_TOPICS)[number]): string {
+  return `<li class="insurance-scope-item"><span class="insurance-scope-icon">${icon(item.icon, 22)}</span><div class="insurance-scope-item-copy"><h4>${e(item.title)}</h4><p>${e(item.description)}</p></div></li>`;
 }
 
+function insuranceScope(): string {
+  const popular = INSURANCE_SCOPE_TOPICS.filter(item => item.popular).map(insuranceScopeItem).join('');
+  const other = INSURANCE_SCOPE_TOPICS.filter(item => !item.popular).map(insuranceScopeItem).join('');
+
+  return `<section class="section insurance-scope-section" id="insurance-scope" aria-labelledby="insurance-scope-title" data-pattern="split-directory"><div class="container"><div class="section-heading insurance-scope-heading"><p class="eyebrow">대표 15가지 상담 분야</p><h2 id="insurance-scope-title">보험 이름이 떠오르면, 그대로 말씀해 주세요.</h2><p class="section-support">아래는 자주 문의받는 대표 15가지입니다. 이 외 모든 보험 종류도 상담 가능합니다.</p></div><div class="insurance-scope-directory"><section class="insurance-scope-group insurance-scope-popular" aria-labelledby="insurance-scope-popular-title"><p class="insurance-scope-label">POPULAR</p><h3 id="insurance-scope-popular-title">많이 찾는 상담</h3><p class="insurance-scope-group-support">먼저 확인하시는 경우가 많은 보험을 모았습니다.</p><ul class="insurance-scope-list insurance-scope-popular-list">${popular}</ul></section><section class="insurance-scope-group insurance-scope-other" aria-labelledby="insurance-scope-other-title"><p class="insurance-scope-label">ALL CONSULTATION</p><h3 id="insurance-scope-other-title">그 외 상담 가능한 보험</h3><p class="insurance-scope-group-support">아래 항목 외에도 보험 이름이나 상황을 말씀해 주시면 함께 확인합니다.</p><ul class="insurance-scope-list insurance-scope-other-list">${other}</ul></section></div><div class="insurance-scope-all-note">${icon('message', 24)}<div><strong>대표 15가지는 예시입니다. 목록에 없어도 상담 가능합니다.</strong><p>정확한 보험 이름을 모르셔도 상황을 말씀해 주세요.</p></div></div></div></section>`;
+}
 function services(site: SiteConfig): string {
   const design = getDesign(site);
   const items = site.specialties.map((item, i) => `<article class="service-card"><span class="section-index" aria-hidden="true">${formatIndex(i)}</span><div class="service-copy"><h3>${e(item.title)}</h3><p>${copy(item.body, item.mobileBody)}</p></div></article>`).join('');
