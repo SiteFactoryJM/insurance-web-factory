@@ -162,7 +162,7 @@ export const uiCopyDensityRefreshStyles = `
  }
  .premium-page #main .insurance-scope-topic{
   min-height:54px;padding:4px 2px;font-size:1.0625rem;line-height:1.45;
-  white-space:nowrap;text-align:center;
+  white-space:normal;text-align:center;overflow-wrap:anywhere;
  }
  .premium-page #main .insurance-scope-topic.is-emphasis{font-size:1.1875rem}
  .premium-page #main .insurance-scope-topic:last-child:nth-child(odd){
