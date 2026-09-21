@@ -97,6 +97,17 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 60
+        },
+        "brandLayout": {
+          "enum": ["soft-panel", "gold-wave", "watermark"]
+        },
+        "brandTagline": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "brandSubline": {
+          "type": "string",
+          "maxLength": 100
         }
       }
     },
