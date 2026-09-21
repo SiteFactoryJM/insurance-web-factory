@@ -173,15 +173,15 @@ function focus(site: SiteConfig): string {
 
 function casesTicker(site: SiteConfig): string {
   const items = [
-    { title: '가족별 가입 내용', body: '가족마다 다른 계약과 보장 기간을 구분해 봅니다.' },
-    { title: '자녀 보험 질문', body: '자녀 계약에서 다시 확인할 조건을 추립니다.' },
-    { title: '부모님 보험 질문', body: '동의를 확인한 뒤 계약 관련 질문을 준비합니다.' },
-    { title: '가족 보험료 확인', body: '가족별 납입액과 유지 기간을 비교합니다.' },
-    { title: '배우자 계약 확인', body: '배우자 계약 조건을 함께 살펴봅니다.' },
-    { title: '가족 계약 한눈에 정리', body: '흩어진 계약을 한 장으로 모아 정리합니다.' },
+    { title: '보장이 잘 되어있는지 궁금해요', body: '현재 가입중이신 모든 보험을 한장으로 보기 쉽게끔 정리해드립니다. 어디가 부족하고 어디가 중복이 가능한지 한눈에 보실수 있으십니다.' },
+    { title: '보험 리모델링', body: '불필요한 금액 누수등을 먼저 체크하고 중증위주가 아닌 경증에서도 보험금이 잘 나올수 있도록 꼼꼼하게 진단하여 꼭 필요한 보장만 남기고 합리적으로 재 설계를 합니다.' },
+    { title: '맞춤설계', body: '나이·직업·가족력등 상황에 맞춰서 꼭 필요한 보장만을 우선순위대로 안내드립니다.' },
+    { title: '보험금 청구 지원', body: '진단,수술,사고시 받으셔야할 보험금을 빠짐없이, 병원 내원에서부터 하나하나 꼼꼼하게 안내드립니다. 연중무휴로 언제든지 새벽에도 편하게 연락만 주시면 친절하게 안내드리겠습니다.' },
+    { title: '가족 통합 관리', body: '부모님·배우자·자녀까지 가족 전체의 보장을 가입여부와 상관없이 모두 관리해드립니다.' },
+    { title: '은퇴·노후 준비', body: '연금·저축성 상품으로 막연한 노후 걱정을 구체적인 계획으로 바꿔 드립니다.' },
   ];
   const repeated = [...items, ...items];
-  return `<section class="section cases-section" id="cases" aria-labelledby="cases-title"><div class="container">${heading('상담 포인트', '많이 확인하는 내용을 먼저 훑어보세요.', undefined, '자주 고르는 질문을 카드로 정리해 어떤 내용을 확인하는지 한눈에 볼 수 있습니다.')}<div class="cases-marquee" aria-label="상담 포인트가 흐르는 안내 영역"><ul class="cases-track">${repeated.map((item, i) => `<li class="cases-item"${i >= items.length ? ' aria-hidden="true"' : ''}><span class="cases-badge">${String((i % items.length) + 1).padStart(2, '0')}</span><div class="cases-copy"><h3>${e(item.title)}</h3><p>${e(item.body)}</p></div></li>`).join('')}</ul></div></div></section>`;
+  return `<section class="section cases-section" id="cases" aria-labelledby="cases-title"><div class="container">${heading('상담 포인트', '많이 확인하는 내용을 먼저 훑어보세요.', undefined, '자주 고르는 질문을 카드로 정리해 어떤 내용을 확인하는지 한눈에 볼 수 있습니다.')}<div class="cases-marquee" aria-label="상담 포인트가 흐르는 안내 영역"><ul class="cases-track">${repeated.map((item, i) => `<li class="cases-item${i % items.length === 0 ? ' cases-cycle-start' : ''}"${i >= items.length ? ' aria-hidden="true"' : ''}><span class="cases-badge">${String((i % items.length) + 1).padStart(2, '0')}</span><div class="cases-copy"><h3>${e(item.title)}</h3><p>${e(item.body)}</p></div></li>`).join('')}</ul></div></div></section>`;
 }
 function contact(site: SiteConfig): string {
   const channels = site.contact.instagramUrl ? '전화·카카오톡·인스타그램' : '전화와 카카오톡 오픈채팅';
