@@ -79,6 +79,15 @@ export const guidedStyles = `
 .g-layout-diagram i{display:block;background:#cdd6e0}.g-layout-diagram i:first-child{grid-row:1/3;background:#2d4864}
 .g-layout-warm-care{grid-template-columns:1fr 2fr}.g-layout-premium-navy{grid-template-columns:1fr 1fr}
 .g-layout-clean-minimal{display:flex;flex-direction:column}.g-layout-local-friendly i:first-child{grid-column:1/3;grid-row:auto}
+.g-brand-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:1.25rem}
+.g-brand-choice{display:grid;grid-template-columns:150px minmax(0,1fr);gap:4px 16px;align-items:center;padding:14px;border:1px solid #cdd6e0;background:#fff;border-radius:8px;text-align:left}
+.g-brand-choice>strong,.g-brand-choice>small{grid-column:2}.g-brand-choice>small{color:#526170}
+.g-brand-choice[aria-pressed=true]{border:2px solid #2d4864;background:#e8edf3;padding:13px}
+.g-brand-diagram{position:relative;grid-row:1/3;display:grid;align-content:center;justify-items:center;min-height:76px;overflow:hidden;border-radius:6px;background:#fffaf1;border:1px solid #eadcc3;color:#b98236}
+.g-brand-diagram b{font-size:1rem;letter-spacing:.18em}.g-brand-diagram em{font-size:.58rem;line-height:1.35;font-style:normal;text-align:center;color:#65594e;padding:0 8px}.g-brand-diagram i{display:block;width:32px;height:1px;margin:7px 0;background:#c9a66d}
+.g-brand-soft-panel::after{content:"";position:absolute;right:-25px;bottom:-35px;width:76px;height:76px;border:12px solid #ead7b83f;border-radius:50%}
+.g-brand-gold-wave{border-color:#d4ab66}.g-brand-gold-wave::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-24px;height:42px;border-top:2px solid #d3a75e80;border-radius:50%}
+.g-brand-watermark{background:linear-gradient(120deg,#fffdf8,#f8f0e1)}.g-brand-watermark b{font-size:1.3rem;opacity:.35;transform:scale(1.35)}.g-brand-watermark i{width:66px;opacity:.35}.g-brand-watermark em{letter-spacing:.16em;color:#a88248}
 .g-palette-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem}
 .g-palette-choice{display:flex;align-items:center;gap:8px;border:1px solid #cdd6e0;background:#fff;padding:10px;border-radius:8px;text-align:left}
 .g-palette-choice[aria-pressed=true]{border:2px solid #2d4864;background:#e8edf3;padding:9px}
