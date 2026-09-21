@@ -483,4 +483,181 @@ export const uiCopyDensityRefreshStyles = `
 @media(prefers-reduced-motion:reduce){
  .premium-page #main .service-card::after{transition:none!important}
 }
+
+
+/* Adviser introduction: reference composition with portrait, narrative and three promises. */
+.premium-page #main .about-section-profile{
+ padding-block:38px!important;
+ background:var(--tint);
+}
+.premium-page #main .about-profile{
+ display:grid;
+ grid-template-columns:minmax(15.5rem,18.25rem) minmax(0,34rem);
+ justify-content:center;
+ align-items:start;
+ gap:38px;
+ width:min(100%,56rem);
+ max-width:56rem;
+ margin-inline:auto;
+}
+.premium-page #main .about-profile-portrait{
+ width:100%;
+ max-width:18.25rem;
+ margin:0;
+}
+.premium-page #main .about-profile-portrait>img{
+ display:block;
+ width:100%;
+ aspect-ratio:3/4;
+ height:auto;
+ object-fit:cover!important;
+ object-position:50% 13%!important;
+ background:var(--paper);
+}
+.premium-page #main .about-profile-caption{
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ gap:1px;
+ padding-top:10px;
+ text-align:center;
+ color:var(--ink);
+}
+.premium-page #main .about-profile-caption strong{
+ font-size:1.625rem;
+ line-height:1.25;
+ font-weight:750;
+ letter-spacing:-.045em;
+}
+.premium-page #main .about-profile-caption span{
+ font-size:.9375rem;
+ line-height:1.45;
+ color:var(--ink);
+}
+.premium-page #main .about-profile-content{
+ min-width:0;
+ padding-top:1px;
+}
+.premium-page #main .about-profile-heading{
+ max-width:none;
+ margin:0;
+ text-align:left;
+}
+.premium-page #main .about-profile-heading .eyebrow{
+ margin:0 0 12px;
+ font-size:.875rem;
+ line-height:1.45;
+ font-weight:700;
+ letter-spacing:.02em;
+ color:var(--muted);
+}
+.premium-page #main .about-profile-heading h2{
+ margin:0;
+ max-width:31rem;
+ font-size:clamp(1.95rem,2.55vw,2.35rem);
+ line-height:1.18;
+ font-weight:760;
+ letter-spacing:-.05em;
+ color:var(--ink);
+ text-wrap:balance;
+}
+.premium-page #main .about-profile-copy{
+ width:100%;
+ max-width:none;
+ margin:18px 0 0;
+ padding:0;
+ text-align:left;
+ border:0;
+}
+.premium-page #main .about-profile-lead p,
+.premium-page #main .about-profile-message p{
+ max-width:none;
+ margin:0;
+ font-size:1rem;
+ line-height:1.7;
+ letter-spacing:-.022em;
+ color:var(--muted);
+}
+.premium-page #main .about-profile-lead p+p{margin-top:1px}
+.premium-page #main .about-profile-lead strong,
+.premium-page #main .about-profile-message strong{
+ font-weight:750;
+ color:var(--ink);
+}
+.premium-page #main .about-profile-message{
+ margin-top:13px;
+ padding-top:13px;
+ border-top:1px solid var(--line);
+}
+.premium-page #main .about-profile-values{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ margin-top:24px;
+}
+.premium-page #main .about-profile-value{
+ min-width:0;
+ padding:0 12px;
+ text-align:center;
+}
+.premium-page #main .about-profile-value:first-child{padding-left:0}
+.premium-page #main .about-profile-value:last-child{padding-right:0}
+.premium-page #main .about-profile-value+.about-profile-value{
+ border-left:1px solid var(--line);
+}
+.premium-page #main .about-profile-value strong{
+ display:block;
+ font-size:1.45rem;
+ line-height:1.25;
+ font-weight:760;
+ letter-spacing:-.035em;
+ color:var(--ink);
+}
+.premium-page #main .about-profile-value span{
+ display:block;
+ margin-top:4px;
+ font-size:.9375rem;
+ line-height:1.45;
+ letter-spacing:-.025em;
+ color:var(--ink);
+ white-space:nowrap;
+}
+.premium-page #main .about-profile .career-list,
+.premium-page #main .about-profile .agent-meta{
+ margin-top:20px;
+}
+
+@media(max-width:800px){
+ .premium-page #main .about-section-profile{padding-block:34px!important}
+ .premium-page #main .about-profile{
+  grid-template-columns:minmax(0,1fr);
+  width:min(100%,35rem);
+  gap:28px;
+ }
+ .premium-page #main .about-profile-portrait{
+  width:min(72vw,18.25rem);
+  margin-inline:auto;
+ }
+ .premium-page #main .about-profile-content{padding-top:0}
+ .premium-page #main .about-profile-heading{text-align:center}
+ .premium-page #main .about-profile-heading h2{
+  max-width:29rem;
+  margin-inline:auto;
+  font-size:clamp(1.75rem,7vw,2.15rem);
+ }
+ .premium-page #main .about-profile-copy{
+  max-width:31rem;
+  margin:18px auto 0;
+ }
+}
+@media(max-width:420px){
+ .premium-page #main .about-profile-values{margin-top:20px}
+ .premium-page #main .about-profile-value{padding-inline:7px}
+ .premium-page #main .about-profile-value strong{font-size:1.25rem}
+ .premium-page #main .about-profile-value span{
+  font-size:.8125rem;
+  line-height:1.4;
+  white-space:normal;
+  word-break:keep-all;
+ }
+}
 `;
