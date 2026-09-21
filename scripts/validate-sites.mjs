@@ -255,7 +255,7 @@ for (const entry of entries) {
     else seoTitles.set(site.seo.title, id);
   }
 
-  for (const asset of [site.agent?.profileImage, site.agent?.logoImage, site.hero?.image, site.seo?.ogImage].filter(Boolean)) {
+  for (const asset of [site.agent?.profileImage, site.agent?.logoImage, site.agent?.logoMarkImage, site.hero?.image, site.seo?.ogImage].filter(Boolean)) {
     if (!String(asset).startsWith("/")) { warnings.push(`[${id}] 내부 이미지 경로는 /로 시작하는 것을 권장합니다: ${asset}`); continue; }
     try { await access(path.join(root, "public", String(asset).replace(/^\//, ""))); }
     catch { errors.push(`[${id}] 이미지 파일을 찾을 수 없습니다: ${asset}`); }
