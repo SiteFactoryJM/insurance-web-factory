@@ -36,6 +36,47 @@ test('normal contact links permit navigation while automated checks never follow
   }
 });
 
+test('header contact boxes are removed and floating icon contacts stay fixed across all themes', async ({ page }) => {
+  const themes = ['trust-blue', 'warm-care', 'premium-navy', 'clean-minimal', 'local-friendly'];
+  for (const width of [390, 1440]) for (const theme of themes) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(`/?theme=${theme}`);
+    await expect(page.locator('.site-header .direct-contact-actions')).toHaveCount(0);
+    const dock = page.locator('[data-floating-contact]');
+    await expect(dock).toBeVisible();
+    await expect(dock.locator('[data-contact-link="phone"]')).toHaveCount(1);
+    await expect(dock.locator('[data-contact-link="kakao"]')).toHaveCount(1);
+    await expect(dock.locator('[data-contact-link="instagram"]')).toHaveCount(1);
+    const before = await dock.boundingBox();
+    await page.evaluate(() => window.scrollTo(0, Math.max(500, document.body.scrollHeight * 0.45)));
+    await page.waitForTimeout(50);
+    const after = await dock.boundingBox();
+    expect(before && after).toBeTruthy();
+    expect(Math.abs(after.y - before.y), `${theme} floating dock y at ${width}`).toBeLessThanOrEqual(2);
+    expect(Math.abs(after.x - before.x), `${theme} floating dock x at ${width}`).toBeLessThanOrEqual(2);
+  }
+});
+
+test('desktop portrait heroes align the main logo with the photo top and center it in the copy column', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  for (const theme of ['trust-blue', 'warm-care', 'local-friendly']) {
+    await page.goto(`/?theme=${theme}`);
+    const geometry = await page.locator('.premium-hero').evaluate(hero => {
+      const visual = hero.querySelector('.hero-visual').getBoundingClientRect();
+      const copy = hero.querySelector('.hero-copy').getBoundingClientRect();
+      const logo = hero.querySelector('.hero-brand-logo').getBoundingClientRect();
+      return {
+        topDelta: Math.abs(logo.top - visual.top),
+        centerDelta: Math.abs((logo.left + logo.width / 2) - (copy.left + copy.width / 2)),
+        bottomGap: visual.bottom - copy.bottom,
+      };
+    });
+    expect(geometry.topDelta, `${theme} logo top alignment`).toBeLessThanOrEqual(2);
+    expect(geometry.centerDelta, `${theme} logo center alignment`).toBeLessThanOrEqual(3);
+    expect(geometry.bottomGap, `${theme} copy stays inside adviser card bottom`).toBeGreaterThanOrEqual(-2);
+  }
+});
+
 test('all five hero layouts show Instagram instead of the service shortcut and keep the photo first', async ({ page }) => {
   const themes = ['trust-blue', 'warm-care', 'premium-navy', 'clean-minimal', 'local-friendly'];
   for (const width of [390, 768, 1440]) for (const theme of themes) {
