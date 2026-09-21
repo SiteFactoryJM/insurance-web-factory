@@ -14,7 +14,7 @@
     "registrationNumber": "",
     "regions": [],
     "profileImage": "/sites/agent-kim/studio-profile-c1e991dbf3e0446a.png",
-    "logoImage": ""
+    "logoImage": "/assets/haeon-logo-horizontal.svg"
   },
   "hero": {
     "eyebrow": "보험 상담 안내",
@@ -24,7 +24,8 @@
     "mobileSubheadline": "어려운 용어와 납입 조건을 확인하고, 설명을 이해한 뒤 결정할 수 있도록 준비합니다.",
     "primaryCtaLabel": "전화로 문의하기",
     "secondaryCtaLabel": "상담 분야 보기",
-    "trustNote": "계약 조건을 충분히 확인한 뒤 결정하세요."
+    "trustNote": "계약 조건을 충분히 확인한 뒤 결정하세요.",
+    "brandLayout": "watermark"
   },
   "intro": {
     "title": "당신의 보험,\\n누구에게 맡기시겠어요?",
@@ -129,7 +130,8 @@
     "availableHours": "연중무휴 06:00 ~ 24:00",
     "email": "rlarudgus953@naver.com",
     "fax": "0504-369-9533",
-    "officeAddress": "경기도 부천시 소사구 옥길로121 6층 해온"
+    "officeAddress": "경기도 부천시 소사구 옥길로121 6층 해온",
+    "instagramUrl": "https://instagram.com/eddie.9533"
   },
   "sections": {
     "career": false,
