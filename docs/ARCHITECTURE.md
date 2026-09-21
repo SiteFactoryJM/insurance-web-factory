@@ -19,7 +19,7 @@ site.json → generated registry → site resolver → renderSitePage
 
 ## 직접 연락
 
-`src/utils/contact-links.ts`에서 전화번호, 선택 이메일, 오픈채팅 초대 주소를 검증합니다. 선택 팩스는 전화번호와 같은 형식으로 검증하되 링크 없이 표시합니다. `src/render/shared.ts`의 `renderContactButtons()`를 헤더·첫 화면·연락 영역·푸터·모바일 하단에서 재사용하며 버튼은 전화와 카카오톡 두 종류로 유지합니다. 이메일은 별도 `data-email-link`의 안전한 `mailto:` 링크입니다. 서버로 상담 페이로드를 보내지 않습니다. `client-script.ts`는 메뉴·이미지 대체·하단 연락 버튼의 표시와 미리보기 링크 방지만 담당합니다.
+`src/utils/contact-links.ts`에서 전화번호, 선택 이메일, 오픈채팅 초대 주소, 선택 인스타그램 프로필 주소를 검증합니다. 선택 팩스는 전화번호와 같은 형식으로 검증하되 링크 없이 표시합니다. `src/render/shared.ts`의 `renderContactButtons()`를 헤더·첫 화면·연락 영역·푸터·모바일 하단에서 재사용하며 버튼은 전화와 카카오톡 두 종류로 유지합니다. 이메일은 별도 `data-email-link`의 안전한 `mailto:` 링크입니다. 서버로 상담 페이로드를 보내지 않습니다. `client-script.ts`는 메뉴·이미지 대체·하단 연락 버튼의 표시와 미리보기 링크 방지만 담당합니다.
 
 `handleConsultation()`는 이전 API 주소를 안전하게 종료하는 호환 핸들러입니다. HTTP 410과 안내만 반환합니다. 기존 `Env.DB`, `CONSULTATION_WEBHOOK_URL` 선언 및 마이그레이션은 호환/이력으로 남지만 이 핸들러가 사용하지 않습니다. DB 삭제·보유자료 정리는 별도 운영 정책입니다.
 

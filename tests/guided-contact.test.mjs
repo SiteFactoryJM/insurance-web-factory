@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { COPY_LIBRARY as library, COPY_CHOICE_COUNT } from '../.preview-dist/content/copy-library.js';
 import { applyCopy, applyPurpose, blankGuidedSite, guidedIssues } from '../.preview-dist/studio/guided-model.js';
-import { directEmailHref, directPhoneHref, openChatUrl } from '../.preview-dist/utils/contact-links.js';
+import { directEmailHref, directPhoneHref, instagramProfileUrl, openChatUrl } from '../.preview-dist/utils/contact-links.js';
 import { createProject, parseProject, validateProjectSite } from '../.preview-dist/studio/project.js';
 import { validateContentLengths } from '../scripts/validate-sites.mjs';
 const raw=JSON.parse(fs.readFileSync(new URL('../sites/demo-agent/site.json',import.meta.url),'utf8'));
@@ -33,7 +33,7 @@ for(const preset of library.presets)test(`purpose/${preset.id}: real identity is
  assert.equal(s.seo.noIndex,true);assert.deepEqual(s.domains,[]);assert.equal(s.compliance.advertisingReviewNumber,'');
 });
 test('blank project does not silently copy a real advisor identity',()=>{
- const s=blankGuidedSite(raw);for(const v of [s.agent.name,s.agent.company,s.contact.phone,s.contact.kakaoUrl,s.contact.availableHours,s.contact.email,s.contact.fax])assert.equal(v,'');
+ const s=blankGuidedSite(raw);for(const v of [s.agent.name,s.agent.company,s.contact.phone,s.contact.kakaoUrl,s.contact.instagramUrl,s.contact.availableHours,s.contact.email,s.contact.fax])assert.equal(v,'');
  assert.equal(guidedIssues(s).length,5);assert.equal(s.agent.profileImage,'/assets/profile-placeholder.svg');assert.deepEqual(s.career,[]);assert.deepEqual(s.reviews,[]);
 });
 test('invalid and duplicate selection is rejected without changing the source',()=>{
@@ -45,6 +45,14 @@ test('telephone is a plain tel URL and chat has no message payload',()=>{
  assert.equal(directPhoneHref(raw.contact.phone),'tel:01041877511');assert.equal(openChatUrl(raw.contact.kakaoUrl),raw.contact.kakaoUrl);
  assert.equal(directPhoneHref('+82 (10) 1234-5678'),'tel:+821012345678');
  for(const value of ['javascript:1','01012345678;ext=1','123',null])assert.equal(directPhoneHref(value),'');
+});
+
+test('instagram accepts only direct profile URLs and remains optional',()=>{
+ assert.equal(instagramProfileUrl('https://www.instagram.com/91ybok'),'https://www.instagram.com/91ybok');
+ assert.equal(instagramProfileUrl('https://instagram.com/adviser.name/'),'https://instagram.com/adviser.name/');
+ for(const value of ['',null,'http://www.instagram.com/agent','https://instagram.com/agent?igsh=x','https://instagram.com/agent/reels','https://instagram.com@evil.test/agent','javascript:alert(1)'])assert.equal(instagramProfileUrl(value),'');
+ const valid=structuredClone(raw);valid.contact.instagramUrl='https://www.instagram.com/adviser.name';assert.deepEqual(guidedIssues(valid),[]);assert.deepEqual(validateProjectSite(valid),[]);
+ const invalid=structuredClone(raw);invalid.contact.instagramUrl='https://example.com/adviser';assert.ok(guidedIssues(invalid).some(issue=>issue.includes('인스타그램')));assert.ok(validateProjectSite(invalid).some(issue=>issue.includes('instagramUrl')));
 });
 
 test('email creates only a safe plain mailto link and remains optional',()=>{

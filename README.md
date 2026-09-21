@@ -16,7 +16,7 @@
 
 ## 연락 방식
 
-사이트 원본 `sites/<id>/site.json`의 `contact.phone`, `contact.kakaoUrl`, `contact.availableHours`와 선택 항목인 `contact.email`, `contact.fax`를 사용합니다. 오픈채팅은 `https://open.kakao.com/o/초대코드` 형식만 허용합니다. 이메일은 헤더나 쿼리가 없는 검증된 `mailto:` 링크로, 팩스는 일반 텍스트로 표시합니다. 다른 도메인, 실행 가능한 URL, 쿼리 전달, 로그인·메시지 API를 사용하지 않습니다. 전화 앱이 없는 PC를 위해 번호를 텍스트로도 표시합니다.
+사이트 원본 `sites/<id>/site.json`의 `contact.phone`, `contact.kakaoUrl`, `contact.availableHours`와 선택 항목인 `contact.instagramUrl`, `contact.email`, `contact.fax`를 사용합니다. 오픈채팅은 `https://open.kakao.com/o/초대코드` 형식만 허용합니다. 인스타그램은 `https://www.instagram.com/사용자명` 형식의 프로필 주소만 허용합니다. 이메일은 헤더나 쿼리가 없는 검증된 `mailto:` 링크로, 팩스는 일반 텍스트로 표시합니다. 다른 도메인, 실행 가능한 URL, 쿼리 전달, 로그인·메시지 API를 사용하지 않습니다. 전화 앱이 없는 PC를 위해 번호를 텍스트로도 표시합니다.
 
 대표 샘플의 전화와 오픈채팅 버튼은 **실제 담당자에게 연결**됩니다. 샘플 안내를 유지합니다. 제작 도구의 iframe 미리보기에서는 실제 연결을 막습니다. 메시지를 자동으로 작성하거나 보내지 않습니다.
 
