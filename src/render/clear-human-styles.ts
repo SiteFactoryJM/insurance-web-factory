@@ -95,11 +95,11 @@ export const clearHumanStyles = `
 .premium-page #main .hero-watermark-zone>.eyebrow,.premium-page #main .hero-watermark-zone>h1,
 .premium-page #main .hero-copy-brand-watermark>.hero-description,.premium-page #main .hero-copy-brand-watermark>.hero-topics,
 .premium-page #main .hero-copy-brand-watermark>.hero-actions,.premium-page #main .hero-copy-brand-watermark>.hero-note{position:relative;z-index:1}
-.premium-page #main .hero-copy-brand-watermark .hero-description{margin-top:26px}
+.premium-page #main .hero-copy-brand-watermark .hero-description{margin-top:48px}
 .premium-page #main .premium-hero:not(.hero-statement) .hero-copy>.eyebrow{margin-top:auto}
 .premium-page #main .hero-description{max-width:36rem;margin-top:16px;font-size:var(--ch-body);line-height:var(--ch-body-lh)}
 .premium-page #main .hero-actions{margin-top:22px;gap:12px 20px}
-.premium-page #main .premium-hero:not(.hero-statement) .hero-note{max-width:36rem;margin-top:auto;margin-bottom:0;padding-top:24px}
+.premium-page #main .premium-hero:not(.hero-statement) .hero-note{max-width:36rem;margin-top:14px;margin-bottom:0;padding-top:0}
 .premium-page #main .hero-visual{
  display:flex;flex-direction:column;align-items:stretch;gap:0;width:100%;max-width:20.5rem;
  padding:0;justify-self:start;min-width:0;
@@ -393,6 +393,7 @@ html{scroll-behavior:smooth}
 
 .premium-page #main .hero-topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;max-width:40rem}
 .premium-page #main .hero-topics span{display:inline-flex;align-items:center;min-height:34px;max-width:100%;padding:5px 11px;border:1px solid var(--line);background:var(--tint);color:var(--ink);font-size:.9375rem;line-height:1.45;font-weight:600;overflow-wrap:anywhere}
+.premium-page #main .premium-hero:not(.hero-statement) .hero-actions{margin-top:auto;padding-top:24px}
 .premium-page #main .hero-actions{margin-top:28px}
 .premium-page #main .hero-visual{position:relative}
 .premium-page #main .portrait-figure,.premium-page #main .hero-scene{position:relative;z-index:1;background:transparent;box-shadow:none}
