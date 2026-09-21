@@ -80,10 +80,11 @@ export const uiCopyDensityRefreshStyles = `
  max-width:52rem;margin-inline:auto;color:var(--muted);text-wrap:pretty;
 }
 .premium-page #main .insurance-scope-directory{
- display:grid;grid-template-columns:minmax(17rem,.82fr) minmax(0,1.35fr);gap:18px;
+ display:grid;grid-template-columns:minmax(20rem,.95fr) minmax(0,1.25fr);gap:18px;
  width:min(100%,62rem);margin-inline:auto;align-items:stretch;
 }
 .premium-page #main .insurance-scope-group{
+ display:flex;flex-direction:column;height:100%;
  min-width:0;padding:26px;border:1px solid var(--line);border-radius:18px;background:var(--surface);
 }
 .premium-page #main .insurance-scope-popular{background:var(--tint)}
@@ -94,16 +95,17 @@ export const uiCopyDensityRefreshStyles = `
  margin:0;font-size:clamp(1.5rem,2vw,1.75rem);line-height:1.4;font-weight:700;letter-spacing:-.03em;color:var(--ink);
 }
 .premium-page #main .insurance-scope-group-support{
- margin:8px 0 20px;font-size:1rem;line-height:1.65;color:var(--muted);text-wrap:pretty;
+ margin:8px 0 20px;font-size:.9rem;line-height:1.55;letter-spacing:-.025em;color:var(--muted);text-wrap:pretty;
 }
 .premium-page #main .insurance-scope-list{
- display:grid;gap:10px;margin:0;padding:0;list-style:none;
+ display:grid;grid-auto-rows:minmax(0,1fr);align-content:stretch;flex:1 1 auto;
+ gap:10px;margin:0;padding:0;list-style:none;
 }
 .premium-page #main .insurance-scope-popular-list{grid-template-columns:minmax(0,1fr)}
 .premium-page #main .insurance-scope-other-list{grid-template-columns:repeat(2,minmax(0,1fr))}
 .premium-page #main .insurance-scope-item{
  display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;gap:12px;
- min-width:0;min-height:78px;padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);
+ min-width:0;min-height:78px;height:100%;padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);
 }
 .premium-page #main .insurance-scope-icon{
  display:grid;place-items:center;width:44px;height:44px;border-radius:50%;
@@ -129,6 +131,11 @@ export const uiCopyDensityRefreshStyles = `
 }
 .premium-page #main .insurance-scope-all-note p{
  margin:2px 0 0;font-size:.9rem;line-height:1.55;color:var(--muted);
+}
+@media(min-width:901px){
+ .premium-page #main .insurance-scope-popular .insurance-scope-group-support{
+  white-space:nowrap;letter-spacing:-.045em;
+ }
 }
 @media(max-width:900px){
  .premium-page #main .insurance-scope-directory{grid-template-columns:1fr;width:min(100%,44rem);gap:14px}

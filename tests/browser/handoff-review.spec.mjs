@@ -197,6 +197,10 @@ test('insurance scope uses the approved split directory and compact mobile items
       const directoryBox = directory.getBoundingClientRect();
       const descriptions = [...el.querySelectorAll('.insurance-scope-item p')];
       const items = [...el.querySelectorAll('.insurance-scope-item')];
+      const popularSupport = el.querySelector('.insurance-scope-popular .insurance-scope-group-support');
+      const popularSupportStyle = getComputedStyle(popularSupport);
+      const popularSupportBox = popularSupport.getBoundingClientRect();
+      const cardHeights = items.map(node => node.getBoundingClientRect().height);
       return {
         directoryColumns: getComputedStyle(directory).gridTemplateColumns.split(' ').filter(Boolean).length,
         popularColumns: getComputedStyle(popularList).gridTemplateColumns.split(' ').filter(Boolean).length,
@@ -204,6 +208,9 @@ test('insurance scope uses the approved split directory and compact mobile items
         directoryWidth: directoryBox.width,
         descriptionsVisible: descriptions.every(node => getComputedStyle(node).display !== 'none'),
         itemsFit: items.every(node => node.scrollWidth <= node.clientWidth),
+        popularSupportFits: popularSupport.scrollWidth <= popularSupport.clientWidth,
+        popularSupportLines: popularSupportBox.height / parseFloat(popularSupportStyle.lineHeight),
+        cardHeightDelta: Math.max(...cardHeights) - Math.min(...cardHeights),
         overflow: el.scrollWidth > el.clientWidth,
       };
     });
@@ -214,7 +221,12 @@ test('insurance scope uses the approved split directory and compact mobile items
     expect(layout.descriptionsVisible, `description visibility at ${width}px`).toBe(width > 650);
     expect(layout.itemsFit, `scope item fit at ${width}px`).toBe(true);
     expect(layout.overflow, `scope overflow at ${width}px`).toBe(false);
-    if (width === 1440) expect(layout.directoryWidth, 'desktop scope width').toBeLessThanOrEqual(994);
+    if (width === 1440) {
+      expect(layout.directoryWidth, 'desktop scope width').toBeLessThanOrEqual(994);
+      expect(layout.popularSupportFits, 'popular support fits one line').toBe(true);
+      expect(layout.popularSupportLines, 'popular support line count').toBeLessThanOrEqual(1.15);
+      expect(layout.cardHeightDelta, 'desktop insurance card height delta').toBeLessThanOrEqual(1);
+    }
     expect(await page.evaluate(() => document.documentElement.scrollWidth), `page overflow at ${width}px`).toBeLessThanOrEqual(width);
   }
 
