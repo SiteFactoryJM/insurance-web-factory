@@ -1,4 +1,4 @@
-import { directEmailHref, directPhoneHref, openChatUrl } from '../utils/contact-links.js';
+import { directEmailHref, directPhoneHref, instagramProfileUrl, openChatUrl } from '../utils/contact-links.js';
 import { DESIGN_SECTION_IDS, HEADING_FONT_IDS, INTRO_PRINCIPLE_LAYOUT_IDS, PALETTE_IDS, TEMPLATE_IDS, type DesignSectionId, type SiteConfig } from "../types.js";
 import { COPY_LIBRARY } from '../content/copy-library.js';
 import { DESIGN_VERSION } from '../render/design-system.js';
@@ -122,7 +122,7 @@ const siteRule = object({
   reviews: list(object({ quote: text(400), author: text(80), context: text(120, true), isExample: bool(true) }), 0, 12, true), faqs: list(faqRule),
   consultation: object({ topics: list(text(60), 1, 12, false, true) }, true),
   contact: object({ phone: { ...text(32), check: value => directPhoneHref(value) ? undefined : "연결 가능한 전화번호를 숫자와 +, -, 괄호로 입력하세요." },
-    kakaoUrl: urlRule(), instagramUrl: urlRule(), email: emailRule,
+    kakaoUrl: urlRule(), instagramUrl: { ...urlRule(), check: value => !value || instagramProfileUrl(value) ? undefined : "https://www.instagram.com/사용자명 형식의 프로필 주소를 입력하세요." }, email: emailRule,
     fax: { ...text(32, true), check: value => !value || directPhoneHref(value) ? undefined : "팩스번호를 숫자와 +, -, 괄호로 입력하세요." },
     formEmail: emailRule, officeAddress: text(240, true), mapUrl: urlRule(), availableHours: text(100) }),
   sections: object({ career: bool(), process: bool(), reviews: bool(true), faq: bool(), location: bool(), contactForm: bool() }),

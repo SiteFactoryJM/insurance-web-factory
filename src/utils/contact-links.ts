@@ -28,3 +28,17 @@ export function openChatUrl(input: unknown): string {
       !url.port && !url.username && !url.password && !url.search && !url.hash ? url.href : '';
   } catch { return ''; }
 }
+
+/** Accept only a direct Instagram profile URL, never an arbitrary redirect or share URL. */
+export function instagramProfileUrl(input: unknown): string {
+  if (typeof input !== 'string') return '';
+  const value = input.trim();
+  if (!value) return '';
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'https:' || !['instagram.com', 'www.instagram.com'].includes(url.hostname) ||
+      url.port || url.username || url.password || url.search || url.hash) return '';
+    if (!/^\/[A-Za-z0-9._]{1,30}\/?$/.test(url.pathname)) return '';
+    return url.href;
+  } catch { return ''; }
+}
