@@ -645,6 +645,17 @@ export const uiCopyDensityRefreshStyles = `
  margin-top:20px;
 }
 
+@media(min-width:801px){
+ .premium-page #main .about-profile-heading,
+ .premium-page #main .about-profile-lead,
+ .premium-page #main .about-profile-message{
+  margin-left:24px;
+ }
+ .premium-page #main .about-profile-message{
+  margin-top:13px;
+ }
+}
+
 @media(max-width:800px){
  .premium-page #main .about-section-profile{padding-block:34px!important}
  .premium-page #main .about-profile{
