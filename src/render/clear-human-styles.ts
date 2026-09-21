@@ -380,7 +380,7 @@ export const clearHumanStyles = `
 .premium-page #main .direct-contact-panel>.support-note,.premium-page #main .direct-contact-panel>.demo-contact-notice{margin:0;text-align:left;font-size:var(--ch-small);line-height:var(--ch-small-lh)}
 .premium-page #main .direct-contact-panel>.demo-contact-notice{margin-top:14px}
 
-/* 리쿠르트: 연락 섹션 바로 아래에서 핵심 3가지, 지원 성향, 담당자 연락을 한 패널로 묶습니다. */
+/* 리쿠르트: 왼쪽에 01~03 가로형 항목, 가운데에 세로형 지원 성향, 오른쪽에 연락을 배치합니다. */
 .premium-page #main .recruit-section{
  position:relative;isolation:isolate;overflow:hidden;padding-block:72px 64px;
  background:linear-gradient(180deg,var(--paper) 0%,color-mix(in srgb,var(--paper) 92%,#EAD9BC 8%) 100%);
@@ -408,33 +408,32 @@ export const clearHumanStyles = `
 .premium-page #main .recruit-support{margin:14px 0 0;font-size:1.125rem;line-height:1.7;color:var(--muted)}
 .premium-page #main .recruit-support strong{font-weight:800;color:var(--ink)}
 .premium-page #main .recruit-panel{
- display:grid;grid-template-columns:minmax(14rem,.9fr) minmax(0,1.5fr) minmax(19rem,1fr);
+ display:grid;grid-template-columns:minmax(0,1.5fr) minmax(14rem,.9fr) minmax(19rem,1fr);
  min-width:0;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--surface) 94%,transparent);
  box-shadow:0 20px 50px rgba(29,36,45,.05);overflow:hidden;
 }
-.premium-page #main .recruit-first,.premium-page #main .recruit-main,.premium-page #main .recruit-contact{min-width:0}
-.premium-page #main .recruit-first{
- display:grid;grid-template-columns:56px minmax(0,1fr);gap:18px;align-content:start;
- padding:48px 36px;border-right:1px solid var(--line);
+.premium-page #main .recruit-list,.premium-page #main .recruit-fit,.premium-page #main .recruit-contact{min-width:0}
+.premium-page #main .recruit-list{
+ list-style:none;margin:0;padding:26px 42px;border-right:1px solid var(--line);
 }
-.premium-page #main .recruit-first h3{margin:0;font-size:1.35rem;line-height:1.55}
-.premium-page #main .recruit-first p{margin:10px 0 0;font-size:1rem;line-height:1.72;color:var(--muted);overflow-wrap:anywhere}
-.premium-page #main .recruit-main{border-right:1px solid var(--line)}
-.premium-page #main .recruit-fit{padding:32px 42px 26px;border-bottom:1px solid var(--line)}
-.premium-page #main .recruit-intro-mark{display:block;width:24px;height:2px;margin:0 0 18px;background:var(--ink)}
-.premium-page #main .recruit-fit h3{margin:0;font-size:1.35rem;line-height:1.5}
-.premium-page #main .recruit-fit ul{display:grid;gap:9px;list-style:none;margin:18px 0 0;padding:0}
-.premium-page #main .recruit-fit li{
- display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;align-items:start;
- font-size:1rem;line-height:1.6;color:var(--muted);
+.premium-page #main .recruit-list li{
+ display:grid;grid-template-columns:56px minmax(0,1fr);gap:18px;padding:26px 0;border-bottom:1px solid var(--line);
 }
-.premium-page #main .recruit-check{color:currentColor;font-weight:800;line-height:1.6}
-.premium-page #main .recruit-list{list-style:none;margin:0;padding:4px 42px}
-.premium-page #main .recruit-list li{display:grid;grid-template-columns:56px minmax(0,1fr);gap:18px;padding:24px 0;border-bottom:1px solid var(--line)}
 .premium-page #main .recruit-list li:last-child{border-bottom:0}
 .premium-page #main .recruit-number{padding-top:2px;font-size:1.45rem;line-height:1.5;font-weight:700;color:var(--muted)}
-.premium-page #main .recruit-list h3{margin:0;font-size:1.25rem;line-height:1.55}
-.premium-page #main .recruit-list p{margin:8px 0 0;font-size:1rem;line-height:1.72;color:var(--muted);overflow-wrap:anywhere}
+.premium-page #main .recruit-list h3{margin:0;font-size:1.3rem;line-height:1.55}
+.premium-page #main .recruit-list p{margin:9px 0 0;font-size:1rem;line-height:1.72;color:var(--muted);overflow-wrap:anywhere}
+.premium-page #main .recruit-fit{
+ padding:44px 34px;border-right:1px solid var(--line);
+}
+.premium-page #main .recruit-intro-mark{display:block;width:24px;height:2px;margin:0 0 30px;background:var(--ink)}
+.premium-page #main .recruit-fit h3{margin:0;font-size:clamp(1.75rem,2.2vw,2.15rem);line-height:1.45}
+.premium-page #main .recruit-fit ul{display:grid;gap:14px;list-style:none;margin:28px 0 0;padding:0}
+.premium-page #main .recruit-fit li{
+ display:grid;grid-template-columns:20px minmax(0,1fr);gap:9px;align-items:start;
+ font-size:1.02rem;line-height:1.7;color:var(--muted);
+}
+.premium-page #main .recruit-check{color:currentColor;font-weight:800;line-height:1.7}
 .premium-page #main .recruit-contact{padding:34px 34px 28px}
 .premium-page #main .recruit-contact-person{
  display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;align-items:center;margin:0 0 22px;
@@ -460,10 +459,9 @@ export const clearHumanStyles = `
 @media(max-width:980px){
  .premium-page #main .recruit-heading{margin-left:0}
  .premium-page #main .recruit-panel{grid-template-columns:1fr}
- .premium-page #main .recruit-first,.premium-page #main .recruit-main{border-right:0;border-bottom:1px solid var(--line)}
- .premium-page #main .recruit-first{padding:30px 36px}
- .premium-page #main .recruit-fit{padding:28px 36px 24px}
- .premium-page #main .recruit-list{padding:4px 36px}
+ .premium-page #main .recruit-list,.premium-page #main .recruit-fit{border-right:0;border-bottom:1px solid var(--line)}
+ .premium-page #main .recruit-list{padding:18px 36px}
+ .premium-page #main .recruit-fit{padding:32px 36px}
  .premium-page #main .recruit-contact{padding:34px 36px}
 }
 @media(max-width:650px){
@@ -474,11 +472,13 @@ export const clearHumanStyles = `
  .premium-page #main .recruit-lead{font-size:1.16rem}
  .premium-page #main .recruit-support{font-size:1rem}
  .premium-page #main .recruit-panel{border-radius:10px}
- .premium-page #main .recruit-first{grid-template-columns:42px minmax(0,1fr);gap:10px;padding:28px 24px}
- .premium-page #main .recruit-fit{padding:26px 24px 22px}
- .premium-page #main .recruit-list{padding:4px 24px}
+ .premium-page #main .recruit-list{padding:8px 24px}
  .premium-page #main .recruit-list li{grid-template-columns:42px minmax(0,1fr);gap:10px;padding:22px 0}
  .premium-page #main .recruit-number{font-size:1.15rem}
+ .premium-page #main .recruit-fit{padding:30px 24px}
+ .premium-page #main .recruit-intro-mark{margin-bottom:22px}
+ .premium-page #main .recruit-fit h3{font-size:1.8rem}
+ .premium-page #main .recruit-fit ul{margin-top:22px}
  .premium-page #main .recruit-contact{padding:28px 24px 24px}
  .premium-page #main .recruit-contact-meta{display:none}
  .premium-page #main .recruit-contact-link{grid-template-columns:28px minmax(0,1fr) auto}
@@ -488,7 +488,7 @@ export const clearHumanStyles = `
 @media(max-width:380px){
  .premium-page #main .recruit-kicker{gap:12px}
  .premium-page #main .recruit-kicker::after{width:72px}
- .premium-page #main .recruit-first,.premium-page #main .recruit-fit,.premium-page #main .recruit-list,.premium-page #main .recruit-contact{padding-left:18px;padding-right:18px}
+ .premium-page #main .recruit-list,.premium-page #main .recruit-fit,.premium-page #main .recruit-contact{padding-left:18px;padding-right:18px}
 }
 
 .premium-page #main .location-section{text-align:center}
