@@ -90,7 +90,7 @@ export const uiCopyDensityRefreshStyles = `
  display:block;margin-top:8px;font-size:1.25rem;line-height:1.5;font-weight:700;color:var(--on-brand);
 }
 .premium-page #main .insurance-scope-summary p{
- margin:24px 0 0;padding-top:20px;border-top:1px solid color-mix(in srgb,var(--detail) 38%,transparent);
+ margin:24px 0 0;padding-top:20px;border-top:1px solid rgba(255,255,255,.18);
  font-size:1rem;line-height:1.7;color:var(--detail);text-wrap:pretty;
 }
 .premium-page #main .insurance-scope-groups{min-width:0}
