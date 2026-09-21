@@ -594,6 +594,23 @@ export const uiCopyDensityRefreshStyles = `
  grid-template-columns:repeat(3,minmax(0,1fr));
  margin-top:24px;
 }
+.premium-page #main .about-profile-values.adviser-principle{
+ position:relative;
+ max-width:none;
+ padding:0;
+ border:0;
+}
+.premium-page #main .about-profile-principle-copy{
+ position:absolute;
+ width:1px;
+ height:1px;
+ padding:0;
+ margin:-1px;
+ overflow:hidden;
+ clip-path:inset(50%);
+ white-space:nowrap;
+ border:0;
+}
 .premium-page #main .about-profile-value{
  min-width:0;
  padding:0 12px;
