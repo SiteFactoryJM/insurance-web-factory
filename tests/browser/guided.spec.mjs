@@ -93,11 +93,26 @@ test('logo image uploads appear immediately in the preview',async({page})=>{
  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aPioAAAAASUVORK5CYII=','base64');
  await page.locator('#guided-logo').setInputFiles({name:'logo.png',mimeType:'image/png',buffer:png});
  await expect(page.locator('#guided-status')).toContainText('메인 로고');
- await expect(preview(page).locator('.hero-brand-logo img')).toHaveAttribute('src',/^data:image\/png;base64,/);
+ await expect(preview(page).locator('.hero-brand-feature img')).toHaveAttribute('src',/^data:image\/png;base64,/);
  await expect(preview(page).locator('.brand-logo')).toHaveAttribute('src',/^data:image\/png;base64,/);
  await page.locator('#guided-logo-mark').setInputFiles({name:'mark.png',mimeType:'image/png',buffer:png});
  await expect(page.locator('#guided-status')).toContainText('상단·푸터용 로고');
  await expect(preview(page).locator('.footer-brand-logo')).toHaveAttribute('src',/^data:image\/png;base64,/);
+});
+test('all three hero brand concepts are selectable with their bundled copy',async({page})=>{
+ await start(page);await stage(page,1);await page.locator('[data-action="example-profile"]').click();await stage(page,0);
+ const cases=[
+  ['soft-panel','사람을 먼저 생각하는 보험의 기준, 해온','LIFE INSURANCE FOR A BRIGHTER TOMORROW'],
+  ['gold-wave','당신의 오늘이 더 나은 내일이 되도록','LIFE, ALWAYS WITH YOU'],
+  ['watermark','',''],
+ ];
+ for(const [id,tagline,subline] of cases){
+  await page.locator(`[data-brand-layout="${id}"]`).click();
+  const feature=preview(page).locator(`[data-brand-layout="${id}"]`);
+  await expect(feature).toBeVisible();
+  if(tagline){await expect(feature).toContainText(tagline);await expect(feature).toContainText(subline);}
+  else{await expect(feature.locator('.brand-watermark-mark')).toHaveCount(1);await expect(feature.locator('.brand-watermark-wordmark')).toHaveCount(1);}
+ }
 });
 test('profile, chosen copy, layout and phone/chat links survive JSON export/import',async({page})=>{
  await start(page);await purpose(page,'new');await facts(page);
