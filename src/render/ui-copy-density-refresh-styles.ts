@@ -131,6 +131,11 @@ export const uiCopyDensityRefreshStyles = `
  text-wrap:balance;
  word-break:keep-all;
 }
+.premium-page #main .cases-copy h3.cases-title-single{
+ min-height:1.4em;
+ font-size:clamp(1.5rem,1.9vw,1.75rem);
+ line-height:1.4;
+}
 .premium-page #main .cases-item p{
  margin:22px 0 0;
  font-size:1.125rem;
@@ -211,6 +216,7 @@ export const uiCopyDensityRefreshStyles = `
  .premium-page #main .cases-carousel .cases-item.is-prev,
  .premium-page #main .cases-carousel .cases-item.is-next{opacity:0;pointer-events:none}
  .premium-page #main .cases-copy h3{min-height:0;font-size:1.35rem;line-height:1.45}
+ .premium-page #main .cases-copy h3.cases-title-single{font-size:1.45rem;line-height:1.42}
  .premium-page #main .cases-item p{margin-top:18px;font-size:1.0625rem;line-height:1.7}
  .premium-page #main .cases-badge{margin-bottom:20px;font-size:.8125rem}
  .premium-page #main .cases-nav{width:44px;height:44px}
