@@ -84,7 +84,7 @@ export const clearHumanStyles = `
 .premium-page #main .hero-brand-gold-wave .brand-panel-wave{left:-8%;right:-8%;bottom:-112px;height:175px;border-top:1px solid rgba(212,168,92,.45);border-radius:50% 50% 0 0 / 100% 100% 0 0;transform:rotate(-2deg);box-shadow:0 -18px 0 rgba(226,194,132,.075),0 -36px 0 rgba(226,194,132,.045)}
 .premium-page #main .hero-copy-brand-watermark{position:relative;isolation:isolate;overflow:visible;padding-inline:0}
 .premium-page #main .hero-watermark-zone{position:relative;isolation:isolate;overflow:hidden;margin:0 0 4px;padding:34px 0 24px}
-.premium-page #main .hero-watermark-zone>.hero-brand-watermark{position:absolute;inset:0;z-index:0;width:100%;height:100%;min-height:0;margin:0;pointer-events:none;background-image:linear-gradient(to bottom,rgba(255,255,255,0) 70%,var(--paper) 100%),url('/assets/haeon-watermark-wave.svg');background-size:cover;background-position:center 42%;background-repeat:no-repeat;opacity:.96}
+.premium-page #main .hero-watermark-zone>.hero-brand-watermark{position:absolute;inset:0;z-index:0;width:100%;height:100%;min-height:0;margin:0;pointer-events:none;background-image:linear-gradient(to bottom,rgba(255,255,255,0) 70%,var(--paper) 100%),url('/assets/haeon-watermark-wave.png');background-size:cover;background-position:center 42%;background-repeat:no-repeat;opacity:.96}
 .premium-page #main .hero-watermark-zone>.eyebrow,.premium-page #main .hero-watermark-zone>h1{position:relative;z-index:1}
 .premium-page #main .hero-copy-brand-watermark .hero-description{margin-top:18px}
 .premium-page #main .premium-hero:not(.hero-statement) .hero-copy>.eyebrow{margin-top:auto}
