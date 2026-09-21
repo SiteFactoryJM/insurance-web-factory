@@ -56,6 +56,9 @@ export const clearHumanStyles = `
 .premium-page .direct-phone:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
 .premium-page .direct-kakao{background:var(--kakao);color:var(--kakao-ink);border-color:var(--kakao-line)}
 .premium-page .direct-kakao:hover{background:var(--kakao-hover);color:var(--kakao-ink);border-color:var(--kakao-line)}
+.premium-page .direct-instagram{background:linear-gradient(135deg,#833AB4 0%,#C13584 48%,#E1306C 72%,#F77737 100%);color:#fff;border-color:#C13584}
+.premium-page .direct-instagram:hover{background:linear-gradient(135deg,#6F2F9B 0%,#A92D72 48%,#C92B61 72%,#DD642F 100%);color:#fff;border-color:#A92D72}
+.premium-page .brand-logo{width:3.5rem;height:3.5rem;object-fit:contain;flex:0 0 auto}
 .premium-page .site-footer .direct-phone{border-color:#B9C4CE;background:transparent;color:#fff}
 .premium-page .site-footer .direct-phone:hover{background:#243347;border-color:#B9C4CE}
 
@@ -65,6 +68,8 @@ export const clearHumanStyles = `
  padding-block:48px;align-items:center;
 }
 .premium-page #main .hero-copy{max-width:42rem}
+.premium-page #main .hero-brand-logo{width:min(100%,28rem);margin:0 0 26px}
+.premium-page #main .hero-brand-logo img{display:block;width:min(100%,26rem);height:auto;max-height:10rem;object-fit:contain;object-position:left center}
 .premium-page #main .hero-description{max-width:36rem;margin-top:16px;font-size:var(--ch-body);line-height:var(--ch-body-lh)}
 .premium-page #main .hero-actions{margin-top:22px;gap:12px 20px}
 .premium-page #main .hero-note{max-width:36rem;margin-top:10px}
@@ -217,6 +222,7 @@ export const clearHumanStyles = `
 .premium-page #main .direct-contact-panel>.eyebrow{margin:0 0 12px}
 .premium-page #main .direct-contact-panel h3{max-width:36rem;margin:0 auto;font-size:var(--ch-h3);line-height:var(--ch-h3-lh);text-wrap:balance}
 .premium-page #main .direct-contact-panel>.direct-contact-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:24px 0}
+.premium-page #main .direct-contact-panel>.direct-contact-actions:has(>a:nth-child(3)){grid-template-columns:repeat(3,minmax(0,1fr))}
 .premium-page #main .direct-contact-panel>.direct-contact-actions:has(>a:only-child){grid-template-columns:1fr}
 .premium-page #main .direct-contact-panel>.direct-contact-actions .button{width:100%;min-width:0}
 .premium-page #main .direct-contact-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;margin:24px 0;border-block:1px solid var(--line);text-align:left}
@@ -238,6 +244,8 @@ export const clearHumanStyles = `
 .premium-page .site-footer dt,.premium-page .site-footer dd{color:#F7F6F0}
 .premium-page .site-footer .footer-legal p{color:#CBD3DC}
 .premium-page .site-footer .direct-kakao{color:var(--kakao-ink)}
+.premium-page .footer-brand-end{display:flex;flex-direction:column;align-items:flex-end;gap:.75rem}
+.premium-page .footer-brand-logo{display:block;width:5.5rem;height:5.5rem;object-fit:contain}
 
 .gallery-page #main .gallery-header{max-width:52rem;margin-inline:auto;text-align:center}
 .gallery-page #main .gallery-header>p{max-width:42rem;margin-inline:auto}
@@ -272,6 +280,8 @@ export const clearHumanStyles = `
  .premium-page #main .section-heading{margin-bottom:22px}
  .premium-page #main .premium-hero:not(.hero-statement),.premium-page #main .hero-statement{grid-template-columns:minmax(0,1fr);gap:24px;padding-block:32px}
  .premium-page #main .hero-visual{max-width:none;justify-self:stretch}
+ .premium-page #main .hero-brand-logo{width:min(100%,22rem);margin-bottom:20px}
+ .premium-page #main .hero-brand-logo img{width:min(100%,21rem)}
  .premium-page #main .hero-actions{display:block}
  .premium-page #main .hero-actions>.text-link{margin-top:12px}
  .premium-page #main .hero-statement-person{flex-wrap:wrap;max-width:22.5rem}
@@ -304,7 +314,10 @@ export const clearHumanStyles = `
  .premium-page #main .contact-grid{gap:24px}
  .premium-page #main .contact-person{margin-top:20px}
  .premium-page #main .direct-contact-panel{padding:22px 18px}
- .premium-page #main .direct-contact-panel>.direct-contact-actions{grid-template-columns:minmax(0,1fr)}
+ .premium-page #main .direct-contact-panel>.direct-contact-actions,.premium-page #main .direct-contact-panel>.direct-contact-actions:has(>a:nth-child(3)){grid-template-columns:minmax(0,1fr)}
+ .premium-page .brand-logo{width:2.9rem;height:2.9rem}
+ .premium-page .footer-brand-end{align-items:flex-start}
+ .premium-page .footer-brand-logo{width:4.75rem;height:4.75rem}
  .premium-page #main .direct-contact-details{grid-template-columns:minmax(0,1fr)}
  .premium-page #main .direct-contact-details>div{padding:12px 0}
  .premium-page #main .direct-contact-details>div:nth-child(even){border-left:0}
@@ -332,7 +345,12 @@ html{scroll-behavior:smooth}
 .premium-page #main .section-heading::after{content:"";display:block;width:48px;height:2px;margin:18px auto 0;background:var(--accent)}
 
 .premium-page #main .hero-topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;max-width:40rem}
-.premium-page #main .hero-topics span{display:inline-flex;align-items:center;min-height:34px;padding:5px 11px;border:1px solid var(--line);background:var(--tint);color:var(--ink);font-size:.9375rem;line-height:1.45;font-weight:600}
+.premium-page #main .hero-topics span{display:inline-flex;align-items:center;min-height:34px;max-width:100%;padding:5px 11px;border:1px solid var(--line);background:var(--tint);color:var(--ink);font-size:.9375rem;line-height:1.45;font-weight:600;overflow-wrap:anywhere}
+.premium-page #main .hero-topics .topic-claim{background:#FFF2D7;border-color:#E9C36F;color:#664D16}
+.premium-page #main .hero-topics .topic-amount{background:#E8F5EE;border-color:#9BC9AE;color:#285E3D}
+.premium-page #main .hero-topics .topic-unpaid{background:#FBEAEC;border-color:#E6A7AE;color:#7A3039}
+.premium-page #main .hero-topics .topic-auto{background:#EAF3FB;border-color:#A6C9E7;color:#315F83}
+.premium-page #main .hero-topics .topic-liability{background:#F1ECFA;border-color:#C3AFE6;color:#5A4382}
 .premium-page #main .hero-actions{margin-top:24px}
 .premium-page #main .hero-visual{position:relative}
 .premium-page #main .portrait-figure,.premium-page #main .hero-scene{position:relative;z-index:1;background:transparent;box-shadow:none}
