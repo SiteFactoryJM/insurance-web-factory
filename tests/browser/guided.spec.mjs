@@ -99,20 +99,32 @@ test('logo image uploads appear immediately in the preview',async({page})=>{
  await expect(page.locator('#guided-status')).toContainText('상단·푸터용 로고');
  await expect(preview(page).locator('.footer-brand-logo')).toHaveAttribute('src',/^data:image\/png;base64,/);
 });
-test('all three hero brand concepts are selectable with their bundled copy',async({page})=>{
- await start(page);await stage(page,1);await page.locator('[data-action="example-profile"]').click();await stage(page,0);
+test('actual-info step shows three brand samples, previews them immediately and exports the choice to JSON',async({page})=>{
+ await start(page);await stage(page,1);
+ await expect(page.locator('.g-brand-section [data-brand-layout]')).toHaveCount(3);
  const cases=[
   ['soft-panel','사람을 먼저 생각하는 보험의 기준, 해온','LIFE INSURANCE FOR A BRIGHTER TOMORROW'],
   ['gold-wave','당신의 오늘이 더 나은 내일이 되도록','LIFE, ALWAYS WITH YOU'],
   ['watermark','',''],
  ];
  for(const [id,tagline,subline] of cases){
-  await page.locator(`[data-brand-layout="${id}"]`).click();
-  const feature=preview(page).locator(`[data-brand-layout="${id}"]`);
+  await page.locator(`.g-brand-section [data-brand-layout="${id}"]`).click();
+  await expect(page.locator(`.g-brand-section [data-brand-layout="${id}"]`)).toHaveAttribute('aria-pressed','true');
+  const feature=preview(page).locator(`.hero-brand-feature[data-brand-layout="${id}"]`);
   await expect(feature).toBeVisible();
+  await expect(feature.locator('img').first()).toBeVisible();
   if(tagline){await expect(feature).toContainText(tagline);await expect(feature).toContainText(subline);}
   else{await expect(feature.locator('.brand-watermark-mark')).toHaveCount(1);await expect(feature.locator('.brand-watermark-wordmark')).toHaveCount(1);}
  }
+ await page.locator('.g-brand-section [data-brand-layout="gold-wave"]').click();
+ await facts(page);await confirm(page);const project=await save(page);
+ expect(project.site.hero.brandLayout).toBe('gold-wave');
+ expect(project.site.hero.brandTagline).toBe('당신의 오늘이 더 나은 내일이 되도록');
+ expect(project.site.hero.brandSubline).toBe('LIFE, ALWAYS WITH YOU');
+ await page.reload();await page.locator('#guided-file').setInputFiles({name:'brand-draft.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(project))});
+ await stage(page,1);
+ await expect(page.locator('.g-brand-section [data-brand-layout="gold-wave"]')).toHaveAttribute('aria-pressed','true');
+ await expect(preview(page).locator('.hero-brand-feature[data-brand-layout="gold-wave"]')).toBeVisible();
 });
 test('profile, chosen copy, layout and phone/chat links survive JSON export/import',async({page})=>{
  await start(page);await purpose(page,'new');await facts(page);
