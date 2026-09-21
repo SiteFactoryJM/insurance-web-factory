@@ -28,6 +28,14 @@ const isEmail = (value) => {
   const labels = match[2].split(".");
   return labels.length >= 2 && labels.every(label => label.length <= 63 && /^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$/.test(label));
 };
+const isInstagramUrl = (value) => {
+  if (!value) return true;
+  try {
+    const url = new URL(String(value).trim());
+    return url.protocol === "https:" && ["instagram.com", "www.instagram.com"].includes(url.hostname) &&
+      !url.port && !url.username && !url.password && !url.search && !url.hash && /^\/[A-Za-z0-9._]{1,30}\/?$/.test(url.pathname);
+  } catch { return false; }
+};
 
 // Mirrors the browser helper without depending on an already-compiled build.
 export function isSectionEnabled(site, id) {
@@ -201,7 +209,7 @@ for (const entry of entries) {
 
   if (site.contact?.kakaoUrl && !/^https:\/\/open\.kakao\.com\/o\/[A-Za-z0-9_-]+\/?$/.test(String(site.contact.kakaoUrl).trim())) errors.push(`[${id}] kakaoUrl은 https://open.kakao.com/o/ 형식의 초대 주소여야 합니다.`);
   if (site.status === "published" && !site.demo?.enabled && site.compliance?.advertisingReviewStatus === "pending") errors.push(`[${id}] 조직의 게시 검토가 끝나지 않았습니다. approved 또는 조직 기준에 따라 확인된 not-required 상태가 필요합니다.`);
-  if (!isUrl(site.contact?.instagramUrl)) errors.push(`[${id}] instagramUrl 형식이 올바르지 않습니다.`);
+  if (!isInstagramUrl(site.contact?.instagramUrl)) errors.push(`[${id}] instagramUrl은 https://www.instagram.com/사용자명 형식의 프로필 주소여야 합니다.`);
   if (!isUrl(site.contact?.mapUrl)) errors.push(`[${id}] mapUrl 형식이 올바르지 않습니다.`);
   if (!isEmail(site.contact?.email)) errors.push(`[${id}] email 형식이 올바르지 않습니다.`);
   const fax = site.contact?.fax;
