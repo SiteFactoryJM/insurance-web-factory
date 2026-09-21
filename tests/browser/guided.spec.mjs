@@ -114,7 +114,16 @@ test('actual-info step shows three brand samples, previews them immediately and 
   await expect(feature).toBeVisible();
   await expect(feature.locator('img').first()).toBeVisible();
   if(tagline){await expect(feature).toContainText(tagline);await expect(feature).toContainText(subline);}
-  else{await expect(feature.locator('.brand-watermark-mark')).toHaveCount(1);await expect(feature.locator('.brand-watermark-wordmark')).toHaveCount(1);}
+  else{
+   await expect(feature.locator('.brand-watermark-mark')).toHaveCount(1);await expect(feature.locator('.brand-watermark-wordmark')).toHaveCount(1);
+   const overlap=await preview(page).locator('.hero-copy-brand-watermark').evaluate(copy=>{
+    const background=copy.querySelector('.hero-brand-watermark').getBoundingClientRect();
+    const title=copy.querySelector('h1').getBoundingClientRect();
+    const actions=copy.querySelector('.hero-actions').getBoundingClientRect();
+    return {position:getComputedStyle(copy.querySelector('.hero-brand-watermark')).position,titleInside:title.top>=background.top&&title.bottom<=background.bottom,actionsInside:actions.top>=background.top&&actions.bottom<=background.bottom};
+   });
+   expect(overlap.position).toBe('absolute');expect(overlap.titleInside).toBe(true);expect(overlap.actionsInside).toBe(true);
+  }
  }
  await page.locator('.g-brand-section [data-brand-layout="gold-wave"]').click();
  await facts(page);await confirm(page);const project=await save(page);
