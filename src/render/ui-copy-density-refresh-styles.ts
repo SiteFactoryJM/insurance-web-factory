@@ -536,7 +536,7 @@ export const uiCopyDensityRefreshStyles = `
 }
 .premium-page #main .about-profile-content{
  min-width:0;
- padding-top:1px;
+ padding:1px 0 0 18px;
 }
 .premium-page #main .about-profile-heading{
  max-width:none;
@@ -656,7 +656,7 @@ export const uiCopyDensityRefreshStyles = `
   width:min(72vw,18.25rem);
   margin-inline:auto;
  }
- .premium-page #main .about-profile-content{padding-top:0}
+ .premium-page #main .about-profile-content{padding:0}
  .premium-page #main .about-profile-heading{text-align:center}
  .premium-page #main .about-profile-heading h2{
   max-width:29rem;
@@ -664,8 +664,10 @@ export const uiCopyDensityRefreshStyles = `
   font-size:clamp(1.75rem,7vw,2.15rem);
  }
  .premium-page #main .about-profile-copy{
-  max-width:31rem;
+  width:calc(100% - 2rem);
+  max-width:29.5rem;
   margin:18px auto 0;
+  padding-inline:8px;
  }
  .premium-page #main .about-profile-values{
   width:min(100%,29rem);
