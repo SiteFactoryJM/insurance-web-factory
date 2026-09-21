@@ -24,13 +24,15 @@ let site = fixedSite(original);
 let device: 'desktop' | 'mobile' = 'desktop';
 let renderTimer = 0;
 
-const frame = document.getElementById('studio-frame') as HTMLIFrameElement | null;
-const preview = document.getElementById('studio-preview') as HTMLElement | null;
-const mat = document.querySelector('.s-mat') as HTMLElement | null;
-const canvas = document.querySelector('.s-canvas') as HTMLElement | null;
-const status = document.getElementById('studio-status') as HTMLElement | null;
+const frame = document.getElementById('studio-frame');
+const preview = document.getElementById('studio-preview');
+const mat = document.querySelector('.s-mat');
+const canvas = document.querySelector('.s-canvas');
+const status = document.getElementById('studio-status');
 
-if (!frame || !preview || !mat || !canvas) throw new Error('미리보기 요소를 찾지 못했습니다.');
+if (!(frame instanceof HTMLIFrameElement) || !(preview instanceof HTMLElement) || !(mat instanceof HTMLElement) || !(canvas instanceof HTMLElement)) {
+  throw new Error('미리보기 요소를 찾지 못했습니다.');
+}
 
 function setNested(target: Record<string, any>, path: string, value: string): void {
   const keys = path.split('.');
