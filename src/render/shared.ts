@@ -22,7 +22,7 @@ export function renderInstagramLink(site: SiteConfig): string {
 
 export function renderHeader(site: SiteConfig): string {
   const hidden = getDesign(site).hiddenSections;
-  const headerLogo = site.agent.logoMarkImage || site.agent.logoImage;
+  const headerLogo = site.agent.logoImage || site.agent.logoMarkImage;
   const links = `${!hidden.includes('about') ? '<a href="#about">담당자 소개</a>' : ''}${!hidden.includes('services') ? '<a href="#specialties">상담 분야</a>' : ''}${site.sections.faq && !hidden.includes('faq') ? '<a href="#faq">자주 묻는 질문</a>' : ''}<a href="${hidden.includes('contact') ? '#footer' : '#contact'}">연락 방법</a>`;
   return `<header class="site-header"><div class="container header-inner"><a class="brand" href="/" aria-label="${e(site.agent.name)} 보험상담 홈">${headerLogo ? `<img class="brand-logo" src="${e(headerLogo)}" alt="${e(site.agent.company)} 로고" width="80" height="80">` : ''}<span><strong>${e(site.agent.name || '담당자 이름')} <span class="brand-service">${e(site.agent.title || '보험설계사')}</span></strong><span class="brand-sub">${e(site.agent.company)}</span></span></a><nav class="desktop-nav" aria-label="주요 메뉴">${links}</nav><div class="header-tools"><details class="mobile-menu"><summary>메뉴</summary><nav aria-label="모바일 메뉴">${links}</nav></details></div></div></header>`;
 }
