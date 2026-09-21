@@ -380,7 +380,7 @@ export const clearHumanStyles = `
 .premium-page #main .direct-contact-panel>.support-note,.premium-page #main .direct-contact-panel>.demo-contact-notice{margin:0;text-align:left;font-size:var(--ch-small);line-height:var(--ch-small-lh)}
 .premium-page #main .direct-contact-panel>.demo-contact-notice{margin-top:14px}
 
-/* 리쿠르트: 연락 섹션 바로 아래에서 소개, 핵심 3가지, 담당자 연락을 한 패널로 묶습니다. */
+/* 리쿠르트: 연락 섹션 바로 아래에서 핵심 3가지, 지원 성향, 담당자 연락을 한 패널로 묶습니다. */
 .premium-page #main .recruit-section{
  position:relative;isolation:isolate;overflow:hidden;padding-block:72px 64px;
  background:linear-gradient(180deg,var(--paper) 0%,color-mix(in srgb,var(--paper) 92%,#EAD9BC 8%) 100%);
@@ -411,30 +411,38 @@ export const clearHumanStyles = `
  min-width:0;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--surface) 94%,transparent);
  box-shadow:0 20px 50px rgba(29,36,45,.05);overflow:hidden;
 }
-.premium-page #main .recruit-intro,.premium-page #main .recruit-list,.premium-page #main .recruit-contact{min-width:0}
-.premium-page #main .recruit-intro{padding:44px 36px;border-right:1px solid var(--line)}
-.premium-page #main .recruit-intro-mark{display:block;width:24px;height:2px;margin:0 0 30px;background:var(--ink)}
-.premium-page #main .recruit-intro h3{margin:0;font-size:clamp(1.75rem,2.3vw,2.2rem);line-height:1.45}
-.premium-page #main .recruit-intro-lead{margin:28px 0 0;font-size:1.22rem;line-height:1.6;color:var(--muted)}
-.premium-page #main .recruit-intro-copy{margin:26px 0 0;font-size:1rem;line-height:1.75;color:var(--muted)}
-.premium-page #main .recruit-list{list-style:none;margin:0;padding:28px 42px;border-right:1px solid var(--line)}
-.premium-page #main .recruit-list li{display:grid;grid-template-columns:56px minmax(0,1fr);gap:18px;padding:26px 0;border-bottom:1px solid var(--line)}
+.premium-page #main .recruit-first,.premium-page #main .recruit-main,.premium-page #main .recruit-contact{min-width:0}
+.premium-page #main .recruit-first{
+ display:grid;grid-template-columns:56px minmax(0,1fr);gap:18px;align-content:start;
+ padding:48px 36px;border-right:1px solid var(--line);
+}
+.premium-page #main .recruit-first h3{margin:0;font-size:1.35rem;line-height:1.55}
+.premium-page #main .recruit-first p{margin:10px 0 0;font-size:1rem;line-height:1.72;color:var(--muted);overflow-wrap:anywhere}
+.premium-page #main .recruit-main{border-right:1px solid var(--line)}
+.premium-page #main .recruit-fit{padding:32px 42px 26px;border-bottom:1px solid var(--line)}
+.premium-page #main .recruit-intro-mark{display:block;width:24px;height:2px;margin:0 0 18px;background:var(--ink)}
+.premium-page #main .recruit-fit h3{margin:0;font-size:1.35rem;line-height:1.5}
+.premium-page #main .recruit-fit ul{display:grid;gap:9px;list-style:none;margin:18px 0 0;padding:0}
+.premium-page #main .recruit-fit li{
+ display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;align-items:start;
+ font-size:1rem;line-height:1.6;color:var(--muted);
+}
+.premium-page #main .recruit-check{color:currentColor;font-weight:800;line-height:1.6}
+.premium-page #main .recruit-list{list-style:none;margin:0;padding:4px 42px}
+.premium-page #main .recruit-list li{display:grid;grid-template-columns:56px minmax(0,1fr);gap:18px;padding:24px 0;border-bottom:1px solid var(--line)}
 .premium-page #main .recruit-list li:last-child{border-bottom:0}
 .premium-page #main .recruit-number{padding-top:2px;font-size:1.45rem;line-height:1.5;font-weight:700;color:var(--muted)}
 .premium-page #main .recruit-list h3{margin:0;font-size:1.25rem;line-height:1.55}
 .premium-page #main .recruit-list p{margin:8px 0 0;font-size:1rem;line-height:1.72;color:var(--muted);overflow-wrap:anywhere}
 .premium-page #main .recruit-contact{padding:34px 34px 28px}
-.premium-page #main .recruit-contact-eyebrow{margin:0 0 12px;font-size:.95rem;line-height:1.5;font-weight:600;color:var(--ink)}
-.premium-page #main .recruit-contact>h3{margin:0;font-size:clamp(1.75rem,2.35vw,2.15rem);line-height:1.4}
 .premium-page #main .recruit-contact-person{
- display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;align-items:center;margin:24px 0 20px;
- padding-top:14px;border-top:1px solid var(--line);
+ display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;align-items:center;margin:0 0 22px;
+ padding:0 0 18px;border-bottom:1px solid var(--line);
 }
 .premium-page #main .recruit-contact-avatar{
  display:block;width:48px;height:48px;border-radius:50%;object-fit:cover;object-position:50% 16%;border:1px solid var(--line);background:var(--paper);
 }
 .premium-page #main .recruit-contact-person strong{display:block;font-size:1.05rem;line-height:1.55;color:var(--ink);overflow-wrap:anywhere}
-.premium-page #main .recruit-contact-person p{margin:6px 0 0;font-size:.92rem;line-height:1.65;color:var(--muted)}
 .premium-page #main .recruit-contact-links{display:grid;gap:8px}
 .premium-page #main .recruit-contact-link{
  display:grid;grid-template-columns:28px minmax(0,1fr) auto auto;gap:12px;align-items:center;min-width:0;min-height:54px;
@@ -447,14 +455,14 @@ export const clearHumanStyles = `
 .premium-page #main .recruit-contact-label{min-width:0;font-size:1rem;line-height:1.45;font-weight:700;overflow-wrap:anywhere}
 .premium-page #main .recruit-contact-meta{font-size:.9rem;line-height:1.45;color:var(--muted);white-space:nowrap}
 .premium-page #main .recruit-contact-chevron{display:grid;place-items:center;color:var(--muted)}
-.premium-page #main .recruit-contact-footer{
- display:flex;flex-wrap:wrap;gap:6px 10px;margin:22px 0 0;font-size:.84rem;line-height:1.55;color:var(--muted);
-}
+.premium-page #main .recruit-contact-footer{margin:22px 0 0;font-size:.84rem;line-height:1.55;color:var(--muted)}
 @media(max-width:980px){
  .premium-page #main .recruit-heading{margin-left:0}
  .premium-page #main .recruit-panel{grid-template-columns:1fr}
- .premium-page #main .recruit-intro,.premium-page #main .recruit-list{border-right:0;border-bottom:1px solid var(--line)}
- .premium-page #main .recruit-list{padding:18px 36px}
+ .premium-page #main .recruit-first,.premium-page #main .recruit-main{border-right:0;border-bottom:1px solid var(--line)}
+ .premium-page #main .recruit-first{padding:30px 36px}
+ .premium-page #main .recruit-fit{padding:28px 36px 24px}
+ .premium-page #main .recruit-list{padding:4px 36px}
  .premium-page #main .recruit-contact{padding:34px 36px}
 }
 @media(max-width:650px){
@@ -465,9 +473,9 @@ export const clearHumanStyles = `
  .premium-page #main .recruit-lead{font-size:1.16rem}
  .premium-page #main .recruit-support{font-size:1rem}
  .premium-page #main .recruit-panel{border-radius:10px}
- .premium-page #main .recruit-intro{padding:30px 24px}
- .premium-page #main .recruit-intro-mark{margin-bottom:22px}
- .premium-page #main .recruit-list{padding:8px 24px}
+ .premium-page #main .recruit-first{grid-template-columns:42px minmax(0,1fr);gap:10px;padding:28px 24px}
+ .premium-page #main .recruit-fit{padding:26px 24px 22px}
+ .premium-page #main .recruit-list{padding:4px 24px}
  .premium-page #main .recruit-list li{grid-template-columns:42px minmax(0,1fr);gap:10px;padding:22px 0}
  .premium-page #main .recruit-number{font-size:1.15rem}
  .premium-page #main .recruit-contact{padding:28px 24px 24px}
@@ -479,7 +487,7 @@ export const clearHumanStyles = `
 @media(max-width:380px){
  .premium-page #main .recruit-kicker{gap:12px}
  .premium-page #main .recruit-kicker::after{width:72px}
- .premium-page #main .recruit-intro,.premium-page #main .recruit-list,.premium-page #main .recruit-contact{padding-left:18px;padding-right:18px}
+ .premium-page #main .recruit-first,.premium-page #main .recruit-fit,.premium-page #main .recruit-list,.premium-page #main .recruit-contact{padding-left:18px;padding-right:18px}
 }
 
 .premium-page #main .location-section{text-align:center}
