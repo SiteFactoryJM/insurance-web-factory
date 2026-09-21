@@ -23,20 +23,14 @@ site.json → generated registry → site resolver → renderSitePage
 
 `handleConsultation()`는 이전 API 주소를 안전하게 종료하는 호환 핸들러입니다. HTTP 410과 안내만 반환합니다. 기존 `Env.DB`, `CONSULTATION_WEBHOOK_URL` 선언 및 마이그레이션은 호환/이력으로 남지만 이 핸들러가 사용하지 않습니다. DB 삭제·보유자료 정리는 별도 운영 정책입니다.
 
-## 선택형 제작
+## 고정 디자인 설정 화면
 
-- `src/content/copy-library.ts`: 114개 문구 선택지와 8개 목적별 추천 구성. 사실 확인·법적 승인과 구분합니다.
-- `src/studio/guided-model.ts`: 선택 적용, 실제 정보 보존, 기존 템플릿 override 해제, 게시 상태 초기화.
-- `src/studio/guided.ts`: 3단계(디자인·문구 / 실제 정보 / 확인·저장) 상태, 문구 검색, 큰 화면 미리보기, 초안 저장 및 시연, 파일 내보내기.
-- `src/render/guided-studio-page.ts`: 제작 화면. 768px 미만에서는 제작 UI를 감추고 안내만 보여 줍니다.
-- `src/studio/project.ts`: v1→v2 마이그레이션, JSON 계약·선택 ID·인계 메타데이터·이미지 서명·용량·원고 길이 검증.
-- `src/studio/export/capture.ts`: 공통 렌더러의 PC·모바일 섹션별 캡처.
-- `src/studio/export/pdf.ts`: 한글 임베딩 글꼴, 표지·캡처·전체 원고 PDF.
-- `src/studio/export/archive.ts`: 동일 스냅샷의 PDF 1개와 JSON 1개를 ZIP으로 구성하고 크기를 검증합니다.
-
-목적을 바꾸면 문구·배치·팔레트가 바뀌지만 담당자 이름·소속·전화·선택 이메일·선택 팩스·오픈채팅 주소는 유지합니다. 실제 후기만 유지하고 예시 후기는 제거합니다. 추천 구성의 실제 배치 값을 작업 파일에 넣어 다시 불러올 때도 구성을 보존합니다.
-
-문구 선택 시 PC와 모바일 원고가 함께 설정됩니다. 현재 라이브러리는 두 화면에서 완전한 문장을 제공하도록 짧은 원고를 사용하며 임의 잘라내기를 하지 않습니다. 선택한 문구는 화면 구성이나 색상을 바꿔도 유지됩니다.
+- `src/render/guided-studio-page.ts`: 색상과 담당자/연락처/이미지 입력, PC·모바일 미리보기 UI.
+- `src/studio/guided.ts`: 입력값을 현재 `SiteConfig`에 반영하고 공통 `renderSitePage()`로 즉시 다시 렌더링합니다.
+- 디자인은 `warm-care`, 글꼴은 `noto-sans-kr`, 메인 브랜드 연출은 `watermark`, 리쿠르트 섹션은 활성 상태로 고정합니다.
+- 좌상단 로고는 `agent.logoImage`, 푸터 로고는 `agent.logoMarkImage`를 사용합니다.
+- 해온 워터마크는 `/assets/haeon-watermark-wave.png`를 기본 자산으로 사용하며 설정 화면에서 교체하지 않습니다.
+- 저장은 현재 설정을 `site.json`으로 내려받는 단순 작업입니다. PDF/ZIP 인계, 목적별 추천 문구, 레이아웃 선택, 문구 라이브러리 편집은 설정 화면에서 제공하지 않습니다.
 
 ## 편집 저장과 게시 경계
 
