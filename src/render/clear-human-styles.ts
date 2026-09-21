@@ -557,8 +557,8 @@ body[data-export-capture="true"] #main *{
  scroll-margin-top:96px;
 }
 @keyframes ch-target-flash{
- 0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 0%,transparent)}
- 25%{box-shadow:0 0 0 8px color-mix(in srgb,var(--accent) 18%,transparent)}
+ 0%{box-shadow:0 0 0 0 transparent}
+ 25%{box-shadow:0 0 0 8px rgba(45,72,100,.16)}
  100%{box-shadow:0 0 0 0 transparent}
 }
 .premium-page #main>section[id]:target,
