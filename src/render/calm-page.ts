@@ -221,16 +221,14 @@ function recruitment(site: SiteConfig): string {
     {
       title: '처음이어도 괜찮습니다',
       bodyLines: [
-        '경력이 없어도 됩니다.',
-        '기초 교육부터 현장 동행까지,',
+        '경력이 없어도 됩니다. 기초 교육부터 현장 동행까지,',
         '혼자 던져두지 않고 한 단계씩 함께 만들어 갑니다.',
       ],
     },
     {
       title: '정직하게 오래 가는 일',
       bodyLines: [
-        '밀어붙이는 영업이 아니라,',
-        '고객을 평생 관리하는 방식.',
+        '밀어붙이는 영업이 아니라, 고객을 평생 관리하는 방식.',
         '그래서 한번 시작하면 오래, 멀리 갈 수 있습니다.',
       ],
     },
@@ -248,7 +246,7 @@ function recruitment(site: SiteConfig): string {
     '시간을 주도적으로 쓰며 성장하고 싶은 분',
   ];
 
-  return `<section class="section recruit-section" id="recruit" aria-labelledby="recruit-title"><div class="container recruit-shell"><header class="recruit-heading"><p class="recruit-kicker">RECRUIT</p><h2 id="recruit-title">함께 성장할 동료를 찾습니다.</h2><p class="recruit-lead">혼자 가면 빨리 가지만, 함께 가면 멀리 갑니다.</p><p class="recruit-support">보험이라는 일을 제대로 배우고 정직하게 오래 하고 싶은 분이라면,<br><strong>${e(agentName)}과 함께 시작해 보세요.</strong></p></header><div class="recruit-panel"><ol class="recruit-list">${items.map((item, index) => `<li><span class="recruit-number">${formatIndex(index)}</span><div><h3>${e(item.title)}</h3><p>${item.bodyLines.map(line => e(line)).join('<br>')}</p></div></li>`).join('')}</ol><div class="recruit-fit"><span class="recruit-intro-mark" aria-hidden="true"></span><h3>이런 분과<br>함께하고 싶습니다.</h3><ul>${fitPoints.map(point => `<li><span class="recruit-check" aria-hidden="true">✓</span><span>${e(point)}</span></li>`).join('')}</ul></div><aside class="recruit-contact" aria-label="리쿠르트 문의"><div class="recruit-contact-person">${profile(site, 'recruit-contact-avatar')}<div><strong>${e(agentName)} <span aria-hidden="true">·</span> ${e(role || '보험설계사')}</strong></div></div><div class="recruit-contact-links">${contactRows}</div><p class="recruit-contact-footer">부담 갖지 말고 편하게 연락주세요.</p></aside></div></div></section>`;
+  return `<section class="section recruit-section" id="recruit" aria-labelledby="recruit-title"><div class="container recruit-shell"><header class="recruit-heading"><p class="recruit-kicker">RECRUIT</p><h2 id="recruit-title">함께 성장할 동료를 찾습니다.</h2><p class="recruit-lead">혼자 가면 빨리 가지만, 함께 가면 멀리 갑니다.</p><p class="recruit-support">보험이라는 일을 제대로 배우고 정직하게 오래 하고 싶은 분이라면,<br><strong>${e(agentName)}과 함께 시작해 보세요.</strong></p></header><div class="recruit-panel"><ol class="recruit-list">${items.map((item, index) => `<li><span class="recruit-number">${formatIndex(index)}</span><div><h3>${e(item.title)}</h3><p>${item.bodyLines.map(line => e(line)).join('<br>')}</p></div></li>`).join('')}</ol><div class="recruit-fit"><span class="recruit-intro-mark" aria-hidden="true"></span><h3>이런 분과<br>함께하고 싶습니다.</h3><ul>${fitPoints.map(point => `<li><span class="recruit-check" aria-hidden="true">✓</span><span>${e(point)}</span></li>`).join('')}</ul></div><aside class="recruit-contact" aria-label="리쿠르트 문의"><div class="recruit-contact-person">${profile(site, 'recruit-contact-avatar')}<div><strong>${e(agentName)} <span aria-hidden="true">·</span> ${e(role || '보험설계사')}</strong><p class="recruit-contact-note">궁금한 점이 있다면 편하게 문의 주세요.</p></div></div><div class="recruit-contact-links">${contactRows}</div><p class="recruit-contact-footer">부담 갖지 말고 편하게 연락주세요.</p></aside></div></div></section>`;
 }
 
 function contact(site: SiteConfig): string {

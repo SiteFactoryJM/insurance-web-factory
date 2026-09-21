@@ -387,16 +387,16 @@ export const clearHumanStyles = `
  border-top:1px solid var(--line);
 }
 .premium-page #main .recruit-section::before{
- content:"";position:absolute;z-index:-2;inset:-5% -8% auto 24%;height:420px;pointer-events:none;
- background:url('/assets/haeon-watermark-wave.png') center top / cover no-repeat;opacity:.11;
+ content:"";position:absolute;z-index:0;inset:-5% -8% auto 24%;height:420px;pointer-events:none;
+ background:url('/assets/haeon-watermark-wave.png') center top / cover no-repeat;opacity:.18;
  -webkit-mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.82) 52%,transparent 100%);
  mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.82) 52%,transparent 100%);
 }
 .premium-page #main .recruit-section::after{
- content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;
+ content:"";position:absolute;z-index:0;inset:0;pointer-events:none;
  background:radial-gradient(circle at 82% 8%,rgba(214,178,112,.12),transparent 34%);
 }
-.premium-page #main .recruit-shell{position:relative;min-width:0}
+.premium-page #main .recruit-shell{position:relative;z-index:1;min-width:0}
 .premium-page #main .recruit-heading{max-width:58rem;margin:0 0 30px 28px;text-align:left}
 .premium-page #main .recruit-kicker{
  display:flex;align-items:center;gap:18px;margin:0 0 18px;font-size:var(--ch-small);line-height:1.4;
@@ -408,7 +408,7 @@ export const clearHumanStyles = `
 .premium-page #main .recruit-support{margin:14px 0 0;font-size:1.125rem;line-height:1.7;color:var(--muted)}
 .premium-page #main .recruit-support strong{font-weight:800;color:var(--ink)}
 .premium-page #main .recruit-panel{
- display:grid;grid-template-columns:minmax(0,1.5fr) minmax(14rem,.9fr) minmax(19rem,1fr);
+ display:grid;grid-template-columns:minmax(0,1.6fr) minmax(13rem,.82fr) minmax(19rem,1fr);
  min-width:0;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--surface) 94%,transparent);
  box-shadow:0 20px 50px rgba(29,36,45,.05);overflow:hidden;
 }
@@ -427,11 +427,11 @@ export const clearHumanStyles = `
  padding:44px 34px;border-right:1px solid var(--line);
 }
 .premium-page #main .recruit-intro-mark{display:block;width:24px;height:2px;margin:0 0 30px;background:var(--ink)}
-.premium-page #main .recruit-fit h3{margin:0;font-size:clamp(1.75rem,2.2vw,2.15rem);line-height:1.45}
+.premium-page #main .recruit-fit h3{margin:0;font-size:clamp(1.5rem,1.7vw,1.75rem);line-height:1.48}
 .premium-page #main .recruit-fit ul{display:grid;gap:14px;list-style:none;margin:28px 0 0;padding:0}
 .premium-page #main .recruit-fit li{
  display:grid;grid-template-columns:20px minmax(0,1fr);gap:9px;align-items:start;
- font-size:1.02rem;line-height:1.7;color:var(--muted);
+ font-size:1.125rem;line-height:1.68;color:var(--muted);
 }
 .premium-page #main .recruit-check{color:currentColor;font-weight:800;line-height:1.7}
 .premium-page #main .recruit-contact{padding:34px 34px 28px}
@@ -443,6 +443,7 @@ export const clearHumanStyles = `
  display:block;width:48px;height:48px;border-radius:50%;object-fit:cover;object-position:50% 16%;border:1px solid var(--line);background:var(--paper);
 }
 .premium-page #main .recruit-contact-person strong{display:block;font-size:1.05rem;line-height:1.55;color:var(--ink);overflow-wrap:anywhere}
+.premium-page #main .recruit-contact-note{margin:6px 0 0;font-size:.9rem;line-height:1.55;color:var(--muted)}
 .premium-page #main .recruit-contact-links{display:grid;gap:8px}
 .premium-page #main .recruit-contact-link{
  display:grid;grid-template-columns:28px minmax(0,1fr) auto auto;gap:12px;align-items:center;min-width:0;min-height:54px;
@@ -477,7 +478,8 @@ export const clearHumanStyles = `
  .premium-page #main .recruit-number{font-size:1.15rem}
  .premium-page #main .recruit-fit{padding:30px 24px}
  .premium-page #main .recruit-intro-mark{margin-bottom:22px}
- .premium-page #main .recruit-fit h3{font-size:1.8rem}
+ .premium-page #main .recruit-fit h3{font-size:1.55rem}
+ .premium-page #main .recruit-fit li{font-size:1.075rem}
  .premium-page #main .recruit-fit ul{margin-top:22px}
  .premium-page #main .recruit-contact{padding:28px 24px 24px}
  .premium-page #main .recruit-contact-meta{display:none}
