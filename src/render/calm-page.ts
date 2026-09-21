@@ -139,6 +139,19 @@ function about(site: SiteConfig): string {
   const layout = pattern === 'quote' ? `<div class="about-quote">${intro}<blockquote>${e(site.intro.philosophy || site.intro.title)}</blockquote>${body}</div>` : `${intro}${body}`;
   return `<section class="section about-section about-section-${e(pattern)}" id="about" aria-labelledby="about-title"><div class="container about-grid about-${pattern}" data-pattern="about-${pattern}">${layout}</div></section>`;
 }
+function promiseSection(site: SiteConfig): string {
+  const items = [
+    { title: '평생 1:1 전담 관리', body: '가입 후가 진짜 시작입니다. 매년 보장 점검과 변화 안내를 직접 챙깁니다.' },
+    { title: '보험금 청구 끝까지 동행', body: '복잡한 서류와 절차, 받으셔야 할 보험금까지 함께 챙깁니다.' },
+    { title: '정직한 보장 분석', body: '중복·과잉은 줄이고 꼭 필요한 보장에 집중합니다.' },
+    { title: '내게 꼭 맞는 맞춤 설계', body: '지금 상황과 목표에 맞춰 꼭 필요한 보장만 담아 설계합니다.' },
+    { title: '가족 전체를 함께', body: '나 한 명이 아니라 가족 모두의 보장을 한눈에 관리합니다.' },
+    { title: '부담 없는 상담', body: '가입을 강요하지 않습니다. 궁금증을 푸는 것부터 시작합니다.' },
+  ];
+  const agentName = site.agent.name?.trim() || '담당자';
+  return `<section class="section promise-section" id="promise" aria-labelledby="promise-title"><div class="container"><div class="promise-panel"><header class="promise-heading"><p class="promise-eyebrow">${e(agentName)}의 약속</p><h2 id="promise-title">“저에게 관리받으셔야 하는 이유”</h2></header><div class="promise-grid">${items.map(item => `<article class="promise-item"><span class="promise-check" aria-hidden="true"></span><div class="promise-copy"><h3>${e(item.title)}</h3><p>${e(item.body)}</p></div></article>`).join('')}</div></div></div></section>`;
+}
+
 function process(site: SiteConfig): string {
   if (!site.sections.process || !site.process.length) return '';
   const pattern = getDesign(site).process;
@@ -197,7 +210,7 @@ function contact(site: SiteConfig): string {
 
 export function renderCalmPage(site: SiteConfig): string {
   const design = getDesign(site);
-  const modules: Record<DesignSectionId, () => string> = { services: () => services(site), about: () => about(site), process: () => process(site), reviews: () => reviews(site), faq: () => faq(site), contact: () => contact(site) };
+  const modules: Record<DesignSectionId, () => string> = { services: () => services(site), about: () => `${about(site)}${promiseSection(site)}`, process: () => process(site), reviews: () => reviews(site), faq: () => faq(site), contact: () => contact(site) };
   const sections = design.sectionOrder.filter(key => !design.hiddenSections.includes(key)).map(key => modules[key]()).join('');
   return `<main id="main" tabindex="-1" data-typography-version="balanced-v3" class="ornament-${design.ornament} density-${design.density}">${hero(site)}${focus(site)}${casesTicker(site)}${sections}</main>`;
 }
