@@ -435,24 +435,26 @@ export const clearHumanStyles = `
  margin:8px 0 0;font-family:var(--ch-font);font-size:1rem;line-height:1.72;font-weight:400;color:var(--muted);overflow-wrap:anywhere;
 }
 
-/* 가운데는 제목+세 개의 작은 카드로 바꿔 애매한 빈 칸 대신 명확한 '인재상' 영역으로 읽히게 합니다. */
+/* 가운데는 별도 배경 없이 제목과 체크 항목의 여백/구분선만으로 정리합니다. */
 .premium-page #main .recruit-fit{
- display:flex;flex-direction:column;justify-content:center;padding:34px 28px;border-right:1px solid var(--line);
- background:linear-gradient(180deg,rgba(246,242,234,.74) 0%,rgba(255,255,255,.54) 100%);
+ display:flex;flex-direction:column;justify-content:flex-start;padding:46px 32px 38px;border-right:1px solid var(--line);
+ background:transparent;
 }
-.premium-page #main .recruit-intro-mark{display:block;width:22px;height:2px;margin:0 0 20px;background:var(--ink)}
+.premium-page #main .recruit-intro-mark{display:block;width:22px;height:2px;margin:0 0 22px;background:var(--ink)}
 .premium-page #main .recruit-fit h3{
- margin:0;font-family:var(--ch-font);font-size:1.46rem;line-height:1.46;font-weight:800;letter-spacing:-.035em;color:var(--ink);
+ margin:0;font-family:var(--ch-font);font-size:1.48rem;line-height:1.5;font-weight:800;letter-spacing:-.035em;color:var(--ink);
 }
-.premium-page #main .recruit-fit ul{display:grid;gap:10px;list-style:none;margin:24px 0 0;padding:0}
+.premium-page #main .recruit-fit ul{
+ display:grid;gap:0;list-style:none;margin:28px 0 0;padding:0;border-top:1px solid var(--line);
+}
 .premium-page #main .recruit-fit li{
- display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:center;
- padding:11px 12px;border:1px solid rgba(124,132,140,.17);border-radius:10px;background:rgba(255,255,255,.78);
- font-family:var(--ch-font);font-size:1.06rem;line-height:1.58;font-weight:500;color:#4f5966;
+ display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;align-items:start;
+ padding:15px 0;border-bottom:1px solid var(--line);
+ font-family:var(--ch-font);font-size:1.08rem;line-height:1.62;font-weight:500;color:#4f5966;
 }
 .premium-page #main .recruit-check{
- display:grid;place-items:center;width:22px;height:22px;border-radius:50%;
- background:rgba(80,91,105,.08);color:currentColor;font-size:.9rem;font-weight:800;line-height:1;
+ display:block;width:auto;height:auto;padding-top:1px;
+ background:none;color:currentColor;font-size:1rem;font-weight:800;line-height:1.5;
 }
 
 /* 연락 영역은 세로 중앙 정렬 + 옅은 톤으로 묶어 남는 공간을 의도적인 여백으로 보이게 합니다. */
@@ -498,8 +500,10 @@ export const clearHumanStyles = `
  .premium-page #main .recruit-panel{grid-template-columns:1fr}
  .premium-page #main .recruit-list,.premium-page #main .recruit-fit{border-right:0;border-bottom:1px solid var(--line)}
  .premium-page #main .recruit-list{padding:18px 36px}
- .premium-page #main .recruit-fit{padding:30px 36px}
- .premium-page #main .recruit-fit ul{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+ .premium-page #main .recruit-fit{padding:32px 36px 28px}
+ .premium-page #main .recruit-fit ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:1px solid var(--line)}
+ .premium-page #main .recruit-fit li{padding:14px 12px;border-bottom:0;border-right:1px solid var(--line)}
+ .premium-page #main .recruit-fit li:last-child{border-right:0}
  .premium-page #main .recruit-contact{padding:32px 36px}
 }
 @media(max-width:650px){
@@ -515,11 +519,11 @@ export const clearHumanStyles = `
  .premium-page #main .recruit-number{font-size:1.12rem}
  .premium-page #main .recruit-list h3{font-size:1.12rem}
  .premium-page #main .recruit-list p{font-size:.98rem}
- .premium-page #main .recruit-fit{padding:28px 24px}
+ .premium-page #main .recruit-fit{padding:28px 24px 24px}
  .premium-page #main .recruit-intro-mark{margin-bottom:18px}
  .premium-page #main .recruit-fit h3{font-size:1.4rem}
  .premium-page #main .recruit-fit ul{grid-template-columns:1fr;margin-top:20px}
- .premium-page #main .recruit-fit li{font-size:1.02rem}
+ .premium-page #main .recruit-fit li{padding:13px 0;border-right:0;border-bottom:1px solid var(--line);font-size:1.02rem}
  .premium-page #main .recruit-contact{padding:28px 24px}
  .premium-page #main .recruit-contact-meta{display:none}
  .premium-page #main .recruit-contact-link{grid-template-columns:30px minmax(0,1fr) auto}
