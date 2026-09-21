@@ -2,7 +2,7 @@ import type { DesignSectionId, SiteConfig } from '../types.js';
 import { escapeHtml as e, safeUrl } from '../utils/html.js';
 import { responsiveCopy as copy } from './copy.js';
 import { getDesign } from './design-system.js';
-import { arrow, formatIndex, renderContactButtons, renderContactForm } from './shared.js';
+import { formatIndex, renderContactButtons, renderContactForm, renderInstagramLink } from './shared.js';
 import { directPhoneHref } from '../utils/contact-links.js';
 
 const profile = (site: SiteConfig, className = '', eager = false) => `<img class="${className}" src="${e(site.agent.profileImage || '/assets/profile-placeholder.svg')}" alt="${e(site.agent.name || '담당자')} 프로필" width="600" height="800" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'}>`;
@@ -25,9 +25,8 @@ function naturalHeading(value?: string): string {
 function hero(site: SiteConfig): string {
   const design = getDesign(site);
   const pattern = design.hero;
-  const servicesTarget = design.hiddenSections.includes('services') ? '#footer' : '#specialties';
   const topicChips = site.specialties.slice(0, 3).map(item => `<span>${e(item.title)}</span>`).join('');
-  const lead = `<div class="hero-copy"><p class="eyebrow"><span class="small-line" aria-hidden="true"></span>${e(site.hero.eyebrow || '보험 상담 안내')}</p><h1 id="hero-title">${copy(naturalHeading(site.hero.headline || '가입한 보험, 무엇부터 확인할까요?'), naturalHeading(site.hero.mobileHeadline))}</h1><p class="hero-description">${copy(site.hero.subheadline, site.hero.mobileSubheadline)}</p>${topicChips ? `<div class="hero-topics" aria-label="주요 상담 분야">${topicChips}</div>` : ''}<div class="hero-actions">${renderContactButtons(site)}<a class="text-link" href="${servicesTarget}">${e(site.hero.secondaryCtaLabel || '상담 분야 보기')} <span aria-hidden="true">↓</span></a></div><p class="hero-note">상담은 가입 신청과 별개입니다.${site.hero.trustNote ? `<br>${e(site.hero.trustNote)}` : ''}</p></div>`;
+  const lead = `<div class="hero-copy"><p class="eyebrow"><span class="small-line" aria-hidden="true"></span>${e(site.hero.eyebrow || '보험 상담 안내')}</p><h1 id="hero-title">${copy(naturalHeading(site.hero.headline || '가입한 보험, 무엇부터 확인할까요?'), naturalHeading(site.hero.mobileHeadline))}</h1><p class="hero-description">${copy(site.hero.subheadline, site.hero.mobileSubheadline)}</p>${topicChips ? `<div class="hero-topics" aria-label="주요 상담 분야">${topicChips}</div>` : ''}<div class="hero-actions">${renderContactButtons(site)}${renderInstagramLink(site)}</div><p class="hero-note">상담은 가입 신청과 별개입니다.${site.hero.trustNote ? `<br>${e(site.hero.trustNote)}` : ''}</p></div>`;
   let visual: string;
   if (pattern === 'editorial') {
     visual = `<div class="hero-visual"><figure class="hero-scene"><img src="${e(site.hero.image || site.agent.profileImage || '/assets/profile-placeholder.svg')}" alt="${site.hero.image ? '' : e(`${site.agent.name || '담당자'} 프로필`)}" width="1536" height="1024" fetchpriority="high"></figure>${adviserCard(site)}</div>`;
@@ -36,7 +35,7 @@ function hero(site: SiteConfig): string {
   } else {
     visual = `<div class="hero-visual hero-statement-person">${profile(site, '', true)}${adviserCard(site)}</div>`;
   }
-  return `<section class="hero premium-hero hero-${pattern} container" id="home" aria-labelledby="hero-title">${lead}${visual}</section>`;
+  return `<section class="hero premium-hero hero-${pattern} container" id="home" aria-labelledby="hero-title">${visual}${lead}</section>`;
 }
 
 function services(site: SiteConfig): string {

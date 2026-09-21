@@ -59,9 +59,9 @@ export const clearHumanStyles = `
 .premium-page .site-footer .direct-phone{border-color:#B9C4CE;background:transparent;color:#fff}
 .premium-page .site-footer .direct-phone:hover{background:#243347;border-color:#B9C4CE}
 
-/* 첫 화면: 원고와 360px 인물 묶음의 비율을 맞추고 사진과 정보 카드 폭을 일치시킵니다. */
+/* 첫 화면: 사진을 먼저 읽고 본문으로 이어지도록 360px 인물 묶음을 첫 열에 둡니다. */
 .premium-page #main .premium-hero:not(.hero-statement){
- grid-template-columns:minmax(0,1fr) minmax(19rem,22.5rem);gap:clamp(2.5rem,5vw,5rem);
+ grid-template-columns:minmax(19rem,22.5rem) minmax(0,1fr);gap:clamp(2.5rem,5vw,5rem);
  padding-block:48px;align-items:center;
 }
 .premium-page #main .hero-copy{max-width:42rem}
@@ -70,7 +70,7 @@ export const clearHumanStyles = `
 .premium-page #main .hero-note{max-width:36rem;margin-top:10px}
 .premium-page #main .hero-visual{
  display:flex;flex-direction:column;align-items:stretch;gap:0;width:100%;max-width:22.5rem;
- padding:0;justify-self:end;min-width:0;
+ padding:0;justify-self:start;min-width:0;
 }
 .premium-page #main .hero-visual .adviser-card{width:100%;max-width:none;align-self:stretch}
 .premium-page #main .hero-visual .portrait-figure{width:100%;max-width:none;padding:0;border:0}
@@ -251,7 +251,7 @@ export const clearHumanStyles = `
 @media(max-width:900px){
  .premium-page #main .container{width:min(1120px,calc(100% - 3rem))}
  .premium-page #main .section{padding-block:32px}
- .premium-page #main .premium-hero:not(.hero-statement){grid-template-columns:minmax(0,1fr) minmax(18rem,21rem);gap:32px;padding-block:40px}
+ .premium-page #main .premium-hero:not(.hero-statement){grid-template-columns:minmax(18rem,21rem) minmax(0,1fr);gap:32px;padding-block:40px}
  .premium-page #main .hero-statement{padding-block:40px}
  .premium-page #main .services-cards[data-count],.premium-page #main .services-split[data-count]{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px}
  .premium-page #main .services-cards[data-count] .service-card,

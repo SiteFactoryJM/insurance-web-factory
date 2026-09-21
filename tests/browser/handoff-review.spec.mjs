@@ -36,6 +36,32 @@ test('normal contact links permit navigation while automated checks never follow
   }
 });
 
+test('all five hero layouts show Instagram instead of the service shortcut and keep the photo first', async ({ page }) => {
+  const themes = ['trust-blue', 'warm-care', 'premium-navy', 'clean-minimal', 'local-friendly'];
+  for (const width of [390, 768, 1440]) for (const theme of themes) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto(`/?theme=${theme}`);
+    await expect(page.locator('.hero-actions [data-contact-link="instagram"]')).toHaveText(/인스타그램/);
+    await expect(page.locator('.hero-actions')).not.toContainText('상담 분야 보기');
+    const layout = await page.locator('.premium-hero').evaluate(hero => {
+      const visual = hero.querySelector('.hero-visual');
+      const copy = hero.querySelector('.hero-copy');
+      const visualBox = visual.getBoundingClientRect();
+      const copyBox = copy.getBoundingClientRect();
+      return {
+        visualFirst: hero.firstElementChild === visual && visual.nextElementSibling === copy,
+        statement: hero.classList.contains('hero-statement'),
+        visual: { left: visualBox.left, top: visualBox.top, bottom: visualBox.bottom },
+        copy: { left: copyBox.left, top: copyBox.top },
+      };
+    });
+    expect(layout.visualFirst, `${theme} at ${width}px DOM order`).toBe(true);
+    if (width <= 650 || layout.statement) expect(layout.visual.top, `${theme} at ${width}px vertical order`).toBeLessThan(layout.copy.top);
+    else expect(layout.visual.left, `${theme} at ${width}px horizontal order`).toBeLessThan(layout.copy.left);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), `${theme} at ${width}px page fit`).toBeLessThanOrEqual(width);
+  }
+});
+
 test('list, card and split service layouts stay symmetric with complete and partial rows', async ({ page }) => {
   test.setTimeout(120000);
   for (const width of [390, 768, 1440]) for (const theme of ['trust-blue', 'warm-care', 'premium-navy']) for (const count of [3, 4, 5, 6, 7, 8]) {
