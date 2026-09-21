@@ -1,24 +1,227 @@
 export const uiCopyDensityRefreshStyles = `
 /* UI copy-density refresh: calmer hierarchy, less dead space, and clearer grouping. */
 
-/* Informational marquee cards should read compactly without shrinking type below 16px. */
-.premium-page #main .cases-section{padding-block:44px}
-.premium-page #main .cases-section .section-heading{margin-bottom:14px}
-.premium-page #main .cases-marquee{margin-top:12px;padding-block:2px 6px}
-.premium-page #main .cases-track{gap:12px;align-items:stretch}
-.premium-page #main .cases-marquee:focus-within .cases-track{animation-play-state:paused}
-.premium-page #main .cases-item{
- width:296px;min-width:296px;min-height:0!important;
- grid-template-columns:44px minmax(0,1fr);gap:12px;align-content:start;
- padding:18px 20px;border-top-width:1px;
+/* Consulting point carousel: three-card spatial flow with readable Korean copy. */
+.premium-page #main .cases-section{
+ padding:52px 0 40px;
+ background:var(--paper);
+ border-block:1px solid var(--line);
 }
-.premium-page #main .cases-copy{gap:7px}
-.premium-page #main .cases-copy h3{font-size:1.125rem;line-height:1.48}
-.premium-page #main .cases-item p{font-size:1rem;line-height:1.62}
-.premium-page #main .cases-badge{font-size:1rem;line-height:1.35}
-.premium-page #main .cases-item:hover{transform:none;box-shadow:none}
+.premium-page #main .cases-section .cases-heading{
+ max-width:50rem;
+ margin:10px auto 8px;
+ text-align:center;
+}
+.premium-page #main .cases-section .cases-heading .eyebrow{margin:0 0 10px}
+.premium-page #main .cases-section .cases-heading h2{
+ max-width:46rem;
+ margin:0 auto;
+ text-wrap:balance;
+}
+.premium-page #main .cases-section .cases-heading .section-support{
+ max-width:42rem;
+ margin:10px auto 0;
+ text-wrap:pretty;
+}
+.premium-page #main .cases-carousel{
+ --case-step:clamp(17.5rem,26vw,20.5rem);
+ position:relative;
+ display:grid;
+ grid-template-columns:56px minmax(0,1fr) 56px;
+ align-items:center;
+ gap:12px;
+ margin-top:2px;
+}
+.premium-page #main .cases-stage{
+ min-width:0;
+ overflow:visible;
+ padding:22px 0 10px;
+}
+.premium-page #main .cases-list{
+ display:grid!important;
+ align-items:stretch;
+ width:100%!important;
+ margin:0;
+ padding:0;
+ list-style:none;
+ animation:none!important;
+}
+.premium-page #main .cases-carousel .cases-item{
+ grid-area:1/1;
+ justify-self:center;
+ align-self:stretch;
+ display:flex!important;
+ flex-direction:column;
+ width:min(33vw,25rem);
+ min-width:0!important;
+ min-height:0!important;
+ padding:28px 30px 32px!important;
+ gap:0!important;
+ overflow:visible;
+ border:1px solid var(--line)!important;
+ border-top:1px solid var(--line)!important;
+ border-radius:16px;
+ background:var(--surface);
+ box-shadow:none;
+ opacity:0;
+ pointer-events:none;
+ transform:translateX(calc(var(--case-step) + 5rem)) scale(.84);
+ transform-origin:center;
+ transition:transform .54s cubic-bezier(.22,.61,.36,1),opacity .36s ease,box-shadow .36s ease,border-color .36s ease;
+}
+.premium-page #main .cases-carousel .cases-item.is-hidden-left{
+ opacity:0;
+ transform:translateX(calc(0px - var(--case-step) - 5rem)) scale(.84);
+}
+.premium-page #main .cases-carousel .cases-item.is-hidden-right{
+ opacity:0;
+ transform:translateX(calc(var(--case-step) + 5rem)) scale(.84);
+}
+.premium-page #main .cases-carousel .cases-item.is-prev{
+ z-index:1;
+ opacity:.94;
+ pointer-events:auto;
+ transform:translateX(calc(0px - var(--case-step))) scale(.92) rotate(-1.15deg);
+}
+.premium-page #main .cases-carousel .cases-item.is-next{
+ z-index:1;
+ opacity:.94;
+ pointer-events:auto;
+ transform:translateX(var(--case-step)) scale(.92) rotate(1.15deg);
+}
+.premium-page #main .cases-carousel .cases-item.is-active{
+ z-index:3;
+ opacity:1;
+ pointer-events:auto;
+ transform:translateX(0) scale(1.02);
+ border-bottom:4px solid var(--accent)!important;
+ box-shadow:0 18px 38px rgba(29,33,39,.10);
+}
+.premium-page #main .cases-badge{
+ display:block;
+ width:auto;
+ min-width:0;
+ height:auto;
+ margin:0 0 26px;
+ padding:0;
+ border:0;
+ background:transparent;
+ font-size:.875rem;
+ line-height:1.35;
+ font-weight:700;
+ letter-spacing:.16em;
+ color:var(--accent);
+ font-variant-numeric:tabular-nums;
+}
+.premium-page #main .cases-badge::before{content:none}
+.premium-page #main .cases-copy{
+ display:flex;
+ flex-direction:column;
+ min-width:0;
+ gap:0!important;
+}
+.premium-page #main .cases-copy h3{
+ min-height:3.05em;
+ margin:0;
+ font-size:clamp(1.35rem,1.8vw,1.65rem);
+ line-height:1.45;
+ font-weight:700;
+ letter-spacing:-.03em;
+ color:var(--ink);
+ text-wrap:balance;
+ word-break:keep-all;
+}
+.premium-page #main .cases-item p{
+ margin:22px 0 0;
+ font-size:1.125rem;
+ line-height:1.72;
+ font-weight:400;
+ letter-spacing:-.012em;
+ color:var(--muted);
+ text-wrap:pretty;
+ word-break:keep-all;
+ overflow-wrap:break-word;
+}
+.premium-page #main .cases-nav{
+ position:relative;
+ z-index:6;
+ display:grid;
+ place-items:center;
+ width:52px;
+ height:52px;
+ padding:0;
+ border:1px solid var(--line);
+ border-radius:50%;
+ background:var(--surface);
+ color:var(--ink);
+ cursor:pointer;
+ transition:background-color .2s ease,border-color .2s ease,transform .2s ease;
+}
+.premium-page #main .cases-nav:hover{
+ background:var(--tint);
+ border-color:var(--input);
+ transform:translateY(-1px);
+}
+.premium-page #main .cases-nav:focus-visible{
+ outline:3px solid var(--accent);
+ outline-offset:3px;
+}
+.premium-page #main .cases-nav-mark{
+ display:block;
+ width:12px;
+ height:12px;
+ border-top:2px solid currentColor;
+ border-right:2px solid currentColor;
+}
+.premium-page #main .cases-nav-prev .cases-nav-mark{transform:rotate(-135deg) translate(-1px,-1px)}
+.premium-page #main .cases-nav-next .cases-nav-mark{transform:rotate(45deg) translate(-1px,1px)}
+.premium-page #main .cases-live{
+ position:absolute!important;
+ width:1px!important;
+ height:1px!important;
+ padding:0!important;
+ margin:-1px!important;
+ overflow:hidden!important;
+ clip:rect(0,0,0,0)!important;
+ white-space:nowrap!important;
+ border:0!important;
+}
+@media(max-width:900px){
+ .premium-page #main .cases-carousel{--case-step:clamp(15rem,42vw,19rem)}
+ .premium-page #main .cases-carousel .cases-item{width:min(58vw,23rem)}
+}
+@media(max-width:650px){
+ .premium-page #main .cases-section{padding:40px 0 34px}
+ .premium-page #main .cases-section .container{width:min(100% - 1.5rem,35rem)}
+ .premium-page #main .cases-section .cases-heading{margin:2px auto 6px}
+ .premium-page #main .cases-section .cases-heading .eyebrow{margin-bottom:8px}
+ .premium-page #main .cases-section .cases-heading .section-support{margin-top:8px}
+ .premium-page #main .cases-carousel{
+  --case-step:110%;
+  grid-template-columns:44px minmax(0,1fr) 44px;
+  gap:4px;
+  margin-top:0;
+ }
+ .premium-page #main .cases-stage{overflow:hidden;padding:18px 0 8px}
+ .premium-page #main .cases-carousel .cases-item{
+  width:min(100% - 8px,20.5rem);
+  padding:22px 20px 24px!important;
+  border-radius:14px;
+ }
+ .premium-page #main .cases-carousel .cases-item.is-prev,
+ .premium-page #main .cases-carousel .cases-item.is-next{opacity:0;pointer-events:none}
+ .premium-page #main .cases-copy h3{min-height:0;font-size:1.35rem;line-height:1.45}
+ .premium-page #main .cases-item p{margin-top:18px;font-size:1.0625rem;line-height:1.7}
+ .premium-page #main .cases-badge{margin-bottom:20px;font-size:.8125rem}
+ .premium-page #main .cases-nav{width:44px;height:44px}
+}
+@media(prefers-reduced-motion:reduce){
+ .premium-page #main .cases-carousel .cases-item,
+ .premium-page #main .cases-nav{transition:none!important}
+}
 
-/* Service topics: one baseline rule contract across all five themes.
+
+/* Service topics: one baseline rule contract across all five themes./* Service topics: one baseline rule contract across all five themes.
    Theme personality stays in surface/accent treatment, not irregular borders. */
 .premium-page #main .service-grid{border-top:0!important}
 .premium-page #main .service-card,
