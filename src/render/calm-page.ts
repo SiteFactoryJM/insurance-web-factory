@@ -2,7 +2,7 @@ import type { DesignSectionId, SiteConfig } from '../types.js';
 import { escapeHtml as e, safeUrl } from '../utils/html.js';
 import { responsiveCopy as copy } from './copy.js';
 import { getDesign } from './design-system.js';
-import { formatIndex, renderContactButtons, renderContactForm, renderInstagramLink } from './shared.js';
+import { formatIndex, renderContactButtons, renderContactForm } from './shared.js';
 import { directPhoneHref } from '../utils/contact-links.js';
 
 const profile = (site: SiteConfig, className = '', eager = false) => `<img class="${className}" src="${e(site.agent.profileImage || '/assets/profile-placeholder.svg')}" alt="${e(site.agent.name || '담당자')} 프로필" width="600" height="800" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'}>`;
@@ -25,8 +25,17 @@ function naturalHeading(value?: string): string {
 function hero(site: SiteConfig): string {
   const design = getDesign(site);
   const pattern = design.hero;
-  const topicChips = site.specialties.slice(0, 3).map(item => `<span>${e(item.title)}</span>`).join('');
-  const lead = `<div class="hero-copy"><p class="eyebrow"><span class="small-line" aria-hidden="true"></span>${e(site.hero.eyebrow || '보험 상담 안내')}</p><h1 id="hero-title">${copy(naturalHeading(site.hero.headline || '가입한 보험, 무엇부터 확인할까요?'), naturalHeading(site.hero.mobileHeadline))}</h1><p class="hero-description">${copy(site.hero.subheadline, site.hero.mobileSubheadline)}</p>${topicChips ? `<div class="hero-topics" aria-label="주요 상담 분야">${topicChips}</div>` : ''}<div class="hero-actions">${renderContactButtons(site)}${renderInstagramLink(site)}</div><p class="hero-note">상담은 가입 신청과 별개입니다.${site.hero.trustNote ? `<br>${e(site.hero.trustNote)}` : ''}</p></div>`;
+  const coreTopics = site.specialties.slice(0, 3).map(item => ({ label: item.title, tone: 'base' }));
+  const extraTopics = [
+    { label: '청구서비스', tone: 'claim' },
+    { label: '청구 금액 확인', tone: 'amount' },
+    { label: '부지급된 보험금 확인', tone: 'unpaid' },
+    { label: '자동차사고', tone: 'auto' },
+    { label: '배상책임사고', tone: 'liability' },
+  ];
+  const topicChips = [...coreTopics, ...extraTopics].map(item => `<span class="topic-chip topic-${item.tone}">${e(item.label)}</span>`).join('');
+  const heroLogo = site.agent.logoImage ? `<div class="hero-brand-logo"><img src="${e(site.agent.logoImage)}" alt="${e(site.agent.company || '소속')} 로고" width="600" height="225"></div>` : '';
+  const lead = `<div class="hero-copy">${heroLogo}<p class="eyebrow"><span class="small-line" aria-hidden="true"></span>${e(site.hero.eyebrow || '보험 상담 안내')}</p><h1 id="hero-title">${copy(naturalHeading(site.hero.headline || '가입한 보험, 무엇부터 확인할까요?'), naturalHeading(site.hero.mobileHeadline))}</h1><p class="hero-description">${copy(site.hero.subheadline, site.hero.mobileSubheadline)}</p>${topicChips ? `<div class="hero-topics" aria-label="주요 상담 분야">${topicChips}</div>` : ''}<div class="hero-actions">${renderContactButtons(site)}</div><p class="hero-note">상담은 가입 신청과 별개입니다.${site.hero.trustNote ? `<br>${e(site.hero.trustNote)}` : ''}</p></div>`;
   let visual: string;
   if (pattern === 'editorial') {
     visual = `<div class="hero-visual"><figure class="hero-scene"><img src="${e(site.hero.image || site.agent.profileImage || '/assets/profile-placeholder.svg')}" alt="${site.hero.image ? '' : e(`${site.agent.name || '담당자'} 프로필`)}" width="1536" height="1024" fetchpriority="high"></figure>${adviserCard(site)}</div>`;
@@ -111,7 +120,7 @@ function casesTicker(site: SiteConfig): string {
   return `<section class="section cases-section" id="cases" aria-labelledby="cases-title"><div class="container">${heading('상담 포인트', '많이 확인하는 내용을 먼저 훑어보세요.', undefined, '자주 고르는 질문을 카드로 정리해 어떤 내용을 확인하는지 한눈에 볼 수 있습니다.')}<div class="cases-marquee" aria-label="상담 포인트가 흐르는 안내 영역"><ul class="cases-track">${repeated.map((item, i) => `<li class="cases-item"${i >= items.length ? ' aria-hidden="true"' : ''}><span class="cases-badge">${String((i % items.length) + 1).padStart(2, '0')}</span><div class="cases-copy"><h3>${e(item.title)}</h3><p>${e(item.body)}</p></div></li>`).join('')}</ul></div></div></section>`;
 }
 function contact(site: SiteConfig): string {
-  return `<section class="section contact-section" id="contact" aria-labelledby="contact-title"><div class="container contact-grid"><div class="contact-copy"><p class="eyebrow">연락 방법</p><h2 id="contact-title">편한 방법으로 바로 문의하세요.</h2><p>전화와 카카오톡 오픈채팅 중 편한 방법을 선택하세요.</p></div>${renderContactForm(site)}</div></section>`;
+  return `<section class="section contact-section" id="contact" aria-labelledby="contact-title"><div class="container contact-grid"><div class="contact-copy"><p class="eyebrow">연락 방법</p><h2 id="contact-title">편한 방법으로 바로 문의하세요.</h2><p>전화·카카오톡·인스타그램 중 편한 방법을 선택하세요.</p></div>${renderContactForm(site)}</div></section>`;
 }
 
 export function renderCalmPage(site: SiteConfig): string {
