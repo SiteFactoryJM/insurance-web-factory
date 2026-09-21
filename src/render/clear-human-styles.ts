@@ -215,12 +215,34 @@ export const clearHumanStyles = `
 /* 담당자 소개 다음 약속 패널: 팔레트의 ink/accent/detail만 사용합니다. */
 .premium-page #main .promise-section{padding-block:48px}
 .premium-page #main .promise-panel{
- position:relative;overflow:hidden;
+ position:relative;overflow:hidden;isolation:isolate;
  padding-block:clamp(2.5rem,4vw,3.25rem);
  padding-inline:clamp(1.75rem,4.5vw,3.5rem);
  border:1px solid var(--accent);border-radius:clamp(1.25rem,2.5vw,1.875rem);
- background:var(--ink);color:var(--on-brand);
+ background:
+  radial-gradient(circle at 91% -7%,color-mix(in srgb,var(--accent) 26%,transparent) 0 16%,transparent 16.4%),
+  radial-gradient(circle at 107% 43%,color-mix(in srgb,var(--accent) 18%,transparent) 0 27%,transparent 27.4%),
+  radial-gradient(circle at -8% 118%,color-mix(in srgb,var(--accent) 20%,transparent) 0 17%,transparent 17.4%),
+  var(--ink);
+ color:var(--on-brand);
 }
+.premium-page #main .promise-panel::before,
+.premium-page #main .promise-panel::after{
+ content:"";position:absolute;z-index:0;pointer-events:none;border-radius:50%;
+}
+.premium-page #main .promise-panel::before{
+ width:34rem;height:18rem;right:-8rem;top:8.5rem;
+ border:1px solid color-mix(in srgb,var(--detail) 30%,transparent);
+ transform:rotate(-12deg);
+}
+.premium-page #main .promise-panel::after{
+ width:19rem;height:19rem;left:-10.5rem;bottom:-11rem;
+ border:1px solid color-mix(in srgb,var(--detail) 24%,transparent);
+ box-shadow:
+  0 0 0 3.25rem color-mix(in srgb,var(--accent) 7%,transparent),
+  0 0 0 6.5rem color-mix(in srgb,var(--accent) 4%,transparent);
+}
+.premium-page #main .promise-panel>*{position:relative;z-index:1}
 .premium-page #main .promise-heading{margin:0 0 1.75rem}
 .premium-page #main .promise-eyebrow{
  margin:0 0 .625rem;
@@ -274,6 +296,19 @@ export const clearHumanStyles = `
   padding-block:1.75rem;
   padding-inline:1.375rem;
   border-radius:1.25rem;
+  background:
+   radial-gradient(circle at 108% -4%,color-mix(in srgb,var(--accent) 24%,transparent) 0 18%,transparent 18.5%),
+   radial-gradient(circle at -16% 110%,color-mix(in srgb,var(--accent) 17%,transparent) 0 18%,transparent 18.5%),
+   var(--ink);
+ }
+ .premium-page #main .promise-panel::before{
+  width:18rem;height:9rem;right:-7rem;top:6.5rem;opacity:.7;
+ }
+ .premium-page #main .promise-panel::after{
+  width:11rem;height:11rem;left:-7rem;bottom:-7rem;opacity:.75;
+  box-shadow:
+   0 0 0 2rem color-mix(in srgb,var(--accent) 6%,transparent),
+   0 0 0 4rem color-mix(in srgb,var(--accent) 3%,transparent);
  }
  .premium-page #main .promise-heading{margin-bottom:1.25rem}
  .premium-page #main .promise-heading h2{font-size:clamp(1.75rem,8vw,2rem)}
