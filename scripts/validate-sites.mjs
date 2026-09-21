@@ -129,7 +129,7 @@ export function validateContentLengths(site) {
   const checkObject = (object, prefix, limits) => {
     for (const [key, limit] of Object.entries(limits)) check(object?.[key], `${prefix}.${key}`, limit);
   };
-  const headlineLimits = { headline: 40, subheadline: 120, mobileHeadline: 24, mobileSubheadline: 60 };
+  const headlineLimits = { headline: 40, subheadline: 120, mobileHeadline: 24, mobileSubheadline: 60, brandTagline: 80, brandSubline: 100 };
   const cards = (items, prefix) => {
     if (Array.isArray(items)) items.forEach((item, index) => checkObject(item, `${prefix}[${index}]`, { title: 60, body: 120, mobileBody: 48 }));
   };
