@@ -380,112 +380,151 @@ export const clearHumanStyles = `
 .premium-page #main .direct-contact-panel>.support-note,.premium-page #main .direct-contact-panel>.demo-contact-notice{margin:0;text-align:left;font-size:var(--ch-small);line-height:var(--ch-small-lh)}
 .premium-page #main .direct-contact-panel>.demo-contact-notice{margin-top:14px}
 
-/* 리쿠르트: 왼쪽에 01~03 가로형 항목, 가운데에 세로형 지원 성향, 오른쪽에 연락을 배치합니다. */
+/* 리쿠르트: 01~03 / 함께하고 싶은 동료 / 연락을 한 호흡으로 읽히게 정리합니다. */
 .premium-page #main .recruit-section{
- position:relative;isolation:isolate;overflow:hidden;padding-block:72px 64px;
- background:linear-gradient(180deg,var(--paper) 0%,color-mix(in srgb,var(--paper) 92%,#EAD9BC 8%) 100%);
+ position:relative;isolation:isolate;overflow:hidden;padding-block:68px 66px;
+ background:linear-gradient(180deg,#fffdfa 0%,color-mix(in srgb,var(--paper) 94%,#E9D7B6 6%) 100%);
  border-top:1px solid var(--line);
 }
-.premium-page #main .recruit-section::before{
- content:"";position:absolute;z-index:0;inset:-5% -8% auto 24%;height:420px;pointer-events:none;
- background:url('/assets/haeon-watermark-wave.png') center top / cover no-repeat;opacity:.18;
- -webkit-mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.82) 52%,transparent 100%);
- mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.82) 52%,transparent 100%);
-}
+.premium-page #main .recruit-section::before{display:none}
 .premium-page #main .recruit-section::after{
  content:"";position:absolute;z-index:0;inset:0;pointer-events:none;
- background:radial-gradient(circle at 82% 8%,rgba(214,178,112,.12),transparent 34%);
+ background:linear-gradient(90deg,rgba(255,255,255,.74) 0%,rgba(255,255,255,.44) 43%,rgba(255,255,255,.08) 100%);
+}
+.premium-page #main .recruit-watermark{
+ position:absolute;z-index:0;top:-34px;right:-40px;width:min(72vw,1080px);height:auto;max-width:none;
+ opacity:.31;mix-blend-mode:multiply;pointer-events:none;user-select:none;
+ filter:saturate(.9) contrast(1.08);
 }
 .premium-page #main .recruit-shell{position:relative;z-index:1;min-width:0}
-.premium-page #main .recruit-heading{max-width:58rem;margin:0 0 30px 28px;text-align:left}
+.premium-page #main .recruit-heading{max-width:58rem;margin:0 0 34px;text-align:left}
 .premium-page #main .recruit-kicker{
- display:flex;align-items:center;gap:18px;margin:0 0 18px;font-size:var(--ch-small);line-height:1.4;
- font-weight:700;letter-spacing:.05em;color:var(--ink);
+ display:flex;align-items:center;gap:18px;margin:0 0 16px;
+ font-family:var(--ch-font);font-size:.95rem;line-height:1.4;font-weight:800;letter-spacing:.08em;color:var(--ink);
 }
-.premium-page #main .recruit-kicker::after{content:"";display:block;width:112px;height:1px;background:var(--muted);opacity:.7}
-.premium-page #main .recruit-heading h2{margin:0;font-size:clamp(2.3rem,4.2vw,3.55rem);line-height:1.2;letter-spacing:-.045em}
-.premium-page #main .recruit-lead{margin:18px 0 0;font-size:1.35rem;line-height:1.55;font-weight:700;color:var(--ink)}
-.premium-page #main .recruit-support{margin:14px 0 0;font-size:1.125rem;line-height:1.7;color:var(--muted)}
+.premium-page #main .recruit-kicker::after{content:"";display:block;width:112px;height:1px;background:var(--muted);opacity:.62}
+.premium-page #main .recruit-heading h2{
+ margin:0;font-family:var(--ch-font);font-size:clamp(2.55rem,4vw,3.4rem);line-height:1.18;font-weight:800;letter-spacing:-.045em;
+}
+.premium-page #main .recruit-lead{margin:16px 0 0;font-size:1.25rem;line-height:1.55;font-weight:700;color:var(--ink)}
+.premium-page #main .recruit-support{margin:14px 0 0;font-size:1.05rem;line-height:1.72;color:var(--muted)}
 .premium-page #main .recruit-support strong{font-weight:800;color:var(--ink)}
+
 .premium-page #main .recruit-panel{
- display:grid;grid-template-columns:minmax(0,1.6fr) minmax(13rem,.82fr) minmax(19rem,1fr);
- min-width:0;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--surface) 94%,transparent);
- box-shadow:0 20px 50px rgba(29,36,45,.05);overflow:hidden;
+ display:grid;grid-template-columns:minmax(0,1.58fr) minmax(14.5rem,.86fr) minmax(18.5rem,.98fr);
+ min-width:0;overflow:hidden;border:1px solid rgba(124,132,140,.24);border-radius:16px;
+ background:rgba(255,255,255,.86);box-shadow:0 18px 44px rgba(29,36,45,.07);
+ backdrop-filter:blur(2px);
 }
 .premium-page #main .recruit-list,.premium-page #main .recruit-fit,.premium-page #main .recruit-contact{min-width:0}
+
 .premium-page #main .recruit-list{
- list-style:none;margin:0;padding:26px 42px;border-right:1px solid var(--line);
+ list-style:none;margin:0;padding:22px 40px;border-right:1px solid var(--line);
 }
 .premium-page #main .recruit-list li{
- display:grid;grid-template-columns:56px minmax(0,1fr);gap:18px;padding:26px 0;border-bottom:1px solid var(--line);
+ display:grid;grid-template-columns:54px minmax(0,1fr);gap:20px;padding:26px 0 27px;border-bottom:1px solid var(--line);
 }
 .premium-page #main .recruit-list li:last-child{border-bottom:0}
-.premium-page #main .recruit-number{padding-top:2px;font-size:1.45rem;line-height:1.5;font-weight:700;color:var(--muted)}
-.premium-page #main .recruit-list h3{margin:0;font-size:1.3rem;line-height:1.55}
-.premium-page #main .recruit-list p{margin:9px 0 0;font-size:1rem;line-height:1.72;color:var(--muted);overflow-wrap:anywhere}
+.premium-page #main .recruit-number{
+ padding-top:1px;font-family:var(--ch-font);font-size:1.28rem;line-height:1.5;font-weight:800;letter-spacing:-.02em;color:#657080;
+}
+.premium-page #main .recruit-list h3{
+ margin:0;font-family:var(--ch-font);font-size:1.22rem;line-height:1.5;font-weight:800;letter-spacing:-.025em;color:var(--ink);
+}
+.premium-page #main .recruit-list p{
+ margin:8px 0 0;font-family:var(--ch-font);font-size:1rem;line-height:1.72;font-weight:400;color:var(--muted);overflow-wrap:anywhere;
+}
+
+/* 가운데는 제목+세 개의 작은 카드로 바꿔 애매한 빈 칸 대신 명확한 '인재상' 영역으로 읽히게 합니다. */
 .premium-page #main .recruit-fit{
- padding:44px 34px;border-right:1px solid var(--line);
+ display:flex;flex-direction:column;justify-content:center;padding:34px 28px;border-right:1px solid var(--line);
+ background:linear-gradient(180deg,rgba(246,242,234,.74) 0%,rgba(255,255,255,.54) 100%);
 }
-.premium-page #main .recruit-intro-mark{display:block;width:24px;height:2px;margin:0 0 30px;background:var(--ink)}
-.premium-page #main .recruit-fit h3{margin:0;font-size:clamp(1.5rem,1.7vw,1.75rem);line-height:1.48}
-.premium-page #main .recruit-fit ul{display:grid;gap:14px;list-style:none;margin:28px 0 0;padding:0}
+.premium-page #main .recruit-intro-mark{display:block;width:22px;height:2px;margin:0 0 20px;background:var(--ink)}
+.premium-page #main .recruit-fit h3{
+ margin:0;font-family:var(--ch-font);font-size:1.46rem;line-height:1.46;font-weight:800;letter-spacing:-.035em;color:var(--ink);
+}
+.premium-page #main .recruit-fit ul{display:grid;gap:10px;list-style:none;margin:24px 0 0;padding:0}
 .premium-page #main .recruit-fit li{
- display:grid;grid-template-columns:20px minmax(0,1fr);gap:9px;align-items:start;
- font-size:1.125rem;line-height:1.68;color:var(--muted);
+ display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:center;
+ padding:11px 12px;border:1px solid rgba(124,132,140,.17);border-radius:10px;background:rgba(255,255,255,.78);
+ font-family:var(--ch-font);font-size:1.06rem;line-height:1.58;font-weight:500;color:#4f5966;
 }
-.premium-page #main .recruit-check{color:currentColor;font-weight:800;line-height:1.7}
-.premium-page #main .recruit-contact{padding:34px 34px 28px}
+.premium-page #main .recruit-check{
+ display:grid;place-items:center;width:22px;height:22px;border-radius:50%;
+ background:rgba(80,91,105,.08);color:currentColor;font-size:.9rem;font-weight:800;line-height:1;
+}
+
+/* 연락 영역은 세로 중앙 정렬 + 옅은 톤으로 묶어 남는 공간을 의도적인 여백으로 보이게 합니다. */
+.premium-page #main .recruit-contact{
+ display:flex;flex-direction:column;justify-content:center;padding:38px 30px 34px;
+ background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(249,247,242,.72));
+}
 .premium-page #main .recruit-contact-person{
- display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;align-items:center;margin:0 0 22px;
- padding:0 0 18px;border-bottom:1px solid var(--line);
+ display:grid;grid-template-columns:56px minmax(0,1fr);gap:15px;align-items:center;margin:0 0 22px;
+ padding:0 0 20px;border-bottom:1px solid var(--line);
 }
 .premium-page #main .recruit-contact-avatar{
- display:block;width:48px;height:48px;border-radius:50%;object-fit:cover;object-position:50% 16%;border:1px solid var(--line);background:var(--paper);
+ display:block;width:56px;height:56px;border-radius:50%;object-fit:cover;object-position:50% 16%;
+ border:1px solid var(--line);background:var(--paper);box-shadow:0 4px 14px rgba(29,36,45,.08);
 }
-.premium-page #main .recruit-contact-person strong{display:block;font-size:1.05rem;line-height:1.55;color:var(--ink);overflow-wrap:anywhere}
-.premium-page #main .recruit-contact-note{margin:6px 0 0;font-size:.9rem;line-height:1.55;color:var(--muted)}
-.premium-page #main .recruit-contact-links{display:grid;gap:8px}
+.premium-page #main .recruit-contact-person strong{
+ display:block;font-family:var(--ch-font);font-size:1.04rem;line-height:1.5;font-weight:800;letter-spacing:-.02em;color:var(--ink);overflow-wrap:anywhere;
+}
+.premium-page #main .recruit-contact-note{
+ margin:6px 0 0;font-family:var(--ch-font);font-size:.92rem;line-height:1.55;font-weight:400;color:var(--muted);
+}
+.premium-page #main .recruit-contact-links{display:grid;gap:9px}
 .premium-page #main .recruit-contact-link{
- display:grid;grid-template-columns:28px minmax(0,1fr) auto auto;gap:12px;align-items:center;min-width:0;min-height:54px;
- padding:0 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);text-decoration:none;
- transition:border-color .2s ease,transform .2s ease,background-color .2s ease;
+ display:grid;grid-template-columns:30px minmax(0,1fr) auto auto;gap:12px;align-items:center;min-width:0;min-height:58px;
+ padding:0 15px;border:1px solid rgba(124,132,140,.22);border-radius:10px;background:rgba(255,255,255,.9);
+ color:var(--ink);text-decoration:none;box-shadow:0 3px 10px rgba(29,36,45,.025);
+ transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease;
 }
-.premium-page #main .recruit-contact-link:hover{border-color:var(--accent);transform:translateY(-1px)}
+.premium-page #main .recruit-contact-link:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 6px 16px rgba(29,36,45,.06)}
 .premium-page #main .recruit-contact-link:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.premium-page #main .recruit-contact-icon{display:grid;place-items:center;width:28px;height:28px;color:var(--ink)}
-.premium-page #main .recruit-contact-label{min-width:0;font-size:1rem;line-height:1.45;font-weight:700;overflow-wrap:anywhere}
-.premium-page #main .recruit-contact-meta{font-size:.9rem;line-height:1.45;color:var(--muted);white-space:nowrap}
+.premium-page #main .recruit-contact-icon{display:grid;place-items:center;width:30px;height:30px;color:var(--ink)}
+.premium-page #main .recruit-contact-label{min-width:0;font-size:1rem;line-height:1.45;font-weight:800;letter-spacing:-.01em;overflow-wrap:anywhere}
+.premium-page #main .recruit-contact-meta{font-size:.88rem;line-height:1.45;color:var(--muted);white-space:nowrap}
 .premium-page #main .recruit-contact-chevron{display:grid;place-items:center;color:var(--muted)}
-.premium-page #main .recruit-contact-footer{margin:22px 0 0;font-size:.84rem;line-height:1.55;color:var(--muted)}
+.premium-page #main .recruit-contact-footer{
+ margin:18px 0 0;padding-top:16px;border-top:1px solid rgba(124,132,140,.14);
+ font-size:.86rem;line-height:1.55;color:var(--muted);
+}
+
 @media(max-width:980px){
  .premium-page #main .recruit-heading{margin-left:0}
+ .premium-page #main .recruit-watermark{top:30px;right:-180px;width:1100px;opacity:.2}
  .premium-page #main .recruit-panel{grid-template-columns:1fr}
  .premium-page #main .recruit-list,.premium-page #main .recruit-fit{border-right:0;border-bottom:1px solid var(--line)}
  .premium-page #main .recruit-list{padding:18px 36px}
- .premium-page #main .recruit-fit{padding:32px 36px}
- .premium-page #main .recruit-contact{padding:34px 36px}
+ .premium-page #main .recruit-fit{padding:30px 36px}
+ .premium-page #main .recruit-fit ul{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+ .premium-page #main .recruit-contact{padding:32px 36px}
 }
 @media(max-width:650px){
- .premium-page #main .recruit-section{padding-block:48px}
- .premium-page #main .recruit-section::before{inset:-2% -45% auto 2%;height:300px;opacity:.08}
+ .premium-page #main .recruit-section{padding-block:46px 50px}
+ .premium-page #main .recruit-watermark{top:30px;right:-420px;width:930px;opacity:.16}
  .premium-page #main .recruit-heading{margin-bottom:24px}
- .premium-page #main .recruit-heading h2{font-size:clamp(2rem,9vw,2.45rem)}
- .premium-page #main .recruit-lead{font-size:1.16rem}
+ .premium-page #main .recruit-heading h2{font-size:clamp(2rem,9vw,2.4rem)}
+ .premium-page #main .recruit-lead{font-size:1.14rem}
  .premium-page #main .recruit-support{font-size:1rem}
- .premium-page #main .recruit-panel{border-radius:10px}
- .premium-page #main .recruit-list{padding:8px 24px}
+ .premium-page #main .recruit-panel{border-radius:12px}
+ .premium-page #main .recruit-list{padding:6px 24px}
  .premium-page #main .recruit-list li{grid-template-columns:42px minmax(0,1fr);gap:10px;padding:22px 0}
- .premium-page #main .recruit-number{font-size:1.15rem}
- .premium-page #main .recruit-fit{padding:30px 24px}
- .premium-page #main .recruit-intro-mark{margin-bottom:22px}
- .premium-page #main .recruit-fit h3{font-size:1.55rem}
- .premium-page #main .recruit-fit li{font-size:1.075rem}
- .premium-page #main .recruit-fit ul{margin-top:22px}
- .premium-page #main .recruit-contact{padding:28px 24px 24px}
+ .premium-page #main .recruit-number{font-size:1.12rem}
+ .premium-page #main .recruit-list h3{font-size:1.12rem}
+ .premium-page #main .recruit-list p{font-size:.98rem}
+ .premium-page #main .recruit-fit{padding:28px 24px}
+ .premium-page #main .recruit-intro-mark{margin-bottom:18px}
+ .premium-page #main .recruit-fit h3{font-size:1.4rem}
+ .premium-page #main .recruit-fit ul{grid-template-columns:1fr;margin-top:20px}
+ .premium-page #main .recruit-fit li{font-size:1.02rem}
+ .premium-page #main .recruit-contact{padding:28px 24px}
  .premium-page #main .recruit-contact-meta{display:none}
- .premium-page #main .recruit-contact-link{grid-template-columns:28px minmax(0,1fr) auto}
- .premium-page #main .recruit-contact-person{grid-template-columns:44px minmax(0,1fr)}
- .premium-page #main .recruit-contact-avatar{width:44px;height:44px}
+ .premium-page #main .recruit-contact-link{grid-template-columns:30px minmax(0,1fr) auto}
+ .premium-page #main .recruit-contact-person{grid-template-columns:50px minmax(0,1fr)}
+ .premium-page #main .recruit-contact-avatar{width:50px;height:50px}
 }
 @media(max-width:380px){
  .premium-page #main .recruit-kicker{gap:12px}
