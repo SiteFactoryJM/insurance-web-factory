@@ -406,6 +406,7 @@ export const clearHumanStyles = `
 .premium-page #main .recruit-heading h2{margin:0;font-size:clamp(2.3rem,4.2vw,3.55rem);line-height:1.2;letter-spacing:-.045em}
 .premium-page #main .recruit-lead{margin:18px 0 0;font-size:1.35rem;line-height:1.55;font-weight:700;color:var(--ink)}
 .premium-page #main .recruit-support{margin:14px 0 0;font-size:1.125rem;line-height:1.7;color:var(--muted)}
+.premium-page #main .recruit-support strong{font-weight:800;color:var(--ink)}
 .premium-page #main .recruit-panel{
  display:grid;grid-template-columns:minmax(14rem,.9fr) minmax(0,1.5fr) minmax(19rem,1fr);
  min-width:0;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--surface) 94%,transparent);

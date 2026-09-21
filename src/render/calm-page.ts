@@ -149,7 +149,7 @@ function promiseSection(site: SiteConfig): string {
     { title: '부담 없는 상담', body: '가입을 강요하지 않습니다. 궁금증을 푸는 것부터 시작합니다.' },
   ];
   const agentName = site.agent.name?.trim() || '담당자';
-  return `<section class="section promise-section" id="promise" aria-labelledby="promise-title"><div class="container"><div class="promise-panel"><header class="promise-heading"><p class="promise-eyebrow">${e(agentName)}의 약속</p><h2 id="promise-title">“저에게 관리받으셔야 하는 이유”</h2></header><div class="promise-grid">${items.map(item => `<article class="promise-item"><span class="promise-check" aria-hidden="true"></span><div class="promise-copy"><h3>${e(item.title)}</h3><p>${e(item.body)}</p></div></article>`).join('')}</div></div></div></section>`;
+  return `<section class="section promise-section" id="promise" aria-labelledby="promise-title"><div class="container"><div class="promise-panel"><header class="promise-heading"><p class="promise-eyebrow">${e(agentName)}의 약속</p><h2 id="promise-title">“저에게 관리받으셔야 하는 이유”</h2></header><div class="promise-grid">${items.map(item => `<article class="promise-item"><span class="promise-check" aria-hidden="true"></span><div class="promise-copy"><h3>${e(item.title)}</h3><p>${item.bodyLines.map(line => e(line)).join('<br>')}</p></div></article>`).join('')}</div></div></div></section>`;
 }
 
 function process(site: SiteConfig): string {
@@ -220,15 +220,26 @@ function recruitment(site: SiteConfig): string {
   const items = [
     {
       title: '처음이어도 괜찮습니다',
-      body: '경력이 없어도 됩니다. 기초 교육부터 현장 동행까지, 한 단계씩 함께 만들어 갑니다.',
+      bodyLines: [
+        '경력이 없어도 됩니다.',
+        '기초 교육부터 현장 동행까지,',
+        '혼자 던져두지 않고 한 단계씩 함께 만들어 갑니다.',
+      ],
     },
     {
       title: '정직하게 오래 가는 일',
-      body: '일회성이 아닌, 고객을 평생 관리하는 방식으로 오래 멀리 가는 일을 배웁니다.',
+      bodyLines: [
+        '밀어붙이는 영업이 아니라,',
+        '고객을 평생 관리하는 방식.',
+        '그래서 한번 시작하면 오래, 멀리 갈 수 있습니다.',
+      ],
     },
     {
       title: '노력한 만큼의 소득',
-      body: '나이·학력보다 태도와 꾸준함이 인정받고, 노력한 만큼 정당하게 보상받는 구조입니다.',
+      bodyLines: [
+        '나이·학력보다 태도와 꾸준함이 인정받는 일입니다.',
+        '한 만큼 정당하게 보상받는 구조를 함께 설계해 드립니다.',
+      ],
     },
   ];
   const fitPoints = [
@@ -237,7 +248,7 @@ function recruitment(site: SiteConfig): string {
     '시간을 주도적으로 쓰며 성장하고 싶은 분',
   ];
 
-  return `<section class="section recruit-section" id="recruit" aria-labelledby="recruit-title"><div class="container recruit-shell"><header class="recruit-heading"><p class="recruit-kicker">RECRUIT</p><h2 id="recruit-title">함께 성장할 동료를 찾습니다.</h2><p class="recruit-lead">혼자 가면 빨리 가지만, 함께 가면 멀리 갑니다.</p><p class="recruit-support">보험이라는 일을 제대로 배우고 정직하게 오래 하고 싶은 분이라면,<br>${e(agentName)}과 함께 시작해 보세요.</p></header><div class="recruit-panel"><div class="recruit-first"><span class="recruit-number">01</span><div><h3>${e(items[0].title)}</h3><p>${e(items[0].body)}</p></div></div><div class="recruit-main"><div class="recruit-fit"><span class="recruit-intro-mark" aria-hidden="true"></span><h3>이런 분과<br>함께하고 싶습니다.</h3><ul>${fitPoints.map(point => `<li><span class="recruit-check" aria-hidden="true">✓</span><span>${e(point)}</span></li>`).join('')}</ul></div><ol class="recruit-list" start="2">${items.slice(1).map((item, index) => `<li><span class="recruit-number">${formatIndex(index + 1)}</span><div><h3>${e(item.title)}</h3><p>${e(item.body)}</p></div></li>`).join('')}</ol></div><aside class="recruit-contact" aria-label="리쿠르트 문의"><div class="recruit-contact-person">${profile(site, 'recruit-contact-avatar')}<div><strong>${e(agentName)} <span aria-hidden="true">·</span> ${e(role || '보험설계사')}</strong></div></div><div class="recruit-contact-links">${contactRows}</div><p class="recruit-contact-footer">부담 갖지 말고 편하게 연락주세요.</p></aside></div></div></section>`;
+  return `<section class="section recruit-section" id="recruit" aria-labelledby="recruit-title"><div class="container recruit-shell"><header class="recruit-heading"><p class="recruit-kicker">RECRUIT</p><h2 id="recruit-title">함께 성장할 동료를 찾습니다.</h2><p class="recruit-lead">혼자 가면 빨리 가지만, 함께 가면 멀리 갑니다.</p><p class="recruit-support">보험이라는 일을 제대로 배우고 정직하게 오래 하고 싶은 분이라면,<br><strong>${e(agentName)}과 함께 시작해 보세요.</strong></p></header><div class="recruit-panel"><div class="recruit-first"><span class="recruit-number">01</span><div><h3>${e(items[0].title)}</h3><p>${items[0].bodyLines.map(line => e(line)).join('<br>')}</p></div></div><div class="recruit-main"><div class="recruit-fit"><span class="recruit-intro-mark" aria-hidden="true"></span><h3>이런 분과<br>함께하고 싶습니다.</h3><ul>${fitPoints.map(point => `<li><span class="recruit-check" aria-hidden="true">✓</span><span>${e(point)}</span></li>`).join('')}</ul></div><ol class="recruit-list" start="2">${items.slice(1).map((item, index) => `<li><span class="recruit-number">${formatIndex(index + 1)}</span><div><h3>${e(item.title)}</h3><p>${e(item.body)}</p></div></li>`).join('')}</ol></div><aside class="recruit-contact" aria-label="리쿠르트 문의"><div class="recruit-contact-person">${profile(site, 'recruit-contact-avatar')}<div><strong>${e(agentName)} <span aria-hidden="true">·</span> ${e(role || '보험설계사')}</strong></div></div><div class="recruit-contact-links">${contactRows}</div><p class="recruit-contact-footer">부담 갖지 말고 편하게 연락주세요.</p></aside></div></div></section>`;
 }
 
 function contact(site: SiteConfig): string {
