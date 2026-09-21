@@ -85,7 +85,7 @@ export function validateImageSource(value: string): string | undefined {
       : header.startsWith("RIFF") && header.slice(8, 12) === "WEBP";
     return valid ? undefined : "파일 내용과 이미지 형식이 일치하지 않습니다.";
   }
-  if (["/assets/profile-placeholder.svg", "/assets/og-demo.svg", "/assets/logo-mark.svg", "/assets/favicon.svg"].includes(value)) return;
+  if (["/assets/profile-placeholder.svg", "/assets/og-demo.svg", "/assets/logo-mark.svg", "/assets/favicon.svg", "/assets/haeon-logo-horizontal.svg", "/assets/haeon-logo-stacked.svg"].includes(value)) return;
   if (/^\/(?:sites|assets)\/[a-zA-Z0-9_./-]+\.(?:png|jpe?g|webp)$/.test(value) && !value.split("/").some(part => part === "." || part === "..") && !value.includes("//")) return;
   try {
     const url = new URL(value);
@@ -114,7 +114,7 @@ const siteRule = object({
   templateContent: object(Object.fromEntries(TEMPLATE_IDS.map(id => [id, templateRule])), true),
   contentBrief: object({ purpose: text(100, true, 1), targetAudience: text(80, true, 1), primaryAction: text(60, true, 1) }, true),
   agent: object({ name: text(60), title: text(80), company: text(120), branch: text(120, true), registrationNumber: text(80, true), businessNumber: text(80, true),
-    careerYears: { type: "number", min: 0, max: 100, optional: true }, regions: list(text(80), 0, 12), profileImage: imageRule(), logoImage: imageRule(true) }),
+    careerYears: { type: "number", min: 0, max: 100, optional: true }, regions: list(text(80), 0, 12), profileImage: imageRule(), logoImage: imageRule(true), logoMarkImage: imageRule(true) }),
   hero: object({ eyebrow: text(80, true), headline: text(40), subheadline: text(120), mobileHeadline: text(24, true, 1), mobileSubheadline: text(60, true, 1),
     primaryCtaLabel: text(24), secondaryCtaLabel: text(24), trustNote: text(240, true), image: imageRule(true) }),
   intro: object({ title: text(40), body: text(400), mobileTitle: text(24, true, 1), mobileBody: text(100, true, 1), philosophy: text(160, true), principleTitle: text(80, true), principleBody: text(240, true), principleLayout: choice(INTRO_PRINCIPLE_LAYOUT_IDS, true) }),
