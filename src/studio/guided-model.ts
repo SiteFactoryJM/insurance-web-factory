@@ -68,7 +68,7 @@ export function blankGuidedSite(example: SiteConfig): SiteConfig {
   const out = structuredClone(example);
   out.id = 'new-adviser';
   out.headingFont = 'noto-sans-kr';
-  out.agent = { name: '', title: '보험설계사', company: '', branch: '', registrationNumber: '', regions: [], profileImage: '/assets/profile-placeholder.svg', logoImage: '' };
+  out.agent = { name: '', title: '보험설계사', company: '', branch: '', registrationNumber: '', regions: [], profileImage: '/assets/profile-placeholder.svg', logoImage: '', logoMarkImage: '' };
   out.contact = { phone: '', kakaoUrl: '', instagramUrl: '', availableHours: '', email: '', fax: '', officeAddress: '' };
   out.hero = { ...out.hero, image: undefined, trustNote: '계약 조건을 충분히 확인한 뒤 결정하세요.' };
   out.career = []; out.reviews = [];
