@@ -69,8 +69,26 @@ export const clearHumanStyles = `
 }
 .premium-page #main .hero-copy{max-width:42rem}
 .premium-page #main .premium-hero:not(.hero-statement) .hero-copy{align-self:stretch;display:flex;flex-direction:column;justify-content:flex-start;padding-bottom:18px}
-.premium-page #main .hero-brand-logo{width:min(100%,28rem);margin:0 auto 26px}
-.premium-page #main .hero-brand-logo img{display:block;width:min(100%,26rem);height:auto;max-height:10rem;margin-inline:auto;object-fit:contain;object-position:center}
+.premium-page #main .hero-brand-feature{position:relative;isolation:isolate;width:100%;min-height:188px;margin:0 0 26px;overflow:hidden}
+.premium-page #main .hero-brand-soft-panel,.premium-page #main .hero-brand-gold-wave{display:grid;grid-template-columns:minmax(0,1.2fr) 1px minmax(10rem,.8fr);gap:24px;align-items:center;padding:26px 30px;border-radius:8px}
+.premium-page #main .hero-brand-soft-panel{background:linear-gradient(120deg,#fffdfa 0%,#fbf6ec 58%,#f4ead9 100%);border:1px solid #efe3cf;box-shadow:0 12px 30px rgba(108,84,46,.06)}
+.premium-page #main .hero-brand-gold-wave{background:#fffdf8;border:1px solid #dcb66e;box-shadow:0 12px 30px rgba(108,84,46,.05)}
+.premium-page #main .brand-panel-logo{position:relative;z-index:2;min-width:0}
+.premium-page #main .brand-panel-logo img{display:block;width:min(100%,23rem);height:auto;max-height:8rem;margin-inline:auto;object-fit:contain;object-position:center}
+.premium-page #main .brand-panel-divider{position:relative;z-index:2;display:block;width:1px;height:86px;background:rgba(163,132,82,.38)}
+.premium-page #main .brand-panel-copy{position:relative;z-index:2;min-width:0;color:#4b4034}
+.premium-page #main .brand-panel-copy p{margin:0;font-family:var(--ch-font);font-size:clamp(1rem,1.45vw,1.2rem);line-height:1.6;font-weight:500;letter-spacing:-.025em;color:#4b4034;text-wrap:balance}
+.premium-page #main .brand-panel-copy span{display:block;margin-top:14px;font-size:.68rem;line-height:1.5;letter-spacing:.28em;color:#6f655c;overflow-wrap:anywhere}
+.premium-page #main .brand-panel-wave{position:absolute;z-index:1;pointer-events:none}
+.premium-page #main .hero-brand-soft-panel .brand-panel-wave{right:-68px;bottom:-118px;width:290px;height:290px;border:34px solid rgba(220,181,112,.10);border-radius:50%;box-shadow:0 0 0 34px rgba(220,181,112,.055),0 0 0 68px rgba(220,181,112,.035)}
+.premium-page #main .hero-brand-gold-wave .brand-panel-wave{left:-8%;right:-8%;bottom:-112px;height:175px;border-top:1px solid rgba(212,168,92,.45);border-radius:50% 50% 0 0 / 100% 100% 0 0;transform:rotate(-2deg);box-shadow:0 -18px 0 rgba(226,194,132,.075),0 -36px 0 rgba(226,194,132,.045)}
+.premium-page #main .hero-brand-watermark{min-height:210px;margin-bottom:10px;background:linear-gradient(120deg,rgba(255,253,248,.96),rgba(250,246,237,.78))}
+.premium-page #main .hero-brand-watermark::before,.premium-page #main .hero-brand-watermark::after{content:"";position:absolute;z-index:0;pointer-events:none;left:-15%;width:130%;height:150px;border-radius:50%}
+.premium-page #main .hero-brand-watermark::before{bottom:-86px;border-top:28px solid rgba(218,177,105,.09);transform:rotate(-4deg)}
+.premium-page #main .hero-brand-watermark::after{bottom:-112px;border-top:1px solid rgba(207,161,84,.28);transform:rotate(5deg)}
+.premium-page #main .brand-watermark-art{position:absolute;inset:0;z-index:1;overflow:hidden;pointer-events:none}
+.premium-page #main .brand-watermark-mark{position:absolute;right:6%;top:-6%;width:54%;height:112%;object-fit:contain;object-position:center;opacity:.17;filter:saturate(.88)}
+.premium-page #main .brand-watermark-wordmark{position:absolute;z-index:2;right:1.5rem;top:50%;width:min(28%,14rem);height:auto;max-height:5rem;transform:translateY(-50%);object-fit:contain;opacity:.54}
 .premium-page #main .premium-hero:not(.hero-statement) .hero-copy>.eyebrow{margin-top:auto}
 .premium-page #main .hero-description{max-width:36rem;margin-top:16px;font-size:var(--ch-body);line-height:var(--ch-body-lh)}
 .premium-page #main .hero-actions{margin-top:22px;gap:12px 20px}
@@ -102,8 +120,10 @@ export const clearHumanStyles = `
 .premium-page .adviser-card .adviser-phone:hover{text-decoration:underline}
 .premium-page #main .hero-statement{max-width:56rem;grid-template-columns:1fr;gap:24px;padding-block:48px;text-align:center}
 .premium-page #main .hero-statement .hero-copy,.premium-page #main .hero-statement .hero-description{margin-inline:auto}
-.premium-page #main .hero-statement .hero-brand-logo{margin-inline:auto}
-.premium-page #main .hero-statement .hero-brand-logo img{margin-inline:auto;object-position:center}
+.premium-page #main .hero-statement .hero-brand-feature{width:min(100%,52rem);margin-inline:auto}
+.premium-page #main .hero-statement .hero-brand-soft-panel,.premium-page #main .hero-statement .hero-brand-gold-wave{text-align:left}
+.premium-page #main .hero-statement .brand-panel-logo img{margin-inline:auto}
+.premium-page #main .hero-statement .brand-panel-copy{text-align:left}
 .premium-page #main .hero-statement .hero-actions{justify-content:center}
 .premium-page #main .hero-statement-person{
  display:flex;flex-flow:row wrap;align-items:stretch;justify-content:center;gap:0;
@@ -284,8 +304,18 @@ export const clearHumanStyles = `
  .premium-page #main .section-heading{margin-bottom:22px}
  .premium-page #main .premium-hero:not(.hero-statement),.premium-page #main .hero-statement{grid-template-columns:minmax(0,1fr);gap:24px;padding-block:32px}
  .premium-page #main .hero-visual{max-width:none;justify-self:stretch}
- .premium-page #main .hero-brand-logo{width:min(100%,22rem);margin-bottom:20px}
- .premium-page #main .hero-brand-logo img{width:min(100%,21rem)}
+ .premium-page #main .hero-brand-feature{min-height:0;margin-bottom:20px}
+ .premium-page #main .hero-brand-soft-panel,.premium-page #main .hero-brand-gold-wave{grid-template-columns:minmax(0,1fr);gap:14px;padding:20px 18px}
+ .premium-page #main .brand-panel-logo img{width:min(100%,18rem);max-height:6.75rem}
+ .premium-page #main .brand-panel-divider{width:56px;height:1px;margin-inline:auto}
+ .premium-page #main .brand-panel-copy{text-align:center}
+ .premium-page #main .brand-panel-copy p{font-size:1rem}
+ .premium-page #main .brand-panel-copy span{margin-top:9px;font-size:.62rem;letter-spacing:.18em}
+ .premium-page #main .hero-brand-soft-panel .brand-panel-wave{right:-100px;bottom:-155px}
+ .premium-page #main .hero-brand-gold-wave .brand-panel-wave{bottom:-135px}
+ .premium-page #main .hero-brand-watermark{min-height:148px;margin-bottom:14px}
+ .premium-page #main .brand-watermark-mark{right:-2%;top:-8%;width:72%;height:116%}
+ .premium-page #main .brand-watermark-wordmark{right:.75rem;width:min(35%,10rem);max-height:3.5rem}
  .premium-page #main .hero-actions{display:block}
  .premium-page #main .hero-actions>.text-link{margin-top:12px}
  .premium-page #main .hero-statement-person{flex-wrap:wrap;max-width:22.5rem}
