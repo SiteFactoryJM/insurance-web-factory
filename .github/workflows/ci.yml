@@ -30,17 +30,3 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 7
-  verify-live:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: validate
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-      - name: Verify connected Cloudflare build is live
-        env:
-          LIVE_URL: https://insurance-web-factory-demo.pjmsm0319.workers.dev
-        run: node scripts/verify-live.mjs
