@@ -492,12 +492,12 @@ export const uiCopyDensityRefreshStyles = `
 }
 .premium-page #main .about-profile{
  display:grid;
- grid-template-columns:minmax(15.5rem,18.25rem) minmax(0,34rem);
+ grid-template-columns:minmax(15.5rem,18.25rem) minmax(0,33rem);
  justify-content:center;
  align-items:start;
- gap:38px;
- width:min(100%,56rem);
- max-width:56rem;
+ gap:32px;
+ width:min(100%,55rem);
+ max-width:55rem;
  margin-inline:auto;
 }
 .premium-page #main .about-profile-portrait{
@@ -518,8 +518,8 @@ export const uiCopyDensityRefreshStyles = `
  display:flex;
  flex-direction:column;
  align-items:center;
- gap:1px;
- padding-top:10px;
+ gap:0;
+ padding-top:2px;
  text-align:center;
  color:var(--ink);
 }
@@ -553,8 +553,8 @@ export const uiCopyDensityRefreshStyles = `
 }
 .premium-page #main .about-profile-heading h2{
  margin:0;
- max-width:31rem;
- font-size:clamp(1.95rem,2.55vw,2.35rem);
+ max-width:29rem;
+ font-size:clamp(1.78rem,2.2vw,2.08rem);
  line-height:1.18;
  font-weight:760;
  letter-spacing:-.05em;
@@ -573,8 +573,8 @@ export const uiCopyDensityRefreshStyles = `
 .premium-page #main .about-profile-message p{
  max-width:none;
  margin:0;
- font-size:1rem;
- line-height:1.7;
+ font-size:1.0625rem;
+ line-height:1.76;
  letter-spacing:-.022em;
  color:var(--muted);
 }
@@ -592,7 +592,9 @@ export const uiCopyDensityRefreshStyles = `
 .premium-page #main .about-profile-values{
  display:grid;
  grid-template-columns:repeat(3,minmax(0,1fr));
- margin-top:24px;
+ width:min(100%,29.5rem);
+ margin-top:22px;
+ margin-left:-10px;
 }
 .premium-page #main .about-profile-values.adviser-principle{
  position:relative;
@@ -613,7 +615,7 @@ export const uiCopyDensityRefreshStyles = `
 }
 .premium-page #main .about-profile-value{
  min-width:0;
- padding:0 12px;
+ padding:0 7px;
  text-align:center;
 }
 .premium-page #main .about-profile-value:first-child{padding-left:0}
@@ -664,6 +666,11 @@ export const uiCopyDensityRefreshStyles = `
  .premium-page #main .about-profile-copy{
   max-width:31rem;
   margin:18px auto 0;
+ }
+ .premium-page #main .about-profile-values{
+  width:min(100%,29rem);
+  margin-left:auto;
+  margin-right:auto;
  }
 }
 @media(max-width:420px){
