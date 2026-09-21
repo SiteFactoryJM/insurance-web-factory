@@ -213,10 +213,11 @@ export const clearHumanStyles = `
 .premium-page #main .about-quote .about-copy{margin-top:0}
 
 /* 담당자 소개 다음 약속 패널: 팔레트의 ink/accent/detail만 사용합니다. */
-.premium-page #main .promise-section{padding-top:0}
+.premium-page #main .promise-section{padding-block:48px}
 .premium-page #main .promise-panel{
  position:relative;overflow:hidden;
- padding:clamp(2.25rem,4vw,3.25rem) clamp(1.75rem,4.5vw,3.5rem);
+ padding-block:clamp(2.5rem,4vw,3.25rem);
+ padding-inline:clamp(1.75rem,4.5vw,3.5rem);
  border:1px solid var(--accent);border-radius:clamp(1.25rem,2.5vw,1.875rem);
  background:var(--ink);color:var(--on-brand);
 }
@@ -270,7 +271,8 @@ export const clearHumanStyles = `
 }
 @media(max-width:650px){
  .premium-page #main .promise-panel{
-  padding:2rem 1.375rem 1.625rem;
+  padding-block:1.75rem;
+  padding-inline:1.375rem;
   border-radius:1.25rem;
  }
  .premium-page #main .promise-heading{margin-bottom:1.25rem}
@@ -278,11 +280,15 @@ export const clearHumanStyles = `
  .premium-page #main .promise-grid{grid-template-columns:minmax(0,1fr)}
  .premium-page #main .promise-item{
   grid-template-columns:2.25rem minmax(0,1fr);
-  gap:.875rem;padding:1.25rem 0 1.375rem;
+  align-items:center;
+  gap:.875rem;
+  padding:1.05rem 0;
  }
- .premium-page #main .promise-check{width:2.25rem;height:2.25rem}
- .premium-page #main .promise-copy h3{font-size:1.25rem}
- .premium-page #main .promise-copy p{font-size:1.0625rem;line-height:1.68}
+ .premium-page #main .promise-check{
+  width:2.25rem;height:2.25rem;margin-top:0;
+ }
+ .premium-page #main .promise-copy h3{font-size:1.25rem;line-height:1.5}
+ .premium-page #main .promise-copy p{display:none}
 }
 
 /* 상담 과정: timeline도 3개의 동등한 단계 패널로 읽습니다. */
