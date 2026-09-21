@@ -66,8 +66,8 @@ export const uiCopyDensityRefreshStyles = `
 .theme-local-friendly #main .service-card:focus-within{box-shadow:inset 3px 0 0 var(--accent)!important}
 
 /* Insurance scope: Figma B topic-cloud direction.
-   The 15 labels are representative examples rather than the full consultation range.
-   All colour decisions stay on Clear Human palette tokens so every theme switches cleanly. */
+   Representative labels are evenly distributed and move only a few pixels so the
+   section feels alive without becoming distracting. Every colour stays token based. */
 .premium-page #main .insurance-scope-section{
  background:var(--paper);border-bottom:1px solid var(--line);
 }
@@ -82,85 +82,106 @@ export const uiCopyDensityRefreshStyles = `
  max-width:64rem;margin-inline:auto;color:var(--muted);text-wrap:pretty;
 }
 .premium-page #main .insurance-scope-cloud{
- width:min(100%,70rem);margin-inline:auto;padding:48px 42px 36px;
+ width:min(100%,70rem);margin-inline:auto;padding:50px 46px 34px;
  border:1px solid var(--line);border-radius:28px;
  background:var(--surface);box-shadow:0 18px 48px color-mix(in srgb,var(--ink) 7%,transparent);
 }
 .premium-page #main .insurance-scope-badge{
  display:flex;width:max-content;max-width:100%;align-items:center;justify-content:center;gap:7px;
- margin:0 auto 30px;padding:8px 16px;border-radius:999px;
+ margin:0 auto 34px;padding:8px 16px;border-radius:999px;
  background:var(--tint);color:var(--accent);
  font-size:1rem;line-height:1.5;font-weight:700;
 }
-.premium-page #main .insurance-scope-badge strong{
- font:inherit;color:inherit;
-}
-.premium-page #main .insurance-scope-rows{
- display:grid;gap:22px;min-width:0;
-}
-.premium-page #main .insurance-scope-row{
- display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
- min-width:0;margin:0;padding:0;list-style:none;
+.premium-page #main .insurance-scope-badge strong{font:inherit;color:inherit}
+
+.premium-page #main .insurance-scope-topics{
+ display:grid;grid-template-columns:repeat(12,minmax(0,1fr));
+ gap:26px 12px;align-items:center;width:100%;min-width:0;
+ margin:0;padding:0;list-style:none;
 }
 .premium-page #main .insurance-scope-topic{
- display:inline-flex;align-items:center;min-width:0;
- font-size:clamp(1.125rem,1.45vw,1.375rem);line-height:1.5;
+ grid-column:span 3;display:flex;align-items:center;justify-content:center;
+ min-width:0;min-height:64px;padding:6px 4px;text-align:center;
+ font-size:clamp(1.125rem,1.45vw,1.375rem);line-height:1.45;
  font-weight:500;letter-spacing:-.02em;color:var(--ink);white-space:nowrap;
 }
+.premium-page #main .insurance-scope-topic:nth-last-child(-n+3){grid-column:span 4}
 .premium-page #main .insurance-scope-topic.is-emphasis{
  font-size:clamp(1.25rem,1.75vw,1.625rem);font-weight:700;letter-spacing:-.03em;
 }
 .premium-page #main .insurance-scope-topic.is-accent{color:var(--accent)}
-.premium-page #main .insurance-scope-topic:not(:last-child)::after{
- content:"";display:block;width:5px;height:5px;flex:0 0 5px;
- margin:0 18px;border-radius:1px;background:var(--line);
+.premium-page #main .insurance-scope-topic span{
+ display:inline-block;will-change:transform;
+ animation:insurance-scope-float 7.4s ease-in-out infinite;
 }
+.premium-page #main .insurance-scope-topic:nth-child(4n+1) span{--scope-float:-3px;animation-duration:7.8s;animation-delay:-1.4s}
+.premium-page #main .insurance-scope-topic:nth-child(4n+2) span{--scope-float:2px;animation-duration:6.8s;animation-delay:-3.2s}
+.premium-page #main .insurance-scope-topic:nth-child(4n+3) span{--scope-float:-2px;animation-duration:8.2s;animation-delay:-.6s}
+.premium-page #main .insurance-scope-topic:nth-child(4n) span{--scope-float:3px;animation-duration:7.2s;animation-delay:-2.3s}
+@keyframes insurance-scope-float{
+ 0%,100%{transform:translate3d(0,0,0)}
+ 50%{transform:translate3d(0,var(--scope-float,-2px),0)}
+}
+
 .premium-page #main .insurance-scope-all-note{
- display:flex;align-items:center;justify-content:center;gap:12px;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
  width:100%;margin-top:34px;padding:17px 22px;border-radius:16px;
- background:var(--tint);color:var(--ink);
+ background:var(--tint);color:var(--ink);text-align:center;
 }
 .premium-page #main .insurance-scope-note-mark{
- width:30px;height:2px;flex:0 0 30px;border-radius:2px;background:var(--accent);
+ width:30px;height:2px;flex:0 0 2px;border-radius:2px;background:var(--accent);
 }
 .premium-page #main .insurance-scope-all-note p{
- margin:0;font-size:1rem;line-height:1.65;font-weight:700;
- color:var(--ink);text-wrap:pretty;overflow-wrap:anywhere;
+ width:100%;margin:0;text-align:center;
+ font-size:1rem;line-height:1.65;font-weight:700;color:var(--ink);
+ text-wrap:pretty;overflow-wrap:anywhere;
 }
 
 @media(max-width:900px){
  .premium-page #main .insurance-scope-heading{margin-bottom:28px}
  .premium-page #main .insurance-scope-cloud{padding:40px 28px 30px;border-radius:24px}
- .premium-page #main .insurance-scope-rows{gap:18px}
- .premium-page #main .insurance-scope-topic:not(:last-child)::after{margin-inline:14px}
- .premium-page #main .insurance-scope-all-note{margin-top:28px}
+ .premium-page #main .insurance-scope-badge{margin-bottom:30px}
+ .premium-page #main .insurance-scope-topics{
+  grid-template-columns:repeat(3,minmax(0,1fr));gap:22px 14px;
+ }
+ .premium-page #main .insurance-scope-topic,
+ .premium-page #main .insurance-scope-topic:nth-last-child(-n+3){grid-column:auto}
+ .premium-page #main .insurance-scope-topic{min-height:60px}
+ .premium-page #main .insurance-scope-all-note{margin-top:30px}
 }
 @media(max-width:650px){
  .premium-page #main .insurance-scope-heading{margin-bottom:22px}
  .premium-page #main .insurance-scope-cloud{
-  padding:30px 18px 22px;border-radius:20px;
-  box-shadow:none;
+  padding:30px 14px 22px;border-radius:20px;box-shadow:none;
  }
- .premium-page #main .insurance-scope-badge{margin-bottom:24px;padding:7px 13px;font-size:.9375rem}
- .premium-page #main .insurance-scope-rows{gap:14px}
- .premium-page #main .insurance-scope-row{gap:9px 16px}
+ .premium-page #main .insurance-scope-badge{
+  margin-bottom:26px;padding:7px 13px;font-size:.9375rem;
+ }
+ .premium-page #main .insurance-scope-topics{
+  grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 10px;
+ }
  .premium-page #main .insurance-scope-topic{
-  font-size:1.0625rem;line-height:1.5;white-space:normal;text-align:center;
+  min-height:54px;padding:4px 2px;font-size:1.0625rem;line-height:1.45;
+  white-space:nowrap;text-align:center;
  }
  .premium-page #main .insurance-scope-topic.is-emphasis{font-size:1.1875rem}
- .premium-page #main .insurance-scope-topic:not(:last-child)::after{display:none}
- .premium-page #main .insurance-scope-all-note{
-  align-items:flex-start;justify-content:flex-start;gap:10px;
-  margin-top:24px;padding:15px 16px;border-radius:14px;
+ .premium-page #main .insurance-scope-topic:last-child:nth-child(odd){
+  grid-column:1/-1;justify-self:center;width:min(100%,10rem);
  }
- .premium-page #main .insurance-scope-note-mark{width:22px;flex-basis:22px;margin-top:.72em}
+ .premium-page #main .insurance-scope-all-note{
+  margin-top:26px;padding:15px 14px;border-radius:14px;
+ }
+ .premium-page #main .insurance-scope-note-mark{width:24px}
  .premium-page #main .insurance-scope-all-note p{font-size:.9375rem;line-height:1.7}
 }
 @media(max-width:390px){
- .premium-page #main .insurance-scope-cloud{padding-inline:14px}
- .premium-page #main .insurance-scope-row{gap:8px 12px}
+ .premium-page #main .insurance-scope-cloud{padding-inline:12px}
+ .premium-page #main .insurance-scope-topics{gap:16px 8px}
  .premium-page #main .insurance-scope-topic{font-size:1rem}
  .premium-page #main .insurance-scope-topic.is-emphasis{font-size:1.125rem}
+}
+@media(prefers-reduced-motion:reduce){
+ .premium-page #main .insurance-scope-topic span{animation:none!important;transform:none!important}
 }
 
 /* About stays editorial; identity facts now live where the user can act on them. */
