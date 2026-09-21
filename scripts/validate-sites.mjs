@@ -118,7 +118,7 @@ export function validateContentLengths(site) {
   const check = (value, label, maxLength) => {
     if (value === undefined) return;
     const section = label.startsWith("intro.") ? "about" : label.startsWith("specialties[") ? "services" : label.startsWith("process[") ? "process" : label.startsWith("faqs[") ? "faq" : undefined;
-    const allowEmpty = section && !isSectionEnabled(site, section);
+    const allowEmpty = (section && !isSectionEnabled(site, section)) || label === "hero.brandTagline" || label === "hero.brandSubline";
     if (typeof value !== "string" || (!allowEmpty && !value.trim())) {
       issues.push(`${label}는 비어 있지 않은 문자열이어야 합니다.`);
       return;
