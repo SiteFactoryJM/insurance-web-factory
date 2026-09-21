@@ -173,15 +173,15 @@ function focus(site: SiteConfig): string {
 
 function casesTicker(site: SiteConfig): string {
   const items = [
-    { title: '보장이 잘 되어있는지 궁금해요', body: '현재 가입중이신 모든 보험을 한장으로 보기 쉽게끔 정리해드립니다. 어디가 부족하고 어디가 중복이 가능한지 한눈에 보실수 있으십니다.' },
-    { title: '보험 리모델링', body: '불필요한 금액 누수등을 먼저 체크하고 중증위주가 아닌 경증에서도 보험금이 잘 나올수 있도록 꼼꼼하게 진단하여 꼭 필요한 보장만 남기고 합리적으로 재 설계를 합니다.' },
-    { title: '맞춤설계', body: '나이·직업·가족력등 상황에 맞춰서 꼭 필요한 보장만을 우선순위대로 안내드립니다.' },
-    { title: '보험금 청구 지원', body: '진단,수술,사고시 받으셔야할 보험금을 빠짐없이, 병원 내원에서부터 하나하나 꼼꼼하게 안내드립니다. 연중무휴로 언제든지 새벽에도 편하게 연락만 주시면 친절하게 안내드리겠습니다.' },
-    { title: '가족 통합 관리', body: '부모님·배우자·자녀까지 가족 전체의 보장을 가입여부와 상관없이 모두 관리해드립니다.' },
-    { title: '은퇴·노후 준비', body: '연금·저축성 상품으로 막연한 노후 걱정을 구체적인 계획으로 바꿔 드립니다.' },
+    { title: '내 보험, 제대로 준비되어 있을까요?', body: '현재 가입 중인 보험을 한눈에 보기 쉽게 정리해드립니다. 부족하거나 중복된 보장은 없는지 꼼꼼하게 점검해드립니다.' },
+    { title: '보험 리모델링', body: '불필요하게 지출되는 보험료는 없는지 확인하고, 중증 보장에만 치우치지 않고 경증 질환이나 일상적인 치료 상황에서도 활용할 수 있는 보장이 있는지 꼼꼼하게 점검합니다. 꼭 필요한 보장은 남겨 합리적으로 다시 설계해드립니다.' },
+    { title: '나에게 맞는 맞춤 설계', body: '나이·직업·가족력·생활환경을 고려해 꼭 필요한 보장을 우선순위에 맞춰 안내해드립니다.' },
+    { title: '보험금 청구 지원', body: '진단·수술·사고 시 받을 수 있는 보험금을 놓치지 않도록 도와드립니다. 병원 내원부터 필요한 서류와 청구 절차까지 꼼꼼하게 안내해드립니다. 연중무휴로 언제든지, 늦은 밤이나 새벽에도 편하게 연락 주시면 친절하게 안내해드립니다.' },
+    { title: '우리 가족 보험 통합 관리', body: '부모님·배우자·자녀까지 가족 전체의 보장을 함께 살펴보고, 가입 여부와 관계없이 지속적으로 관리해드립니다.' },
+    { title: '은퇴·노후 준비', body: '연금·저축성 상품 등을 활용해 막연한 노후 걱정을 구체적인 준비 계획으로 바꿔드립니다.' },
   ];
-  const repeated = [...items, ...items];
-  return `<section class="section cases-section" id="cases" aria-labelledby="cases-title"><div class="container">${heading('상담 포인트', '많이 확인하는 내용을 먼저 훑어보세요.', undefined, '자주 고르는 질문을 카드로 정리해 어떤 내용을 확인하는지 한눈에 볼 수 있습니다.')}<div class="cases-marquee" aria-label="상담 포인트가 흐르는 안내 영역"><ul class="cases-track">${repeated.map((item, i) => `<li class="cases-item${i % items.length === 0 ? ' cases-cycle-start' : ''}"${i >= items.length ? ' aria-hidden="true"' : ''}><span class="cases-badge">${String((i % items.length) + 1).padStart(2, '0')}</span><div class="cases-copy"><h3>${e(item.title)}</h3><p>${e(item.body)}</p></div></li>`).join('')}</ul></div></div></section>`;
+  const initialClass = (index: number) => index === 0 ? 'is-active' : index === 1 ? 'is-next' : index === items.length - 1 ? 'is-prev' : index >= items.length - 2 ? 'is-hidden-left' : 'is-hidden-right';
+  return `<section class="section cases-section" id="cases" aria-labelledby="cases-title"><div class="container cases-shell"><div class="section-heading cases-heading"><p class="eyebrow">상담 포인트</p><h2 id="cases-title">많이 확인하는 내용을 먼저 훑어보세요.</h2><p class="section-support">자주 고르는 질문을 정리해 어떤 내용을 확인하는지 한눈에 볼 수 있습니다.</p></div><div class="cases-carousel" data-cases-carousel role="region" aria-roledescription="carousel" aria-label="상담 포인트 6가지"><button class="cases-nav cases-nav-prev" type="button" data-cases-prev aria-label="이전 상담 포인트" aria-controls="cases-list"><span class="cases-nav-mark" aria-hidden="true"></span></button><div class="cases-stage"><ol class="cases-list" id="cases-list">${items.map((item, i) => `<li class="cases-item ${initialClass(i)}" data-case-index="${i}" role="group" aria-roledescription="slide" aria-label="${i + 1} / ${items.length}"${i > 1 && i < items.length - 1 ? ' aria-hidden="true"' : ''}><span class="cases-badge">POINT ${String(i + 1).padStart(2, '0')}</span><div class="cases-copy"><h3>${e(item.title)}</h3><p>${e(item.body)}</p></div></li>`).join('')}</ol></div><button class="cases-nav cases-nav-next" type="button" data-cases-next aria-label="다음 상담 포인트" aria-controls="cases-list"><span class="cases-nav-mark" aria-hidden="true"></span></button><p class="cases-live" data-cases-live aria-live="polite">01 / 06 ${e(items[0].title)}</p></div></div></section>`;
 }
 function contact(site: SiteConfig): string {
   const channels = site.contact.instagramUrl ? '전화·카카오톡·인스타그램' : '전화와 카카오톡 오픈채팅';
