@@ -88,7 +88,7 @@ test('studio tools are outside the consumer header and stay out of production',(
  production.status='draft';assert.match(page(production),/name="robots" content="noindex,nofollow"/);
 });
 test('invalid contact destinations are never exposed as clickable links',()=>{
- const modified=structuredClone(site);modified.contact.phone='javascript:alert(1)';modified.contact.kakaoUrl='https://open.kakao.com.evil.test/o/x';
+ const modified=structuredClone(site);modified.contact.phone='javascript:alert(1)';modified.contact.kakaoUrl='https://open.kakao.com.evil.test/o/x';modified.contact.instagramUrl='https://instagram.com.evil.test/adviser';
  assert.doesNotMatch(page(modified),/data-contact-link=/);assert.match(page(modified),/연락처 확인 후/);
 });
 test('privacy guidance matches direct contact and never promises a functioning form',()=>{

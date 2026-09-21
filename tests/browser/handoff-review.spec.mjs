@@ -36,6 +36,81 @@ test('normal contact links permit navigation while automated checks never follow
   }
 });
 
+test('header contact boxes are removed and floating icon contacts stay fixed across all themes', async ({ page }) => {
+  const themes = ['trust-blue', 'warm-care', 'premium-navy', 'clean-minimal', 'local-friendly'];
+  for (const width of [390, 1440]) for (const theme of themes) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(`/?theme=${theme}`);
+    await expect(page.locator('.site-header .direct-contact-actions')).toHaveCount(0);
+    const dock = page.locator('[data-floating-contact]');
+    await expect(dock).toBeVisible();
+    await expect(dock.locator('[data-contact-link="phone"]')).toHaveCount(1);
+    await expect(dock.locator('[data-contact-link="kakao"]')).toHaveCount(1);
+    await expect(dock.locator('[data-contact-link="instagram"]')).toHaveCount(1);
+    const before = await dock.boundingBox();
+    await page.evaluate(() => window.scrollTo(0, Math.max(500, document.body.scrollHeight * 0.45)));
+    await page.waitForTimeout(50);
+    const after = await dock.boundingBox();
+    expect(before && after).toBeTruthy();
+    expect(Math.abs(after.y - before.y), `${theme} floating dock y at ${width}`).toBeLessThanOrEqual(2);
+    expect(Math.abs(after.x - before.x), `${theme} floating dock x at ${width}`).toBeLessThanOrEqual(2);
+  }
+});
+
+test('desktop portrait heroes keep the brand feature near the photo top and centered in the copy column', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  for (const theme of ['trust-blue', 'warm-care', 'local-friendly']) {
+    await page.goto(`/?theme=${theme}`);
+    const geometry = await page.locator('.premium-hero').evaluate(hero => {
+      const visual = hero.querySelector('.hero-visual').getBoundingClientRect();
+      const copy = hero.querySelector('.hero-copy').getBoundingClientRect();
+      const logo = hero.querySelector('.hero-brand-feature').getBoundingClientRect();
+      return {
+        topDelta: Math.abs(logo.top - visual.top),
+        centerDelta: Math.abs((logo.left + logo.width / 2) - (copy.left + copy.width / 2)),
+        bottomGap: visual.bottom - copy.bottom,
+      };
+    });
+    expect(geometry.topDelta, `${theme} brand top offset`).toBeLessThanOrEqual(16);
+    expect(geometry.centerDelta, `${theme} logo center alignment`).toBeLessThanOrEqual(3);
+    expect(geometry.bottomGap, `${theme} copy stays inside adviser card bottom`).toBeGreaterThanOrEqual(-2);
+  }
+});
+
+test('all five hero layouts show Instagram instead of the service shortcut and keep the photo first', async ({ page }) => {
+  const themes = ['trust-blue', 'warm-care', 'premium-navy', 'clean-minimal', 'local-friendly'];
+  for (const width of [390, 768, 1440]) for (const theme of themes) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto(`/?theme=${theme}`);
+    const instagram = page.locator('.hero-actions [data-contact-link="instagram"]');
+    await expect(instagram).toHaveText(/인스타그램/);
+    await expect(instagram).toHaveClass(/direct-instagram/);
+    await expect(page.locator('.hero-brand-feature img')).toBeVisible();
+    await expect(page.locator('.hero-topics')).toContainText('청구서비스');
+    await expect(page.locator('.hero-topics')).toContainText('청구 금액 확인');
+    await expect(page.locator('.hero-topics')).toContainText('부지급된 보험금 확인');
+    await expect(page.locator('.hero-topics')).toContainText('자동차사고');
+    await expect(page.locator('.hero-topics')).toContainText('배상책임사고');
+    await expect(page.locator('.hero-actions')).not.toContainText('상담 분야 보기');
+    const layout = await page.locator('.premium-hero').evaluate(hero => {
+      const visual = hero.querySelector('.hero-visual');
+      const copy = hero.querySelector('.hero-copy');
+      const visualBox = visual.getBoundingClientRect();
+      const copyBox = copy.getBoundingClientRect();
+      return {
+        visualFirst: hero.firstElementChild === visual && visual.nextElementSibling === copy,
+        statement: hero.classList.contains('hero-statement'),
+        visual: { left: visualBox.left, top: visualBox.top, bottom: visualBox.bottom },
+        copy: { left: copyBox.left, top: copyBox.top },
+      };
+    });
+    expect(layout.visualFirst, `${theme} at ${width}px DOM order`).toBe(true);
+    if (width <= 900 || layout.statement) expect(layout.visual.top, `${theme} at ${width}px vertical order`).toBeLessThan(layout.copy.top);
+    else expect(layout.visual.left, `${theme} at ${width}px horizontal order`).toBeLessThan(layout.copy.left);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), `${theme} at ${width}px page fit`).toBeLessThanOrEqual(width);
+  }
+});
+
 test('list, card and split service layouts stay symmetric with complete and partial rows', async ({ page }) => {
   test.setTimeout(120000);
   for (const width of [390, 768, 1440]) for (const theme of ['trust-blue', 'warm-care', 'premium-navy']) for (const count of [3, 4, 5, 6, 7, 8]) {

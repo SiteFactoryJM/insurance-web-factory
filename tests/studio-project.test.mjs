@@ -22,7 +22,8 @@ async function fixture(t) {
   });
   const site = example();
   site.agent.profileImage = png;
-  site.agent.logoImage = "";
+  site.agent.logoImage = png;
+  site.agent.logoMarkImage = png;
   site.hero.image = png;
   delete site.seo.ogImage;
   const file = path.join(rootDir, "project.json");
@@ -37,6 +38,9 @@ test("DIY JSON round-trip preserves chosen patterns, mobile copy, footer and cus
   site.agent.businessNumber = "123-45-67890";
   site.hero.image = png;
   site.hero.mobileHeadline = "우리 가족의 다음 선택";
+  site.hero.brandLayout = "gold-wave";
+  site.hero.brandTagline = "당신의 오늘이 더 나은 내일이 되도록";
+  site.hero.brandSubline = "LIFE, ALWAYS WITH YOU";
   site.contact.email = "advisor+vip@example.com";
   site.contact.fax = "02-1234-5678";
   const project = createProject(site);
@@ -45,7 +49,12 @@ test("DIY JSON round-trip preserves chosen patterns, mobile copy, footer and cus
   assert.deepEqual(restored.site.design, site.design);
   assert.deepEqual(restored.site.footer, site.footer);
   assert.equal(restored.site.hero.mobileHeadline, "우리 가족의 다음 선택");
+  assert.equal(restored.site.hero.brandLayout, "gold-wave");
+  assert.equal(restored.site.hero.brandTagline, "당신의 오늘이 더 나은 내일이 되도록");
+  assert.equal(restored.site.hero.brandSubline, "LIFE, ALWAYS WITH YOU");
   assert.equal(restored.site.hero.image, png);
+  assert.equal(restored.site.agent.logoImage, site.agent.logoImage);
+  assert.equal(restored.site.agent.logoMarkImage, site.agent.logoMarkImage);
   assert.equal(restored.site.agent.businessNumber, "123-45-67890");
   assert.equal(restored.site.contact.email, "advisor+vip@example.com");
   assert.equal(restored.site.contact.fax, "02-1234-5678");

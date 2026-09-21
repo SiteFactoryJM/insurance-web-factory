@@ -40,6 +40,9 @@ test('demo is noindex and keeps submissions disabled', () => {
 test('all demo layouts provide concise mobile copy within editing limits', () => {
   assert.deepEqual(validateContentLengths(site), []);
   assert.ok(site.hero.mobileHeadline && site.hero.mobileSubheadline);
+  assert.equal(site.hero.brandLayout, 'soft-panel');
+  assert.equal(site.hero.brandTagline, '사람을 먼저 생각하는 보험의 기준, 해온');
+  assert.equal(site.hero.brandSubline, 'LIFE INSURANCE FOR A BRIGHTER TOMORROW');
   assert.ok(site.intro.mobileTitle && site.intro.mobileBody);
   for (const content of [site, ...Object.values(site.templateContent)]) {
     for (const key of ['specialties', 'process', 'focus']) assert.ok((content[key] ?? []).every(item => item.mobileBody));

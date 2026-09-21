@@ -97,6 +97,17 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 60
+        },
+        "brandLayout": {
+          "enum": ["soft-panel", "gold-wave", "watermark"]
+        },
+        "brandTagline": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "brandSubline": {
+          "type": "string",
+          "maxLength": 100
         }
       }
     },
@@ -197,6 +208,11 @@
           "type": "string",
           "maxLength": 32,
           "pattern": "^$|^[+0-9][0-9 ()-]{5,31}$"
+        },
+        "instagramUrl": {
+          "type": "string",
+          "maxLength": 2048,
+          "pattern": "^$|^https://(www\\.)?instagram\\.com/[A-Za-z0-9._]{1,30}/?$"
         }
       }
     },

@@ -88,6 +88,58 @@ test('invalid multi-selection leaves the prior page intact',async({page})=>{
  await expect(page.locator('[name="copy-choice"]:checked')).toHaveCount(0);
  await page.locator('[data-action="apply-copies"]').click();await expect(page.locator('#guided-errors')).toContainText('3~6');expect(await preview(page).locator('.service-card h3').allTextContents()).toEqual(before);
 });
+test('logo image uploads appear immediately in the preview',async({page})=>{
+ await start(page);await stage(page,1);
+ const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aPioAAAAASUVORK5CYII=','base64');
+ await page.locator('#guided-logo').setInputFiles({name:'logo.png',mimeType:'image/png',buffer:png});
+ await expect(page.locator('#guided-status')).toContainText('메인 로고');
+ await expect(preview(page).locator('.hero-brand-feature img')).toHaveAttribute('src',/^data:image\/png;base64,/);
+ await expect(preview(page).locator('.brand-logo')).toHaveAttribute('src',/^data:image\/png;base64,/);
+ await page.locator('#guided-logo-mark').setInputFiles({name:'mark.png',mimeType:'image/png',buffer:png});
+ await expect(page.locator('#guided-status')).toContainText('상단·푸터용 로고');
+ await expect(preview(page).locator('.footer-brand-logo')).toHaveAttribute('src',/^data:image\/png;base64,/);
+});
+test('actual-info step shows three brand samples, previews them immediately and exports the choice to JSON',async({page})=>{
+ await start(page);await stage(page,1);
+ await expect(page.locator('.g-brand-section [data-brand-layout]')).toHaveCount(3);
+ const cases=[
+  ['soft-panel','사람을 먼저 생각하는 보험의 기준, 해온','LIFE INSURANCE FOR A BRIGHTER TOMORROW'],
+  ['gold-wave','당신의 오늘이 더 나은 내일이 되도록','LIFE, ALWAYS WITH YOU'],
+  ['watermark','',''],
+ ];
+ for(const [id,tagline,subline] of cases){
+  await page.locator(`.g-brand-section [data-brand-layout="${id}"]`).click();
+  await expect(page.locator(`.g-brand-section [data-brand-layout="${id}"]`)).toHaveAttribute('aria-pressed','true');
+  const feature=preview(page).locator(`.hero-brand-feature[data-brand-layout="${id}"]`);
+  await expect(feature).toBeVisible();
+  if(tagline){
+   await expect(feature.locator('img').first()).toBeVisible();
+   await expect(feature).toContainText(tagline);await expect(feature).toContainText(subline);
+  }else{
+   const geometry=await preview(page).locator('.hero-copy-brand-watermark').evaluate(copy=>{
+    const zone=copy.querySelector('.hero-watermark-zone').getBoundingClientRect();
+    const background=copy.querySelector('.hero-brand-watermark');
+    const title=copy.querySelector('h1').getBoundingClientRect();
+    const description=copy.querySelector('.hero-description').getBoundingClientRect();
+    const style=getComputedStyle(background);
+    return {backgroundImage:style.backgroundImage,position:style.position,titleInside:title.top>=zone.top&&title.bottom<=zone.bottom,descriptionBelow:description.top>=zone.bottom-2};
+   });
+   expect(geometry.backgroundImage).toContain('haeon-watermark-wave.png');
+   expect(geometry.position).toBe('absolute');
+   expect(geometry.titleInside).toBe(true);
+   expect(geometry.descriptionBelow).toBe(true);
+  }
+ }
+ await page.locator('.g-brand-section [data-brand-layout="gold-wave"]').click();
+ await facts(page);await confirm(page);const project=await save(page);
+ expect(project.site.hero.brandLayout).toBe('gold-wave');
+ expect(project.site.hero.brandTagline).toBe('당신의 오늘이 더 나은 내일이 되도록');
+ expect(project.site.hero.brandSubline).toBe('LIFE, ALWAYS WITH YOU');
+ await page.reload();await page.locator('#guided-file').setInputFiles({name:'brand-draft.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(project))});
+ await stage(page,1);
+ await expect(page.locator('.g-brand-section [data-brand-layout="gold-wave"]')).toHaveAttribute('aria-pressed','true');
+ await expect(preview(page).locator('.hero-brand-feature[data-brand-layout="gold-wave"]')).toBeVisible();
+});
 test('profile, chosen copy, layout and phone/chat links survive JSON export/import',async({page})=>{
  await start(page);await purpose(page,'new');await facts(page);
  await expect(preview(page).locator('.hero-actions [data-contact-link="phone"]')).toHaveAttribute('href','tel:01000001234');

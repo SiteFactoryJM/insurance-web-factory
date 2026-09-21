@@ -14,7 +14,8 @@
     "registrationNumber": "",
     "regions": [],
     "profileImage": "/sites/demo-agent/lee-yunbok-profile.webp",
-    "logoImage": ""
+    "logoImage": "/assets/haeon-logo-horizontal.svg",
+    "logoMarkImage": "/assets/haeon-logo-stacked.svg"
   },
   "hero": {
     "eyebrow": "보험 상담 안내",
@@ -24,7 +25,10 @@
     "mobileSubheadline": "가입 내역을 한 번에 정리하고, 지금 필요한 질문부터 골라 보세요.",
     "primaryCtaLabel": "전화로 문의하기",
     "secondaryCtaLabel": "상담 분야 보기",
-    "trustNote": "계약 조건을 확인하고 충분히 이해한 뒤 결정하세요."
+    "trustNote": "계약 조건을 확인하고 충분히 이해한 뒤 결정하세요.",
+    "brandLayout": "soft-panel",
+    "brandTagline": "사람을 먼저 생각하는 보험의 기준, 해온",
+    "brandSubline": "LIFE INSURANCE FOR A BRIGHTER TOMORROW"
   },
   "intro": {
     "title": "지금 가진 계약부터 차분히 정리합니다.",

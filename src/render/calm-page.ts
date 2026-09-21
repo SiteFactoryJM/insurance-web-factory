@@ -2,7 +2,7 @@ import type { DesignSectionId, SiteConfig } from '../types.js';
 import { escapeHtml as e, safeUrl } from '../utils/html.js';
 import { responsiveCopy as copy } from './copy.js';
 import { getDesign } from './design-system.js';
-import { arrow, formatIndex, renderContactButtons, renderContactForm } from './shared.js';
+import { formatIndex, renderContactButtons, renderContactForm } from './shared.js';
 import { directPhoneHref } from '../utils/contact-links.js';
 
 const profile = (site: SiteConfig, className = '', eager = false) => `<img class="${className}" src="${e(site.agent.profileImage || '/assets/profile-placeholder.svg')}" alt="${e(site.agent.name || '담당자')} 프로필" width="600" height="800" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'}>`;
@@ -14,7 +14,7 @@ const profile = (site: SiteConfig, className = '', eager = false) => `<img class
 function adviserCard(site: SiteConfig): string {
   const phone = directPhoneHref(site.contact.phone);
   const number = e(site.contact.phone || '연락처 확인 필요');
-  return `<div class="adviser-card"><div class="adviser-details"><p class="adviser-role">담당 설계사</p><p class="adviser-name">${e(site.agent.name || '담당자 이름')}</p><p class="adviser-org">${e(site.agent.company || '소속 확인 필요')}<br>${e(site.agent.title || '보험설계사')}</p>${phone ? `<a class="adviser-phone" data-contact-link="phone" href="${e(phone)}">${number}</a>` : `<p class="adviser-phone">${number}</p>`}<p class="adviser-hours">상담 시간 ${e(site.contact.availableHours || '담당자에게 확인')}</p></div></div>`;
+  return `<div class="adviser-card"><div class="adviser-details"><p class="adviser-role">담당 설계사</p><p class="adviser-name">${e(site.agent.name || '담당자 이름')}</p><p class="adviser-org">${e(site.agent.company || '소속 확인 필요')} · ${e(site.agent.title || '보험설계사')}</p>${phone ? `<a class="adviser-phone" data-contact-link="phone" href="${e(phone)}">${number}</a>` : `<p class="adviser-phone">${number}</p>`}<p class="adviser-hours">상담 시간 ${e(site.contact.availableHours || '담당자에게 확인')}</p></div></div>`;
 }
 const heading = (kicker: string, title: string, mobile?: string, description = '') => `<div class="section-heading"><p class="eyebrow">${e(kicker)}</p><h2>${copy(naturalHeading(title), naturalHeading(mobile))}</h2>${description ? `<p class="section-support">${e(description)}</p>` : ''}</div>`;
 
@@ -22,12 +22,54 @@ function naturalHeading(value?: string): string {
   return (value || '').replace(/\s*\n\s*/g, ' ').replace(/\s{2,}/g, ' ').trim();
 }
 
+const BRAND_PRESENTATION_COPY = {
+  'soft-panel': {
+    tagline: '사람을 먼저 생각하는 보험의 기준, 해온',
+    subline: 'LIFE INSURANCE FOR A BRIGHTER TOMORROW',
+  },
+  'gold-wave': {
+    tagline: '당신의 오늘이 더 나은 내일이 되도록',
+    subline: 'LIFE, ALWAYS WITH YOU',
+  },
+  watermark: {
+    tagline: '',
+    subline: '',
+  },
+} as const;
+
+function heroBrandFeature(site: SiteConfig): string {
+  const layout = site.hero.brandLayout || 'soft-panel';
+  const fallback = BRAND_PRESENTATION_COPY[layout] || BRAND_PRESENTATION_COPY['soft-panel'];
+  const tagline = site.hero.brandTagline?.trim() || fallback.tagline;
+  const subline = site.hero.brandSubline?.trim() || fallback.subline;
+  const logo = site.agent.logoImage?.trim() || '';
+  const mark = site.agent.logoMarkImage?.trim() || logo;
+  if (layout === 'watermark') {
+    return '<div class="hero-brand-feature hero-brand-watermark" data-brand-layout="watermark" aria-hidden="true"></div>';
+  }
+  if (!logo && !mark) return '';
+  const featureClass = layout === 'gold-wave' ? 'hero-brand-gold-wave' : 'hero-brand-soft-panel';
+  return `<div class="hero-brand-feature ${featureClass}" data-brand-layout="${e(layout)}"><div class="brand-panel-logo"><img src="${e(logo || mark)}" alt="${e(site.agent.company || '소속')} 로고"></div><span class="brand-panel-divider" aria-hidden="true"></span><div class="brand-panel-copy">${tagline ? `<p>${e(tagline)}</p>` : ''}${subline ? `<span>${e(subline)}</span>` : ''}</div><span class="brand-panel-wave" aria-hidden="true"></span></div>`;
+}
+
 function hero(site: SiteConfig): string {
   const design = getDesign(site);
   const pattern = design.hero;
-  const servicesTarget = design.hiddenSections.includes('services') ? '#footer' : '#specialties';
-  const topicChips = site.specialties.slice(0, 3).map(item => `<span>${e(item.title)}</span>`).join('');
-  const lead = `<div class="hero-copy"><p class="eyebrow"><span class="small-line" aria-hidden="true"></span>${e(site.hero.eyebrow || '보험 상담 안내')}</p><h1 id="hero-title">${copy(naturalHeading(site.hero.headline || '가입한 보험, 무엇부터 확인할까요?'), naturalHeading(site.hero.mobileHeadline))}</h1><p class="hero-description">${copy(site.hero.subheadline, site.hero.mobileSubheadline)}</p>${topicChips ? `<div class="hero-topics" aria-label="주요 상담 분야">${topicChips}</div>` : ''}<div class="hero-actions">${renderContactButtons(site)}<a class="text-link" href="${servicesTarget}">${e(site.hero.secondaryCtaLabel || '상담 분야 보기')} <span aria-hidden="true">↓</span></a></div><p class="hero-note">상담은 가입 신청과 별개입니다.${site.hero.trustNote ? `<br>${e(site.hero.trustNote)}` : ''}</p></div>`;
+  const coreTopics = site.specialties.slice(0, 3).map(item => ({ label: item.title, tone: 'base' }));
+  const extraTopics = [
+    { label: '청구서비스', tone: 'base' },
+    { label: '청구 금액 확인', tone: 'base' },
+    { label: '부지급된 보험금 확인', tone: 'base' },
+    { label: '자동차사고', tone: 'base' },
+    { label: '배상책임사고', tone: 'base' },
+  ];
+  const topicChips = [...coreTopics, ...extraTopics].map(item => `<span class="topic-chip topic-${item.tone}">${e(item.label)}</span>`).join('');
+  const brandLayout = site.hero.brandLayout || 'soft-panel';
+  const heroBrand = heroBrandFeature(site);
+  const eyebrow = `<p class="eyebrow"><span class="small-line" aria-hidden="true"></span>${e(site.hero.eyebrow || '보험 상담 안내')}</p>`;
+  const title = `<h1 id="hero-title">${copy(naturalHeading(site.hero.headline || '가입한 보험, 무엇부터 확인할까요?'), naturalHeading(site.hero.mobileHeadline))}</h1>`;
+  const brandLead = brandLayout === 'watermark' ? `<div class="hero-watermark-zone">${heroBrand}${eyebrow}${title}</div>` : `${heroBrand}${eyebrow}${title}`;
+  const lead = `<div class="hero-copy hero-copy-brand-${e(brandLayout)}">${brandLead}<p class="hero-description">${copy(site.hero.subheadline, site.hero.mobileSubheadline)}</p>${topicChips ? `<div class="hero-topics" aria-label="주요 상담 분야">${topicChips}</div>` : ''}<div class="hero-actions">${renderContactButtons(site)}</div><p class="hero-note">상담은 가입 신청과 별개입니다.${site.hero.trustNote ? ` ${e(site.hero.trustNote)}` : ''}</p></div>`;
   let visual: string;
   if (pattern === 'editorial') {
     visual = `<div class="hero-visual"><figure class="hero-scene"><img src="${e(site.hero.image || site.agent.profileImage || '/assets/profile-placeholder.svg')}" alt="${site.hero.image ? '' : e(`${site.agent.name || '담당자'} 프로필`)}" width="1536" height="1024" fetchpriority="high"></figure>${adviserCard(site)}</div>`;
@@ -36,7 +78,7 @@ function hero(site: SiteConfig): string {
   } else {
     visual = `<div class="hero-visual hero-statement-person">${profile(site, '', true)}${adviserCard(site)}</div>`;
   }
-  return `<section class="hero premium-hero hero-${pattern} container" id="home" aria-labelledby="hero-title">${lead}${visual}</section>`;
+  return `<section class="hero premium-hero hero-${pattern} container" id="home" aria-labelledby="hero-title">${visual}${lead}</section>`;
 }
 
 function services(site: SiteConfig): string {
@@ -112,7 +154,8 @@ function casesTicker(site: SiteConfig): string {
   return `<section class="section cases-section" id="cases" aria-labelledby="cases-title"><div class="container">${heading('상담 포인트', '많이 확인하는 내용을 먼저 훑어보세요.', undefined, '자주 고르는 질문을 카드로 정리해 어떤 내용을 확인하는지 한눈에 볼 수 있습니다.')}<div class="cases-marquee" aria-label="상담 포인트가 흐르는 안내 영역"><ul class="cases-track">${repeated.map((item, i) => `<li class="cases-item"${i >= items.length ? ' aria-hidden="true"' : ''}><span class="cases-badge">${String((i % items.length) + 1).padStart(2, '0')}</span><div class="cases-copy"><h3>${e(item.title)}</h3><p>${e(item.body)}</p></div></li>`).join('')}</ul></div></div></section>`;
 }
 function contact(site: SiteConfig): string {
-  return `<section class="section contact-section" id="contact" aria-labelledby="contact-title"><div class="container contact-grid"><div class="contact-copy"><p class="eyebrow">연락 방법</p><h2 id="contact-title">편한 방법으로 바로 문의하세요.</h2><p>전화와 카카오톡 오픈채팅 중 편한 방법을 선택하세요.</p></div>${renderContactForm(site)}</div></section>`;
+  const channels = site.contact.instagramUrl ? '전화·카카오톡·인스타그램' : '전화와 카카오톡 오픈채팅';
+  return `<section class="section contact-section" id="contact" aria-labelledby="contact-title"><div class="container contact-grid"><div class="contact-copy"><p class="eyebrow">연락 방법</p><h2 id="contact-title">편한 방법으로 바로 문의하세요.</h2><p>${channels} 중 편한 방법을 선택하세요.</p></div>${renderContactForm(site)}</div></section>`;
 }
 
 export function renderCalmPage(site: SiteConfig): string {

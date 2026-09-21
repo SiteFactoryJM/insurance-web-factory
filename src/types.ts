@@ -4,6 +4,8 @@ export const PALETTE_IDS = ["navy", "forest", "slate", "charcoal", "teal", "ston
 export type PaletteId = (typeof PALETTE_IDS)[number];
 export const HEADING_FONT_IDS = ["pretendard", "noto-serif-kr", "noto-sans-kr", "nanum-gothic", "nanum-myeongjo", "gowun-batang"] as const;
 export type HeadingFont = (typeof HEADING_FONT_IDS)[number];
+export const HERO_BRAND_LAYOUT_IDS = ["soft-panel", "gold-wave", "watermark"] as const;
+export type HeroBrandLayout = (typeof HERO_BRAND_LAYOUT_IDS)[number];
 export type PublishStatus = "draft" | "published";
 export type AdvertisingReviewStatus = "pending" | "approved" | "not-required";
 export const INTRO_PRINCIPLE_LAYOUT_IDS = ["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16"] as const;
@@ -37,8 +39,8 @@ export interface SiteConfig {
   footer?: { heading?: string; note?: string; };
   templateContent?: Partial<Record<TemplateId, TemplateContent>>;
   contentBrief?: { purpose?: string; targetAudience?: string; primaryAction?: string; };
-  agent: { name: string; title: string; company: string; branch?: string; registrationNumber?: string; businessNumber?: string; careerYears?: number; regions: string[]; profileImage: string; logoImage?: string; };
-  hero: { eyebrow?: string; headline: string; subheadline: string; mobileHeadline?: string; mobileSubheadline?: string; primaryCtaLabel: string; secondaryCtaLabel: string; trustNote?: string; image?: string; };
+  agent: { name: string; title: string; company: string; branch?: string; registrationNumber?: string; businessNumber?: string; careerYears?: number; regions: string[]; profileImage: string; logoImage?: string; logoMarkImage?: string; };
+  hero: { eyebrow?: string; headline: string; subheadline: string; mobileHeadline?: string; mobileSubheadline?: string; primaryCtaLabel: string; secondaryCtaLabel: string; trustNote?: string; image?: string; brandLayout?: HeroBrandLayout; brandTagline?: string; brandSubline?: string; };
   intro: { title: string; body: string; mobileTitle?: string; mobileBody?: string; philosophy?: string; principleTitle?: string; principleBody?: string; principleLayout?: IntroPrincipleLayout; };
   specialties: ContentCard[]; process: ContentCard[]; career: string[]; reviews?: ReviewItem[]; faqs: FaqItem[];
   consultation?: { topics: string[] };
