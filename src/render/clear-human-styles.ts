@@ -58,21 +58,23 @@ export const clearHumanStyles = `
 .premium-page .direct-kakao:hover{background:var(--kakao-hover);color:var(--kakao-ink);border-color:var(--kakao-line)}
 .premium-page .direct-instagram{background:linear-gradient(135deg,#76596F 0%,#966278 48%,#AE6C76 72%,#BE7968 100%);color:#fff;border-color:#966278}
 .premium-page .direct-instagram:hover{background:linear-gradient(135deg,#684E62 0%,#85566A 48%,#9A6068 72%,#AA6B5C 100%);color:#fff;border-color:#85566A}
-.premium-page .brand-logo{width:72px;height:72px;object-fit:contain;flex:0 0 auto}
+.premium-page .brand-logo{width:80px;height:80px;object-fit:contain;flex:0 0 auto}
 .premium-page .site-footer .direct-phone{border-color:#B9C4CE;background:transparent;color:#fff}
 .premium-page .site-footer .direct-phone:hover{background:#243347;border-color:#B9C4CE}
 
 /* 첫 화면: 사진을 먼저 읽고 본문으로 이어지도록 360px 인물 묶음을 첫 열에 둡니다. */
 .premium-page #main .premium-hero:not(.hero-statement){
  grid-template-columns:minmax(19rem,22.5rem) minmax(0,1fr);gap:clamp(2.5rem,5vw,5rem);
- padding-block:48px;align-items:center;
+ padding-block:48px;align-items:stretch;
 }
 .premium-page #main .hero-copy{max-width:42rem}
-.premium-page #main .hero-brand-logo{width:min(100%,28rem);margin:0 0 26px}
-.premium-page #main .hero-brand-logo img{display:block;width:min(100%,26rem);height:auto;max-height:10rem;object-fit:contain;object-position:left center}
+.premium-page #main .premium-hero:not(.hero-statement) .hero-copy{align-self:stretch;display:flex;flex-direction:column;justify-content:flex-start;padding-bottom:18px}
+.premium-page #main .hero-brand-logo{width:min(100%,28rem);margin:0 auto 26px}
+.premium-page #main .hero-brand-logo img{display:block;width:min(100%,26rem);height:auto;max-height:10rem;margin-inline:auto;object-fit:contain;object-position:center}
+.premium-page #main .premium-hero:not(.hero-statement) .hero-copy>.eyebrow{margin-top:auto}
 .premium-page #main .hero-description{max-width:36rem;margin-top:16px;font-size:var(--ch-body);line-height:var(--ch-body-lh)}
 .premium-page #main .hero-actions{margin-top:22px;gap:12px 20px}
-.premium-page #main .hero-note{max-width:36rem;margin-top:10px}
+.premium-page #main .premium-hero:not(.hero-statement) .hero-note{max-width:36rem;margin-top:10px;margin-bottom:auto}
 .premium-page #main .hero-visual{
  display:flex;flex-direction:column;align-items:stretch;gap:0;width:100%;max-width:22.5rem;
  padding:0;justify-self:start;min-width:0;
@@ -317,7 +319,7 @@ export const clearHumanStyles = `
  .premium-page #main .contact-person{margin-top:20px}
  .premium-page #main .direct-contact-panel{padding:22px 18px}
  .premium-page #main .direct-contact-panel>.direct-contact-actions,.premium-page #main .direct-contact-panel>.direct-contact-actions:has(>a:nth-child(3)){grid-template-columns:minmax(0,1fr)}
- .premium-page .brand-logo{width:54px;height:54px}
+ .premium-page .brand-logo{width:60px;height:60px}
  .premium-page .footer-brand-end{align-items:flex-start}
  .premium-page .footer-brand-logo{width:76px;height:76px}
  .premium-page #main .direct-contact-details{grid-template-columns:minmax(0,1fr)}
@@ -354,7 +356,7 @@ html{scroll-behavior:smooth}
 .premium-page #main .portrait-figure::before,.premium-page #main .hero-scene::before{display:none}
 .premium-page #main .portrait-figure>img,.premium-page #main .hero-scene>img{position:relative;z-index:1}
 .premium-page #main .hero-editorial,.premium-page #main .hero-portrait{align-items:stretch}
-.premium-page #main .hero-editorial .hero-copy,.premium-page #main .hero-portrait .hero-copy{display:flex;flex-direction:column;justify-content:center}
+.premium-page #main .hero-editorial .hero-copy,.premium-page #main .hero-portrait .hero-copy{display:flex;flex-direction:column;justify-content:flex-start;align-self:stretch}
 
 .premium-page .direct-contact-actions .button{min-height:58px;border-radius:var(--radius-contact)}
 .premium-page .direct-contact-actions .button svg{width:21px;height:21px}
