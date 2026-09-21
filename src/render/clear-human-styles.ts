@@ -85,7 +85,7 @@ export const clearHumanStyles = `
 .premium-page #main .hero-copy-brand-watermark{position:relative;isolation:isolate;overflow:visible;padding-inline:0}
 .premium-page #main .hero-watermark-zone{position:static;margin:0 0 4px;padding:42px 0 24px}
 .premium-page #main .hero-watermark-zone>.hero-brand-watermark{
- position:absolute;top:-26px;right:clamp(-8.5rem,-8vw,-3rem);bottom:-18px;left:clamp(-4.5rem,-5vw,-2rem);
+ position:absolute;top:0;right:clamp(-8.5rem,-8vw,-3rem);bottom:-18px;left:clamp(-4.5rem,-5vw,-2rem);
  z-index:0;width:auto;height:auto;min-height:0;margin:0;pointer-events:none;
  background:url('/assets/haeon-watermark-wave.png') center 40% / cover no-repeat;
  opacity:.82;
