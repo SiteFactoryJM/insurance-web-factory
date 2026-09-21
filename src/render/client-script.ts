@@ -1,8 +1,47 @@
 /** Customer page: navigation only. No form, tracking, contact payload, SDK or persistence. */
 export const clientScript = String.raw`
 (() => {
-  // The advanced editor still calls this hook after replacing preview sections.
-  window.initializeConsultationDemo = () => {};
+  const initializeCaseCarousels = () => {
+    document.querySelectorAll('[data-cases-carousel]').forEach(root => {
+      if (!(root instanceof HTMLElement) || root.dataset.carouselReady === 'true') return;
+      root.dataset.carouselReady = 'true';
+      const cards = [...root.querySelectorAll('[data-case-index]')];
+      const previous = root.querySelector('[data-cases-prev]');
+      const next = root.querySelector('[data-cases-next]');
+      const live = root.querySelector('[data-cases-live]');
+      if (!cards.length || !(previous instanceof HTMLButtonElement) || !(next instanceof HTMLButtonElement)) return;
+      let current = 0;
+      const classNames = ['is-prev','is-active','is-next','is-hidden-left','is-hidden-right'];
+      const update = () => {
+        cards.forEach((card, index) => {
+          let offset = (index - current + cards.length) % cards.length;
+          if (offset > Math.floor(cards.length / 2)) offset -= cards.length;
+          card.classList.remove(...classNames);
+          const state = offset === -1 ? 'is-prev' : offset === 0 ? 'is-active' : offset === 1 ? 'is-next' : offset < -1 ? 'is-hidden-left' : 'is-hidden-right';
+          card.classList.add(state);
+          card.setAttribute('aria-hidden', Math.abs(offset) > 1 ? 'true' : 'false');
+          if (offset === 0) card.setAttribute('aria-current', 'true');
+          else card.removeAttribute('aria-current');
+        });
+        const title = cards[current].querySelector('h3')?.textContent?.trim() || '';
+        if (live) live.textContent = `${String(current + 1).padStart(2, '0')} / ${String(cards.length).padStart(2, '0')} ${title}`;
+      };
+      const move = direction => {
+        current = (current + direction + cards.length) % cards.length;
+        update();
+      };
+      previous.addEventListener('click', () => move(-1));
+      next.addEventListener('click', () => move(1));
+      root.addEventListener('keydown', event => {
+        if (event.key === 'ArrowLeft') { event.preventDefault(); move(-1); }
+        if (event.key === 'ArrowRight') { event.preventDefault(); move(1); }
+      });
+      update();
+    });
+  };
+  // The advanced editor calls this hook after replacing preview sections.
+  window.initializeConsultationDemo = initializeCaseCarousels;
+  initializeCaseCarousels();
   document.addEventListener('click', event => {
     const target = event.target;
     if (!(target instanceof Element)) return;
