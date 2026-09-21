@@ -24,7 +24,7 @@ export const clientScript = String.raw`
           else card.removeAttribute('aria-current');
         });
         const title = cards[current].querySelector('h3')?.textContent?.trim() || '';
-        if (live) live.textContent = `${String(current + 1).padStart(2, '0')} / ${String(cards.length).padStart(2, '0')} ${title}`;
+        if (live) live.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(cards.length).padStart(2, '0') + ' ' + title;
       };
       const move = direction => {
         current = (current + direction + cards.length) % cards.length;
