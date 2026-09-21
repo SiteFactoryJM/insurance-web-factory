@@ -1009,6 +1009,115 @@ body[data-export-capture="true"] #main *{
  .premium-page #main .focus-grid article{padding:20px 16px}
 }
 
+/* consultation point copy/layout refresh */
+.premium-page #main .cases-marquee{
+ margin-top:22px;
+ padding-block:4px 10px;
+}
+.premium-page #main .cases-track{
+ gap:16px;
+ padding:4px 0 8px;
+}
+.premium-page #main .cases-item{
+ width:440px;
+ min-width:440px;
+ min-height:268px;
+ padding:24px 26px 22px;
+ grid-template-columns:54px minmax(0,1fr);
+ gap:16px;
+}
+.premium-page #main .cases-item.cases-cycle-start{
+ margin-left:44px;
+}
+.premium-page #main .cases-copy{
+ gap:14px;
+}
+.premium-page #main .cases-copy h3{
+ display:flex;
+ align-items:center;
+ min-height:2.55rem;
+ margin:0;
+ font-size:1.2rem;
+ line-height:1.34;
+ letter-spacing:-.04em;
+ white-space:nowrap;
+ text-wrap:nowrap;
+}
+.premium-page #main .cases-item p{
+ font-size:.98rem;
+ line-height:1.72;
+}
+.premium-page #main .cases-badge{
+ padding-top:1px;
+ font-size:1.025rem;
+ line-height:1.32;
+}
+.premium-page #main .cases-badge::before{
+ margin-bottom:8px;
+ font-size:.66rem;
+ letter-spacing:.14em;
+}
+
+@media(max-width:920px){
+ .premium-page #main .cases-item{
+  width:380px;
+  min-width:380px;
+  min-height:286px;
+  padding:22px;
+  grid-template-columns:50px minmax(0,1fr);
+  gap:14px;
+ }
+ .premium-page #main .cases-item.cases-cycle-start{
+  margin-left:34px;
+ }
+ .premium-page #main .cases-copy h3{
+  min-height:auto;
+  white-space:normal;
+  text-wrap:balance;
+ }
+}
+@media(max-width:650px){
+ .premium-page #main .cases-track{
+  gap:12px;
+ }
+ .premium-page #main .cases-item{
+  width:300px;
+  min-width:300px;
+  min-height:320px;
+  padding:20px 18px;
+  grid-template-columns:44px minmax(0,1fr);
+  gap:12px;
+ }
+ .premium-page #main .cases-item.cases-cycle-start{
+  margin-left:24px;
+ }
+ .premium-page #main .cases-copy{
+  gap:12px;
+ }
+ .premium-page #main .cases-copy h3{
+  font-size:1.08rem;
+  line-height:1.4;
+  letter-spacing:-.035em;
+ }
+ .premium-page #main .cases-item p{
+  font-size:.94rem;
+  line-height:1.68;
+ }
+}
+@media(max-width:360px){
+ .premium-page #main .cases-item{
+  width:276px;
+  min-width:276px;
+  min-height:352px;
+  padding:18px 16px;
+  grid-template-columns:42px minmax(0,1fr);
+  gap:10px;
+ }
+ .premium-page #main .cases-item.cases-cycle-start{
+  margin-left:18px;
+ }
+}
+
 /* PDF/ZIP export capture: preserve information, skip expensive decoration. */
 body[data-export-capture="true"] #main .portrait-figure::before,
 body[data-export-capture="true"] #main .hero-scene::before{
