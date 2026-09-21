@@ -167,6 +167,52 @@ test('consumer sections group headings and copy within balanced reading widths',
 });
 
 
+test('insurance scope follows services with four scan-friendly groups and no horizontal overflow', async ({ page }) => {
+  const expected = [
+    ['건강·질병', ['실손의료비', '암보험', '뇌심장보험', '수술보험', '치아보험']],
+    ['가족·돌봄', ['태아보험', '치매보험', '간병보험']],
+    ['자동차·사고', ['자동차보험', '운전자보험', '상해보험', '여행자보험']],
+    ['생활·재산', ['배상책임', '화재보험', '펫보험']],
+  ];
+
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.ready);
+
+    const section = page.locator('#insurance-scope');
+    await expect(section).toBeVisible();
+    expect(await page.locator('#specialties + #insurance-scope').count(), `scope order at ${width}px`).toBe(1);
+    expect(await section.locator('.insurance-scope-group').count()).toBe(4);
+
+    const groups = await section.locator('.insurance-scope-group').evaluateAll(items => items.map(item => ({
+      title: item.querySelector('h3')?.textContent?.trim(),
+      labels: [...item.querySelectorAll('li span')].map(label => label.textContent?.trim()),
+      overflow: item.scrollWidth > item.clientWidth,
+    })));
+    expect(groups).toEqual(expected.map(([title, labels]) => ({ title, labels, overflow: false })));
+    expect(groups.flatMap(group => group.labels)).toHaveLength(15);
+    expect(await section.evaluate(el => el.scrollWidth > el.clientWidth), `scope overflow at ${width}px`).toBe(false);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), `page overflow at ${width}px`).toBeLessThanOrEqual(width);
+  }
+
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/');
+  const alignment = await page.locator('#insurance-scope').evaluate(section => {
+    const panel = section.querySelector('.insurance-scope-panel').getBoundingClientRect();
+    const groupHeads = [...section.querySelectorAll('.insurance-scope-group-heading')].map(el => el.getBoundingClientRect().left);
+    const lists = [...section.querySelectorAll('.insurance-scope-group ul')].map(el => el.getBoundingClientRect().left);
+    return {
+      panelCenter: panel.left + panel.width / 2,
+      groupHeadSpread: Math.max(...groupHeads) - Math.min(...groupHeads),
+      listSpread: Math.max(...lists) - Math.min(...lists),
+    };
+  });
+  expect(Math.abs(alignment.panelCenter - 720)).toBeLessThanOrEqual(2);
+  expect(alignment.groupHeadSpread).toBeLessThanOrEqual(1);
+  expect(alignment.listSpread).toBeLessThanOrEqual(1);
+});
+
 test('intro principle stays concise and service rules are consistent across all five themes', async ({ page }) => {
   test.setTimeout(120000);
   const themes = ['trust-blue', 'warm-care', 'premium-navy', 'clean-minimal', 'local-friendly'];
