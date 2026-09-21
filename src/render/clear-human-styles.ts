@@ -82,13 +82,15 @@ export const clearHumanStyles = `
 .premium-page #main .brand-panel-wave{position:absolute;z-index:1;pointer-events:none}
 .premium-page #main .hero-brand-soft-panel .brand-panel-wave{right:-68px;bottom:-118px;width:290px;height:290px;border:34px solid rgba(220,181,112,.10);border-radius:50%;box-shadow:0 0 0 34px rgba(220,181,112,.055),0 0 0 68px rgba(220,181,112,.035)}
 .premium-page #main .hero-brand-gold-wave .brand-panel-wave{left:-8%;right:-8%;bottom:-112px;height:175px;border-top:1px solid rgba(212,168,92,.45);border-radius:50% 50% 0 0 / 100% 100% 0 0;transform:rotate(-2deg);box-shadow:0 -18px 0 rgba(226,194,132,.075),0 -36px 0 rgba(226,194,132,.045)}
-.premium-page #main .hero-brand-watermark{min-height:210px;margin-bottom:10px;background:linear-gradient(120deg,rgba(255,253,248,.96),rgba(250,246,237,.78))}
-.premium-page #main .hero-brand-watermark::before,.premium-page #main .hero-brand-watermark::after{content:"";position:absolute;z-index:0;pointer-events:none;left:-15%;width:130%;height:150px;border-radius:50%}
-.premium-page #main .hero-brand-watermark::before{bottom:-86px;border-top:28px solid rgba(218,177,105,.09);transform:rotate(-4deg)}
-.premium-page #main .hero-brand-watermark::after{bottom:-112px;border-top:1px solid rgba(207,161,84,.28);transform:rotate(5deg)}
-.premium-page #main .brand-watermark-art{position:absolute;inset:0;z-index:1;overflow:hidden;pointer-events:none}
-.premium-page #main .brand-watermark-mark{position:absolute;right:6%;top:-6%;width:54%;height:112%;object-fit:contain;object-position:center;opacity:.17;filter:saturate(.88)}
-.premium-page #main .brand-watermark-wordmark{position:absolute;z-index:2;right:1.5rem;top:50%;width:min(28%,14rem);height:auto;max-height:5rem;transform:translateY(-50%);object-fit:contain;opacity:.54}
+.premium-page #main .hero-copy-brand-watermark{position:relative;isolation:isolate;overflow:hidden;padding-inline:0}
+.premium-page #main .hero-copy-brand-watermark>.hero-brand-watermark{position:absolute;inset:0;z-index:0;width:100%;height:100%;min-height:100%;margin:0;overflow:hidden;pointer-events:none;background:linear-gradient(118deg,rgba(255,253,248,.98) 0%,rgba(251,246,236,.82) 46%,rgba(250,246,237,.38) 78%,rgba(250,246,237,0) 100%)}
+.premium-page #main .hero-copy-brand-watermark>.hero-brand-watermark::before,.premium-page #main .hero-copy-brand-watermark>.hero-brand-watermark::after{content:"";position:absolute;z-index:0;pointer-events:none;left:-18%;width:142%;height:42%;border-radius:50%}
+.premium-page #main .hero-copy-brand-watermark>.hero-brand-watermark::before{top:34%;border-top:30px solid rgba(218,177,105,.085);transform:rotate(-5deg);box-shadow:0 -22px 0 rgba(228,196,137,.045)}
+.premium-page #main .hero-copy-brand-watermark>.hero-brand-watermark::after{top:51%;border-top:1px solid rgba(207,161,84,.27);transform:rotate(5deg)}
+.premium-page #main .hero-copy-brand-watermark>.hero-brand-watermark .brand-watermark-art{position:absolute;inset:0;z-index:1;overflow:visible;pointer-events:none}
+.premium-page #main .hero-copy-brand-watermark>.hero-brand-watermark .brand-watermark-mark{position:absolute;right:4%;top:-3%;width:52%;height:58%;object-fit:contain;object-position:center top;opacity:.13;filter:saturate(.82)}
+.premium-page #main .hero-copy-brand-watermark>.hero-brand-watermark .brand-watermark-wordmark{position:absolute;z-index:2;right:1.5rem;top:25%;width:min(27%,13rem);height:auto;max-height:4.6rem;transform:none;object-fit:contain;opacity:.48}
+.premium-page #main .hero-copy-brand-watermark>:not(.hero-brand-watermark){position:relative;z-index:2}
 .premium-page #main .premium-hero:not(.hero-statement) .hero-copy>.eyebrow{margin-top:auto}
 .premium-page #main .hero-description{max-width:36rem;margin-top:16px;font-size:var(--ch-body);line-height:var(--ch-body-lh)}
 .premium-page #main .hero-actions{margin-top:22px;gap:12px 20px}
@@ -313,9 +315,12 @@ export const clearHumanStyles = `
  .premium-page #main .brand-panel-copy span{margin-top:9px;font-size:.62rem;letter-spacing:.18em}
  .premium-page #main .hero-brand-soft-panel .brand-panel-wave{right:-100px;bottom:-155px}
  .premium-page #main .hero-brand-gold-wave .brand-panel-wave{bottom:-135px}
- .premium-page #main .hero-brand-watermark{min-height:148px;margin-bottom:14px}
- .premium-page #main .brand-watermark-mark{right:-2%;top:-8%;width:72%;height:116%}
- .premium-page #main .brand-watermark-wordmark{right:.75rem;width:min(35%,10rem);max-height:3.5rem}
+ .premium-page #main .hero-copy-brand-watermark{position:relative;overflow:hidden;padding:18px 0 8px}
+ .premium-page #main .hero-copy-brand-watermark>.hero-brand-watermark{position:absolute;inset:0;height:100%;min-height:100%;margin:0}
+ .premium-page #main .hero-copy-brand-watermark>.hero-brand-watermark::before{top:28%;height:52%;border-top-width:22px}
+ .premium-page #main .hero-copy-brand-watermark>.hero-brand-watermark::after{top:47%;height:46%}
+ .premium-page #main .hero-copy-brand-watermark>.hero-brand-watermark .brand-watermark-mark{right:-8%;top:-3%;width:78%;height:48%;opacity:.11}
+ .premium-page #main .hero-copy-brand-watermark>.hero-brand-watermark .brand-watermark-wordmark{right:.5rem;top:15%;width:min(38%,9.5rem);max-height:3.25rem;opacity:.42}
  .premium-page #main .hero-actions{display:block}
  .premium-page #main .hero-actions>.text-link{margin-top:12px}
  .premium-page #main .hero-statement-person{flex-wrap:wrap;max-width:22.5rem}
