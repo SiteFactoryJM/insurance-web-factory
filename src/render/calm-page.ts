@@ -127,11 +127,17 @@ function consultationPrinciple(site: SiteConfig): string {
 function about(site: SiteConfig): string {
   const pattern = getDesign(site).about;
   const extraFacts = `${site.agent.registrationNumber ? `<p><strong>설계사 등록번호</strong> ${e(site.agent.registrationNumber)}</p>` : ''}${site.agent.regions.length ? `<p><strong>상담 지역</strong> ${e(site.agent.regions.join(' · '))}</p>` : ''}`;
+
+  if (pattern === 'profile') {
+    const image = `<figure class="about-portrait about-profile-portrait">${profile(site)}<figcaption class="about-profile-caption"><strong>${e(site.agent.name)}</strong><span>${e(site.agent.title)}</span></figcaption></figure>`;
+    const intro = `<div class="about-profile-content"><div class="about-heading about-profile-heading"><p class="eyebrow">담당자 소개</p><h2 id="about-title">당신의 보험,<br>누구에게 맡기시겠어요?</h2></div><div class="about-copy about-profile-copy"><div class="about-profile-lead"><p>가입은 누구나 시켜줍니다.</p><p>중요한 건 그 다음을 <strong>누가 책임지느냐 입니다.</strong></p></div><div class="about-profile-message"><p>좋은 상품을 고르는 것보다 더 중요한 건,<br>끝까지 곁에서 관리해 줄 사람이 있느냐 입니다.<br><strong>${e(site.agent.name)}이 그 한 사람이 되어 드리겠습니다.</strong></p></div><div class="about-profile-values" aria-label="상담 약속"><div class="about-profile-value"><strong>1:1</strong><span>전담 평생관리</span></div><div class="about-profile-value"><strong>정직</strong><span>강요 없는 상담</span></div><div class="about-profile-value"><strong>동행</strong><span>보험금 청구까지</span></div></div>${site.sections.career && site.career.length ? `<ul class="career-list">${site.career.map(c => `<li>${e(c)}</li>`).join('')}</ul>` : ''}${extraFacts ? `<div class="agent-meta">${extraFacts}</div>` : ''}</div></div>`;
+    return `<section class="section about-section about-section-profile" id="about" aria-labelledby="about-title"><div class="container about-grid about-profile" data-pattern="about-profile">${image}${intro}</div></section>`;
+  }
+
   const body = `<div class="about-copy"><p>${copy(site.intro.body, site.intro.mobileBody)}</p>${site.sections.career && site.career.length ? `<ul class="career-list">${site.career.map(c => `<li>${e(c)}</li>`).join('')}</ul>` : ''}${extraFacts ? `<div class="agent-meta">${extraFacts}</div>` : ''}${consultationPrinciple(site)}</div>`;
   const intro = `<div class="about-heading"><p class="eyebrow">담당자 소개</p><h2 id="about-title">${copy(naturalHeading(site.intro.title), naturalHeading(site.intro.mobileTitle))}</h2>${site.intro.philosophy && !site.intro.principleTitle ? `<p class="philosophy">${e(site.intro.philosophy)}</p>` : ''}</div>`;
-  const image = `<figure class="about-portrait">${profile(site)}<figcaption>${e(site.agent.name)} · ${e(site.agent.title)}</figcaption></figure>`;
-  const layout = pattern === 'profile' ? `${image}<div>${intro}${body}</div>` : pattern === 'quote' ? `<div class="about-quote">${intro}<blockquote>${e(site.intro.philosophy || site.intro.title)}</blockquote>${body}</div>` : `${intro}${body}`;
-  return `<section class="section about-section" id="about" aria-labelledby="about-title"><div class="container about-grid about-${pattern}" data-pattern="about-${pattern}">${layout}</div></section>`;
+  const layout = pattern === 'quote' ? `<div class="about-quote">${intro}<blockquote>${e(site.intro.philosophy || site.intro.title)}</blockquote>${body}</div>` : `${intro}${body}`;
+  return `<section class="section about-section about-section-${e(pattern)}" id="about" aria-labelledby="about-title"><div class="container about-grid about-${pattern}" data-pattern="about-${pattern}">${layout}</div></section>`;
 }
 function process(site: SiteConfig): string {
   if (!site.sections.process || !site.process.length) return '';
