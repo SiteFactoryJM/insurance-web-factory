@@ -81,37 +81,26 @@ function hero(site: SiteConfig): string {
   return `<section class="hero premium-hero hero-${pattern} container" id="home" aria-labelledby="hero-title">${visual}${lead}</section>`;
 }
 
-const INSURANCE_SCOPE_GROUPS = [
-  {
-    title: '건강·질병',
-    description: '의료비와 질병 보장을 중심으로',
-    items: ['실손의료비', '암보험', '뇌심장보험', '수술보험', '치아보험'],
-  },
-  {
-    title: '가족·돌봄',
-    description: '가족 준비와 돌봄 보장을 중심으로',
-    items: ['태아보험', '치매보험', '간병보험'],
-  },
-  {
-    title: '자동차·사고',
-    description: '운전과 이동 중 사고 위험을 중심으로',
-    items: ['자동차보험', '운전자보험', '상해보험', '여행자보험'],
-  },
-  {
-    title: '생활·재산',
-    description: '일상 속 배상과 재산 위험을 중심으로',
-    items: ['배상책임', '화재보험', '펫보험'],
-  },
+const INSURANCE_SCOPE_ROWS = [
+  ['실손의료비', '암보험', '뇌심장보험', '수술보험'],
+  ['치아보험', '태아보험', '자동차보험', '운전자보험'],
+  ['상해보험', '배상책임', '화재보험', '치매보험'],
+  ['간병보험', '펫보험', '여행자보험'],
 ] as const;
 
 function insuranceScope(): string {
-  const total = INSURANCE_SCOPE_GROUPS.reduce((count, group) => count + group.items.length, 0);
-  const groups = INSURANCE_SCOPE_GROUPS.map((group, index) => {
-    const titleId = `insurance-scope-group-${index + 1}`;
-    const items = group.items.map(item => `<li><span>${e(item)}</span></li>`).join('');
-    return `<section class="insurance-scope-group" aria-labelledby="${titleId}"><div class="insurance-scope-group-heading"><span class="insurance-scope-index" aria-hidden="true">${formatIndex(index)}</span><div><h3 id="${titleId}">${e(group.title)}</h3><p>${e(group.description)}</p></div></div><ul>${items}</ul></section>`;
+  const topics = INSURANCE_SCOPE_ROWS.flat();
+  const rows = INSURANCE_SCOPE_ROWS.map((row, rowIndex) => {
+    const items = row.map((item, itemIndex) => {
+      const index = rowIndex * 4 + itemIndex;
+      const emphasis = index % 2 === 0 ? ' is-emphasis' : '';
+      const accent = index % 3 === 0 ? ' is-accent' : '';
+      return `<li class="insurance-scope-topic${emphasis}${accent}"><span>${e(item)}</span></li>`;
+    }).join('');
+    return `<ul class="insurance-scope-row" aria-label="대표 상담 분야 ${rowIndex + 1}행">${items}</ul>`;
   }).join('');
-  return `<section class="section insurance-scope-section" id="insurance-scope" aria-labelledby="insurance-scope-title"><div class="container"><div class="section-heading"><p class="eyebrow">상담 가능 보험</p><h2 id="insurance-scope-title">“이런 것도 하나요?” 편하게 물어보세요.</h2><p class="section-support">실손부터 자동차·간병·펫·여행자보험까지, 자주 문의받는 보험 종류를 한눈에 모았습니다.</p></div><div class="insurance-scope-panel"><aside class="insurance-scope-summary" aria-label="상담 가능 보험 요약"><span class="insurance-scope-summary-label">상담 가능 보험</span><strong>${total}</strong><span class="insurance-scope-summary-unit">가지 상담 분야</span><p>찾는 보험 이름만 말씀해 주셔도 됩니다.</p></aside><div class="insurance-scope-groups">${groups}</div></div><p class="insurance-scope-note">찾는 항목이 보이지 않아도 상담 가능 범위를 먼저 확인해 드립니다.</p></div></section>`;
+
+  return `<section class="section insurance-scope-section" id="insurance-scope" aria-labelledby="insurance-scope-title" data-pattern="topic-cloud"><div class="container"><div class="section-heading insurance-scope-heading"><p class="eyebrow">대표 15가지 상담 분야</p><h2 id="insurance-scope-title">보험 이름이 떠오르면, 그대로 말씀해 주세요.</h2><p class="section-support">아래는 자주 문의받는 대표 15가지입니다. 이 외 모든 보험 종류도 상담 가능합니다.</p></div><div class="insurance-scope-cloud"><div class="insurance-scope-badge" aria-label="대표 상담 분야 ${topics.length}가지"><span>대표 상담</span><strong>${topics.length}</strong></div><div class="insurance-scope-rows">${rows}</div><div class="insurance-scope-all-note"><span class="insurance-scope-note-mark" aria-hidden="true"></span><p>15가지는 대표 예시입니다 · 그 외 모든 보험 종류도 상담 가능합니다.</p></div></div></div></section>`;
 }
 
 function services(site: SiteConfig): string {
