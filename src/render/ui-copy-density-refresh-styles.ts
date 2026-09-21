@@ -192,7 +192,7 @@ export const uiCopyDensityRefreshStyles = `
 }
 @media(max-width:650px){
  .premium-page #main .cases-section{padding:40px 0 34px}
- .premium-page #main .cases-section .container{width:min(100% - 1.5rem,35rem)}
+ .premium-page #main .cases-section .container{width:min(calc(100% - 1.5rem),35rem)}
  .premium-page #main .cases-section .cases-heading{margin:2px auto 6px}
  .premium-page #main .cases-section .cases-heading .eyebrow{margin-bottom:8px}
  .premium-page #main .cases-section .cases-heading .section-support{margin-top:8px}
@@ -204,7 +204,7 @@ export const uiCopyDensityRefreshStyles = `
  }
  .premium-page #main .cases-stage{overflow:hidden;padding:18px 0 8px}
  .premium-page #main .cases-carousel .cases-item{
-  width:min(100% - 8px,20.5rem);
+  width:min(calc(100% - 8px),20.5rem);
   padding:22px 20px 24px!important;
   border-radius:14px;
  }
