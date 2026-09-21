@@ -137,7 +137,7 @@ export const uiCopyDensityRefreshStyles = `
  .premium-page #main .insurance-scope-group{grid-template-columns:minmax(0,10.5rem) minmax(0,1fr)}
  .premium-page #main .insurance-scope-group-heading{grid-template-columns:28px minmax(0,1fr);gap:10px;padding:20px 16px}
  .premium-page #main .insurance-scope-group ul{grid-template-columns:repeat(2,minmax(0,1fr))}
- .premium-page #main .insurance-scope-group li{border-top:1px solid var(--line)}
+ .premium-page #main .insurance-scope-group li:nth-child(n){border-top:1px solid var(--line)}
  .premium-page #main .insurance-scope-group li:nth-child(-n+2){border-top:0}
 }
 @media(max-width:650px){
