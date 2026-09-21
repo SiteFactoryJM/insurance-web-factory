@@ -41,7 +41,15 @@ test('all five hero layouts show Instagram instead of the service shortcut and k
   for (const width of [390, 768, 1440]) for (const theme of themes) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`/?theme=${theme}`);
-    await expect(page.locator('.hero-actions [data-contact-link="instagram"]')).toHaveText(/인스타그램/);
+    const instagram = page.locator('.hero-actions [data-contact-link="instagram"]');
+    await expect(instagram).toHaveText(/인스타그램/);
+    await expect(instagram).toHaveClass(/direct-instagram/);
+    await expect(page.locator('.hero-brand-logo img')).toBeVisible();
+    await expect(page.locator('.hero-topics')).toContainText('청구서비스');
+    await expect(page.locator('.hero-topics')).toContainText('청구 금액 확인');
+    await expect(page.locator('.hero-topics')).toContainText('부지급된 보험금 확인');
+    await expect(page.locator('.hero-topics')).toContainText('자동차사고');
+    await expect(page.locator('.hero-topics')).toContainText('배상책임사고');
     await expect(page.locator('.hero-actions')).not.toContainText('상담 분야 보기');
     const layout = await page.locator('.premium-hero').evaluate(hero => {
       const visual = hero.querySelector('.hero-visual');
