@@ -380,6 +380,108 @@ export const clearHumanStyles = `
 .premium-page #main .direct-contact-panel>.support-note,.premium-page #main .direct-contact-panel>.demo-contact-notice{margin:0;text-align:left;font-size:var(--ch-small);line-height:var(--ch-small-lh)}
 .premium-page #main .direct-contact-panel>.demo-contact-notice{margin-top:14px}
 
+/* 리쿠르트: 연락 섹션 바로 아래에서 소개, 핵심 3가지, 담당자 연락을 한 패널로 묶습니다. */
+.premium-page #main .recruit-section{
+ position:relative;isolation:isolate;overflow:hidden;padding-block:72px 64px;
+ background:linear-gradient(180deg,var(--paper) 0%,color-mix(in srgb,var(--paper) 92%,#EAD9BC 8%) 100%);
+ border-top:1px solid var(--line);
+}
+.premium-page #main .recruit-section::before{
+ content:"";position:absolute;z-index:-2;inset:-5% -8% auto 24%;height:420px;pointer-events:none;
+ background:url('/assets/haeon-watermark-wave.png') center top / cover no-repeat;opacity:.11;
+ -webkit-mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.82) 52%,transparent 100%);
+ mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.82) 52%,transparent 100%);
+}
+.premium-page #main .recruit-section::after{
+ content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;
+ background:radial-gradient(circle at 82% 8%,rgba(214,178,112,.12),transparent 34%);
+}
+.premium-page #main .recruit-shell{position:relative;min-width:0}
+.premium-page #main .recruit-heading{max-width:58rem;margin:0 0 30px 28px;text-align:left}
+.premium-page #main .recruit-kicker{
+ display:flex;align-items:center;gap:18px;margin:0 0 18px;font-size:var(--ch-small);line-height:1.4;
+ font-weight:700;letter-spacing:.05em;color:var(--ink);
+}
+.premium-page #main .recruit-kicker::after{content:"";display:block;width:112px;height:1px;background:var(--muted);opacity:.7}
+.premium-page #main .recruit-heading h2{margin:0;font-size:clamp(2.3rem,4.2vw,3.55rem);line-height:1.2;letter-spacing:-.045em}
+.premium-page #main .recruit-lead{margin:18px 0 0;font-size:1.35rem;line-height:1.55;font-weight:700;color:var(--ink)}
+.premium-page #main .recruit-support{margin:14px 0 0;font-size:1.125rem;line-height:1.7;color:var(--muted)}
+.premium-page #main .recruit-panel{
+ display:grid;grid-template-columns:minmax(14rem,.9fr) minmax(0,1.5fr) minmax(19rem,1fr);
+ min-width:0;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--surface) 94%,transparent);
+ box-shadow:0 20px 50px rgba(29,36,45,.05);overflow:hidden;
+}
+.premium-page #main .recruit-intro,.premium-page #main .recruit-list,.premium-page #main .recruit-contact{min-width:0}
+.premium-page #main .recruit-intro{padding:44px 36px;border-right:1px solid var(--line)}
+.premium-page #main .recruit-intro-mark{display:block;width:24px;height:2px;margin:0 0 30px;background:var(--ink)}
+.premium-page #main .recruit-intro h3{margin:0;font-size:clamp(1.75rem,2.3vw,2.2rem);line-height:1.45}
+.premium-page #main .recruit-intro-lead{margin:28px 0 0;font-size:1.22rem;line-height:1.6;color:var(--muted)}
+.premium-page #main .recruit-intro-copy{margin:26px 0 0;font-size:1rem;line-height:1.75;color:var(--muted)}
+.premium-page #main .recruit-list{list-style:none;margin:0;padding:28px 42px;border-right:1px solid var(--line)}
+.premium-page #main .recruit-list li{display:grid;grid-template-columns:56px minmax(0,1fr);gap:18px;padding:26px 0;border-bottom:1px solid var(--line)}
+.premium-page #main .recruit-list li:last-child{border-bottom:0}
+.premium-page #main .recruit-number{padding-top:2px;font-size:1.45rem;line-height:1.5;font-weight:700;color:var(--muted)}
+.premium-page #main .recruit-list h3{margin:0;font-size:1.25rem;line-height:1.55}
+.premium-page #main .recruit-list p{margin:8px 0 0;font-size:1rem;line-height:1.72;color:var(--muted);overflow-wrap:anywhere}
+.premium-page #main .recruit-contact{padding:34px 34px 28px}
+.premium-page #main .recruit-contact-eyebrow{margin:0 0 12px;font-size:.95rem;line-height:1.5;font-weight:600;color:var(--ink)}
+.premium-page #main .recruit-contact>h3{margin:0;font-size:clamp(1.75rem,2.35vw,2.15rem);line-height:1.4}
+.premium-page #main .recruit-contact-person{
+ display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;align-items:center;margin:24px 0 20px;
+ padding-top:14px;border-top:1px solid var(--line);
+}
+.premium-page #main .recruit-contact-avatar{
+ display:block;width:48px;height:48px;border-radius:50%;object-fit:cover;object-position:50% 16%;border:1px solid var(--line);background:var(--paper);
+}
+.premium-page #main .recruit-contact-person strong{display:block;font-size:1.05rem;line-height:1.55;color:var(--ink);overflow-wrap:anywhere}
+.premium-page #main .recruit-contact-person p{margin:6px 0 0;font-size:.92rem;line-height:1.65;color:var(--muted)}
+.premium-page #main .recruit-contact-links{display:grid;gap:8px}
+.premium-page #main .recruit-contact-link{
+ display:grid;grid-template-columns:28px minmax(0,1fr) auto auto;gap:12px;align-items:center;min-width:0;min-height:54px;
+ padding:0 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);text-decoration:none;
+ transition:border-color .2s ease,transform .2s ease,background-color .2s ease;
+}
+.premium-page #main .recruit-contact-link:hover{border-color:var(--accent);transform:translateY(-1px)}
+.premium-page #main .recruit-contact-link:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.premium-page #main .recruit-contact-icon{display:grid;place-items:center;width:28px;height:28px;color:var(--ink)}
+.premium-page #main .recruit-contact-label{min-width:0;font-size:1rem;line-height:1.45;font-weight:700;overflow-wrap:anywhere}
+.premium-page #main .recruit-contact-meta{font-size:.9rem;line-height:1.45;color:var(--muted);white-space:nowrap}
+.premium-page #main .recruit-contact-chevron{display:grid;place-items:center;color:var(--muted)}
+.premium-page #main .recruit-contact-footer{
+ display:flex;flex-wrap:wrap;gap:6px 10px;margin:22px 0 0;font-size:.84rem;line-height:1.55;color:var(--muted);
+}
+@media(max-width:980px){
+ .premium-page #main .recruit-heading{margin-left:0}
+ .premium-page #main .recruit-panel{grid-template-columns:1fr}
+ .premium-page #main .recruit-intro,.premium-page #main .recruit-list{border-right:0;border-bottom:1px solid var(--line)}
+ .premium-page #main .recruit-list{padding:18px 36px}
+ .premium-page #main .recruit-contact{padding:34px 36px}
+}
+@media(max-width:650px){
+ .premium-page #main .recruit-section{padding-block:48px}
+ .premium-page #main .recruit-section::before{inset:-2% -45% auto 2%;height:300px;opacity:.08}
+ .premium-page #main .recruit-heading{margin-bottom:24px}
+ .premium-page #main .recruit-heading h2{font-size:clamp(2rem,9vw,2.45rem)}
+ .premium-page #main .recruit-lead{font-size:1.16rem}
+ .premium-page #main .recruit-support{font-size:1rem}
+ .premium-page #main .recruit-panel{border-radius:10px}
+ .premium-page #main .recruit-intro{padding:30px 24px}
+ .premium-page #main .recruit-intro-mark{margin-bottom:22px}
+ .premium-page #main .recruit-list{padding:8px 24px}
+ .premium-page #main .recruit-list li{grid-template-columns:42px minmax(0,1fr);gap:10px;padding:22px 0}
+ .premium-page #main .recruit-number{font-size:1.15rem}
+ .premium-page #main .recruit-contact{padding:28px 24px 24px}
+ .premium-page #main .recruit-contact-meta{display:none}
+ .premium-page #main .recruit-contact-link{grid-template-columns:28px minmax(0,1fr) auto}
+ .premium-page #main .recruit-contact-person{grid-template-columns:44px minmax(0,1fr)}
+ .premium-page #main .recruit-contact-avatar{width:44px;height:44px}
+}
+@media(max-width:380px){
+ .premium-page #main .recruit-kicker{gap:12px}
+ .premium-page #main .recruit-kicker::after{width:72px}
+ .premium-page #main .recruit-intro,.premium-page #main .recruit-list,.premium-page #main .recruit-contact{padding-left:18px;padding-right:18px}
+}
+
 .premium-page #main .location-section{text-align:center}
 .premium-page #main .location-section h2{max-width:48rem;margin-inline:auto;font-size:1.25rem;line-height:1.6}
 .premium-page #main .location-section .text-link{margin-top:20px}

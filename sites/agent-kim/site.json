@@ -125,7 +125,8 @@
     "reviews": false,
     "faq": true,
     "location": true,
-    "contactForm": false
+    "contactForm": false,
+    "recruitment": true
   },
   "seo": {
     "title": "보험 상담 안내",

@@ -3,7 +3,7 @@ import { escapeHtml as e, safeUrl } from '../utils/html.js';
 import { responsiveCopy as copy } from './copy.js';
 import { getDesign } from './design-system.js';
 import { formatIndex, renderContactButtons, renderContactForm } from './shared.js';
-import { directPhoneHref } from '../utils/contact-links.js';
+import { directPhoneHref, instagramProfileUrl, openChatUrl } from '../utils/contact-links.js';
 import { icon } from '../utils/icons.js';
 
 const profile = (site: SiteConfig, className = '', eager = false) => `<img class="${className}" src="${e(site.agent.profileImage || '/assets/profile-placeholder.svg')}" alt="${e(site.agent.name || '담당자')} 프로필" width="600" height="800" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'}>`;
@@ -203,9 +203,42 @@ function casesTicker(site: SiteConfig): string {
   const initialClass = (index: number) => index === 0 ? 'is-active' : index === 1 ? 'is-next' : index === items.length - 1 ? 'is-prev' : index >= items.length - 2 ? 'is-hidden-left' : 'is-hidden-right';
   return `<section class="section cases-section" id="cases" aria-labelledby="cases-title"><div class="container cases-shell"><div class="section-heading cases-heading"><p class="eyebrow">상담 포인트</p><h2 id="cases-title">많이 확인하는 내용을 먼저 훑어보세요.</h2><p class="section-support">자주 고르는 질문을 정리해 어떤 내용을 확인하는지 한눈에 볼 수 있습니다.</p></div><div class="cases-carousel" data-cases-carousel role="region" aria-roledescription="carousel" aria-label="상담 포인트 7가지"><button class="cases-nav cases-nav-prev" type="button" data-cases-prev aria-label="이전 상담 포인트" aria-controls="cases-list"><span class="cases-nav-mark" aria-hidden="true"></span></button><div class="cases-stage"><ol class="cases-list" id="cases-list">${items.map((item, i) => `<li class="cases-item ${initialClass(i)}" data-case-index="${i}" role="group" aria-roledescription="slide" aria-label="${i + 1} / ${items.length}"${i > 1 && i < items.length - 1 ? ' aria-hidden="true"' : ''}><span class="cases-badge">POINT ${String(i + 1).padStart(2, '0')}</span><div class="cases-copy"><h3 class="${item.singleLine ? 'cases-title-single' : ''}">${e(item.title)}</h3><p>${e(item.body)}</p></div></li>`).join('')}</ol></div><button class="cases-nav cases-nav-next" type="button" data-cases-next aria-label="다음 상담 포인트" aria-controls="cases-list"><span class="cases-nav-mark" aria-hidden="true"></span></button><p class="cases-live" data-cases-live aria-live="polite">01 / 07 ${e(items[0].title)}</p></div></div></section>`;
 }
+function recruitment(site: SiteConfig): string {
+  if (!site.sections.recruitment) return '';
+
+  const phone = directPhoneHref(site.contact.phone);
+  const kakao = openChatUrl(site.contact.kakaoUrl);
+  const instagram = instagramProfileUrl(site.contact.instagramUrl);
+  const agentName = site.agent.name?.trim() || '담당자';
+  const role = [site.agent.company?.trim(), site.agent.title?.trim()].filter(Boolean).join(' ');
+  const contactRows = [
+    phone ? `<a class="recruit-contact-link" data-contact-link="phone" href="${e(phone)}"><span class="recruit-contact-icon">${icon('phone', 22)}</span><span class="recruit-contact-label">전화 문의하기</span><span class="recruit-contact-meta">${e(site.contact.phone)}</span><span class="recruit-contact-chevron">${icon('chevron', 18)}</span></a>` : '',
+    kakao ? `<a class="recruit-contact-link" data-contact-link="kakao" href="${e(kakao)}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="recruit-contact-icon">${icon('message', 22)}</span><span class="recruit-contact-label">카카오톡 오픈채팅</span><span class="recruit-contact-chevron">${icon('chevron', 18)}</span></a>` : '',
+    instagram ? `<a class="recruit-contact-link" data-contact-link="instagram" href="${e(instagram)}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="recruit-contact-icon">${icon('instagram', 22)}</span><span class="recruit-contact-label">인스타그램</span><span class="recruit-contact-chevron">${icon('chevron', 18)}</span></a>` : '',
+  ].join('');
+
+  const items = [
+    {
+      title: '처음이어도 괜찮습니다',
+      body: '경력이 없어도 됩니다. 기초 교육부터 현장 동행까지, 한 단계씩 함께 만들어 갑니다.',
+    },
+    {
+      title: '정직하게 오래 가는 일',
+      body: '일회성이 아닌, 고객을 평생 관리하는 방식으로 오래 멀리 가는 일을 배웁니다.',
+    },
+    {
+      title: '노력한 만큼의 소득',
+      body: '나이·학력보다 태도와 꾸준함이 인정받고, 노력한 만큼 정당하게 보상받는 구조입니다.',
+    },
+  ];
+
+  return `<section class="section recruit-section" id="recruit" aria-labelledby="recruit-title"><div class="container recruit-shell"><header class="recruit-heading"><p class="recruit-kicker">RECRUIT</p><h2 id="recruit-title">함께 성장할 동료를 찾습니다.</h2><p class="recruit-lead">혼자 가면 빨리 가지만, 함께 가면 멀리 갑니다.</p><p class="recruit-support">보험이라는 일을 제대로 배우고 정직하게 오래 하고 싶은 분이라면,<br>${e(agentName)}과 함께 시작해 보세요.</p></header><div class="recruit-panel"><div class="recruit-intro"><span class="recruit-intro-mark" aria-hidden="true"></span><h3>이런 분과<br>함께하고 싶습니다.</h3><p class="recruit-intro-lead">좋은 사람과의 만남이<br>더 좋은 내일을 만듭니다.</p><p class="recruit-intro-copy">서로에게 힘이 되는 동료와 함께,<br>지금보다 더 큰 성장을 만들어가고 싶습니다.</p></div><ol class="recruit-list">${items.map((item, index) => `<li><span class="recruit-number">${formatIndex(index)}</span><div><h3>${e(item.title)}</h3><p>${e(item.body)}</p></div></li>`).join('')}</ol><aside class="recruit-contact" aria-label="리쿠르트 문의"><p class="recruit-contact-eyebrow">언제든 편하게 연락주세요.</p><h3>좋은 인연이<br>좋은 내일을 만듭니다.</h3><div class="recruit-contact-person">${profile(site, 'recruit-contact-avatar')}<div><strong>${e(agentName)} <span aria-hidden="true">·</span> ${e(role || '보험설계사')}</strong><p>궁금한 점이 있다면, 편한 방법으로 문의해 주세요.<br>빠르고 친절하게 답변드리겠습니다.</p></div></div><div class="recruit-contact-links">${contactRows}</div><p class="recruit-contact-footer">${e(site.contact.availableHours || '상담 시간은 담당자에게 확인해 주세요.')}<span aria-hidden="true">|</span>부담 갖지 말고 편하게 연락주세요.</p></aside></div></div></section>`;
+}
+
 function contact(site: SiteConfig): string {
   const channels = site.contact.instagramUrl ? '전화·카카오톡·인스타그램' : '전화와 카카오톡 오픈채팅';
-  return `<section class="section contact-section" id="contact" aria-labelledby="contact-title"><div class="container contact-grid"><div class="contact-copy"><p class="eyebrow">연락 방법</p><h2 id="contact-title">편한 방법으로 바로 문의하세요.</h2><p>${channels} 중 편한 방법을 선택하세요.</p></div>${renderContactForm(site)}</div></section>`;
+  const contactSection = `<section class="section contact-section" id="contact" aria-labelledby="contact-title"><div class="container contact-grid"><div class="contact-copy"><p class="eyebrow">연락 방법</p><h2 id="contact-title">편한 방법으로 바로 문의하세요.</h2><p>${channels} 중 편한 방법을 선택하세요.</p></div>${renderContactForm(site)}</div></section>`;
+  return `${contactSection}${recruitment(site)}`;
 }
 
 export function renderCalmPage(site: SiteConfig): string {
