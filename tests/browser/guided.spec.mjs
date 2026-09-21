@@ -124,7 +124,7 @@ test('actual-info step shows three brand samples, previews them immediately and 
     const style=getComputedStyle(background);
     return {backgroundImage:style.backgroundImage,position:style.position,titleInside:title.top>=zone.top&&title.bottom<=zone.bottom,descriptionBelow:description.top>=zone.bottom-2};
    });
-   expect(geometry.backgroundImage).toContain('haeon-watermark-wave.svg');
+   expect(geometry.backgroundImage).toContain('haeon-watermark-wave.png');
    expect(geometry.position).toBe('absolute');
    expect(geometry.titleInside).toBe(true);
    expect(geometry.descriptionBelow).toBe(true);
