@@ -69,7 +69,7 @@ function hero(site: SiteConfig): string {
   const eyebrow = `<p class="eyebrow"><span class="small-line" aria-hidden="true"></span>${e(site.hero.eyebrow || '보험 상담 안내')}</p>`;
   const title = `<h1 id="hero-title">${copy(naturalHeading(site.hero.headline || '가입한 보험, 무엇부터 확인할까요?'), naturalHeading(site.hero.mobileHeadline))}</h1>`;
   const brandLead = brandLayout === 'watermark' ? `<div class="hero-watermark-zone">${heroBrand}${eyebrow}${title}</div>` : `${heroBrand}${eyebrow}${title}`;
-  const lead = `<div class="hero-copy hero-copy-brand-${e(brandLayout)}">${brandLead}<p class="hero-description">${copy(site.hero.subheadline, site.hero.mobileSubheadline)}</p>${topicChips ? `<div class="hero-topics" aria-label="주요 상담 분야">${topicChips}</div>` : ''}<div class="hero-actions">${renderContactButtons(site)}</div><p class="hero-note">상담은 가입 신청과 별개입니다.${site.hero.trustNote ? `<br>${e(site.hero.trustNote)}` : ''}</p></div>`;
+  const lead = `<div class="hero-copy hero-copy-brand-${e(brandLayout)}">${brandLead}<p class="hero-description">${copy(site.hero.subheadline, site.hero.mobileSubheadline)}</p>${topicChips ? `<div class="hero-topics" aria-label="주요 상담 분야">${topicChips}</div>` : ''}<div class="hero-actions">${renderContactButtons(site)}</div><p class="hero-note">상담은 가입 신청과 별개입니다.${site.hero.trustNote ? ` ${e(site.hero.trustNote)}` : ''}</p></div>`;
   let visual: string;
   if (pattern === 'editorial') {
     visual = `<div class="hero-visual"><figure class="hero-scene"><img src="${e(site.hero.image || site.agent.profileImage || '/assets/profile-placeholder.svg')}" alt="${site.hero.image ? '' : e(`${site.agent.name || '담당자'} 프로필`)}" width="1536" height="1024" fetchpriority="high"></figure>${adviserCard(site)}</div>`;
