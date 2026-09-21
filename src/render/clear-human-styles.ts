@@ -251,7 +251,8 @@ export const clearHumanStyles = `
 @media(max-width:900px){
  .premium-page #main .container{width:min(1120px,calc(100% - 3rem))}
  .premium-page #main .section{padding-block:32px}
- .premium-page #main .premium-hero:not(.hero-statement){grid-template-columns:minmax(18rem,21rem) minmax(0,1fr);gap:32px;padding-block:40px}
+ .premium-page #main .premium-hero:not(.hero-statement){grid-template-columns:minmax(0,1fr);gap:28px;padding-block:40px}
+ .premium-page #main .premium-hero:not(.hero-statement) .hero-visual{max-width:21rem;justify-self:start}
  .premium-page #main .hero-statement{padding-block:40px}
  .premium-page #main .services-cards[data-count],.premium-page #main .services-split[data-count]{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px}
  .premium-page #main .services-cards[data-count] .service-card,

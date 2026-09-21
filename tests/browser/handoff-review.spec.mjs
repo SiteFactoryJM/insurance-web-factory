@@ -56,7 +56,7 @@ test('all five hero layouts show Instagram instead of the service shortcut and k
       };
     });
     expect(layout.visualFirst, `${theme} at ${width}px DOM order`).toBe(true);
-    if (width <= 650 || layout.statement) expect(layout.visual.top, `${theme} at ${width}px vertical order`).toBeLessThan(layout.copy.top);
+    if (width <= 900 || layout.statement) expect(layout.visual.top, `${theme} at ${width}px vertical order`).toBeLessThan(layout.copy.top);
     else expect(layout.visual.left, `${theme} at ${width}px horizontal order`).toBeLessThan(layout.copy.left);
     expect(await page.evaluate(() => document.documentElement.scrollWidth), `${theme} at ${width}px page fit`).toBeLessThanOrEqual(width);
   }
