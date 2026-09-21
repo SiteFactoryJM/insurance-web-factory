@@ -112,17 +112,22 @@ test('actual-info step shows three brand samples, previews them immediately and 
   await expect(page.locator(`.g-brand-section [data-brand-layout="${id}"]`)).toHaveAttribute('aria-pressed','true');
   const feature=preview(page).locator(`.hero-brand-feature[data-brand-layout="${id}"]`);
   await expect(feature).toBeVisible();
-  await expect(feature.locator('img').first()).toBeVisible();
-  if(tagline){await expect(feature).toContainText(tagline);await expect(feature).toContainText(subline);}
-  else{
-   await expect(feature.locator('.brand-watermark-mark')).toHaveCount(1);await expect(feature.locator('.brand-watermark-wordmark')).toHaveCount(1);
-   const overlap=await preview(page).locator('.hero-copy-brand-watermark').evaluate(copy=>{
-    const background=copy.querySelector('.hero-brand-watermark').getBoundingClientRect();
+  if(tagline){
+   await expect(feature.locator('img').first()).toBeVisible();
+   await expect(feature).toContainText(tagline);await expect(feature).toContainText(subline);
+  }else{
+   const geometry=await preview(page).locator('.hero-copy-brand-watermark').evaluate(copy=>{
+    const zone=copy.querySelector('.hero-watermark-zone').getBoundingClientRect();
+    const background=copy.querySelector('.hero-brand-watermark');
     const title=copy.querySelector('h1').getBoundingClientRect();
-    const actions=copy.querySelector('.hero-actions').getBoundingClientRect();
-    return {position:getComputedStyle(copy.querySelector('.hero-brand-watermark')).position,titleInside:title.top>=background.top&&title.bottom<=background.bottom,actionsInside:actions.top>=background.top&&actions.bottom<=background.bottom};
+    const description=copy.querySelector('.hero-description').getBoundingClientRect();
+    const style=getComputedStyle(background);
+    return {backgroundImage:style.backgroundImage,position:style.position,titleInside:title.top>=zone.top&&title.bottom<=zone.bottom,descriptionBelow:description.top>=zone.bottom-2};
    });
-   expect(overlap.position).toBe('absolute');expect(overlap.titleInside).toBe(true);expect(overlap.actionsInside).toBe(true);
+   expect(geometry.backgroundImage).toContain('haeon-watermark-wave.webp');
+   expect(geometry.position).toBe('absolute');
+   expect(geometry.titleInside).toBe(true);
+   expect(geometry.descriptionBelow).toBe(true);
   }
  }
  await page.locator('.g-brand-section [data-brand-layout="gold-wave"]').click();
