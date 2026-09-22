@@ -40,7 +40,7 @@ export interface SiteConfig {
   templateContent?: Partial<Record<TemplateId, TemplateContent>>;
   contentBrief?: { purpose?: string; targetAudience?: string; primaryAction?: string; };
   agent: { name: string; title: string; company: string; branch?: string; registrationNumber?: string; businessNumber?: string; careerYears?: number; regions: string[]; profileImage: string; logoImage?: string; logoMarkImage?: string; };
-  hero: { eyebrow?: string; headline: string; subheadline: string; mobileHeadline?: string; mobileSubheadline?: string; primaryCtaLabel: string; secondaryCtaLabel: string; trustNote?: string; image?: string; brandLayout?: HeroBrandLayout; brandTagline?: string; brandSubline?: string; };
+  hero: { eyebrow?: string; headline: string; subheadline: string; mobileHeadline?: string; mobileSubheadline?: string; primaryCtaLabel: string; secondaryCtaLabel: string; trustNote?: string; image?: string; brandLayout?: HeroBrandLayout; brandTagline?: string; brandSubline?: string; certificationBadgeImage?: string; certificationBadgeAlt?: string; };
   intro: { title: string; body: string; mobileTitle?: string; mobileBody?: string; philosophy?: string; principleTitle?: string; principleBody?: string; principleLayout?: IntroPrincipleLayout; };
   specialties: ContentCard[]; process: ContentCard[]; career: string[]; reviews?: ReviewItem[]; faqs: FaqItem[];
   consultation?: { topics: string[] };

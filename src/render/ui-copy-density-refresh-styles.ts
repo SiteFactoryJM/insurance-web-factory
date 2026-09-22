@@ -1,6 +1,31 @@
 export const uiCopyDensityRefreshStyles = `
 /* UI copy-density refresh: calmer hierarchy, less dead space, and clearer grouping. */
 
+.premium-page #main .hero-copy{position:relative}
+.premium-page #main .hero-certification-badge{
+ display:block;
+ width:7.5rem;
+ height:auto;
+ margin:16px 0 10px auto;
+ object-fit:contain;
+}
+@media(min-width:1180px){
+ .premium-page #main .hero-certification-badge{
+  position:absolute;
+  z-index:2;
+  right:-1.5rem;
+  bottom:2.5rem;
+  width:8.75rem;
+  margin:0;
+ }
+}
+@media(max-width:650px){
+ .premium-page #main .hero-certification-badge{
+  width:7rem;
+  margin:16px auto 10px;
+ }
+}
+
 /* Consulting point carousel: three-card spatial flow with readable Korean copy. */
 .premium-page #main .cases-section{
  padding:52px 0 40px;
@@ -488,7 +513,7 @@ export const uiCopyDensityRefreshStyles = `
 
 /* Adviser introduction: reference composition with portrait, narrative and three promises. */
 .premium-page #main .about-section-profile{
- padding-block:38px!important;
+ padding-block:32px!important;
  background:var(--tint);
 }
 .premium-page #main .about-profile{
@@ -496,7 +521,7 @@ export const uiCopyDensityRefreshStyles = `
  grid-template-columns:minmax(15.5rem,18.25rem) minmax(0,33rem);
  justify-content:center;
  align-items:start;
- gap:32px;
+ gap:26px;
  width:min(100%,55rem);
  max-width:55rem;
  margin-inline:auto;
@@ -537,7 +562,7 @@ export const uiCopyDensityRefreshStyles = `
 }
 .premium-page #main .about-profile-content{
  min-width:0;
- padding:1px 0 0 18px;
+ padding:1px 0 0 10px;
 }
 .premium-page #main .about-profile-heading{
  max-width:none;
@@ -545,7 +570,7 @@ export const uiCopyDensityRefreshStyles = `
  text-align:left;
 }
 .premium-page #main .about-profile-heading .eyebrow{
- margin:0 0 12px;
+ margin:0 0 8px;
  font-size:.875rem;
  line-height:1.45;
  font-weight:700;
@@ -555,7 +580,7 @@ export const uiCopyDensityRefreshStyles = `
 .premium-page #main .about-profile-heading h2{
  margin:0;
  max-width:29rem;
- font-size:clamp(1.78rem,2.2vw,2.08rem);
+ font-size:clamp(1.68rem,2vw,1.95rem);
  line-height:1.18;
  font-weight:760;
  letter-spacing:-.05em;
@@ -565,7 +590,7 @@ export const uiCopyDensityRefreshStyles = `
 .premium-page #main .about-profile-copy{
  width:100%;
  max-width:none;
- margin:18px 0 0;
+ margin:14px 0 0;
  padding:0;
  text-align:left;
  border:0;
@@ -574,8 +599,8 @@ export const uiCopyDensityRefreshStyles = `
 .premium-page #main .about-profile-message p{
  max-width:none;
  margin:0;
- font-size:1.0625rem;
- line-height:1.76;
+ font-size:1rem;
+ line-height:1.68;
  letter-spacing:-.022em;
  color:var(--muted);
 }
@@ -586,15 +611,15 @@ export const uiCopyDensityRefreshStyles = `
  color:var(--ink);
 }
 .premium-page #main .about-profile-message{
- margin-top:13px;
- padding-top:13px;
+ margin-top:10px;
+ padding-top:10px;
  border-top:1px solid var(--line);
 }
 .premium-page #main .about-profile-values{
  display:grid;
  grid-template-columns:repeat(3,minmax(0,1fr));
  width:min(100%,29.5rem);
- margin-top:22px;
+ margin-top:16px;
  margin-left:-10px;
 }
 .premium-page #main .about-profile-values.adviser-principle{
@@ -602,6 +627,19 @@ export const uiCopyDensityRefreshStyles = `
  max-width:none;
  padding:0;
  border:0;
+}
+.premium-page #main .about-profile-values-with-career{
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ width:min(100%,34rem);
+ margin-left:0;
+ row-gap:12px;
+}
+.premium-page #main .about-profile-values-with-career .about-profile-value:nth-child(3){
+ border-left:0;
+}
+.premium-page #main .about-profile-values-with-career .about-profile-value:nth-child(n+3){
+ padding-top:12px;
+ border-top:1px solid var(--line);
 }
 .premium-page #main .about-profile-principle-copy{
  position:absolute;
@@ -626,7 +664,7 @@ export const uiCopyDensityRefreshStyles = `
 }
 .premium-page #main .about-profile-value strong{
  display:block;
- font-size:1.45rem;
+ font-size:1.3rem;
  line-height:1.25;
  font-weight:760;
  letter-spacing:-.035em;
@@ -634,8 +672,8 @@ export const uiCopyDensityRefreshStyles = `
 }
 .premium-page #main .about-profile-value span{
  display:block;
- margin-top:4px;
- font-size:.9375rem;
+ margin-top:3px;
+ font-size:.875rem;
  line-height:1.45;
  letter-spacing:-.025em;
  color:var(--ink);
@@ -650,7 +688,7 @@ export const uiCopyDensityRefreshStyles = `
  .premium-page #main .about-profile .about-profile-heading,
  .premium-page #main .about-profile-lead,
  .premium-page #main .about-profile-message{
-  margin-left:24px;
+  margin-left:14px;
  }
  .premium-page #main .about-profile-message{
   margin-top:13px;
@@ -704,6 +742,14 @@ export const uiCopyDensityRefreshStyles = `
   line-height:1.4;
   white-space:normal;
   word-break:keep-all;
+ }
+}
+@media(max-width:520px){
+ .premium-page #main .about-profile-values-with-career{
+  row-gap:14px;
+ }
+ .premium-page #main .about-profile-values-with-career .about-profile-value:nth-child(n+3){
+  padding-top:14px;
  }
 }
 `;

@@ -104,6 +104,8 @@ export function validateDesignConfiguration(site) {
   }
   if (site.agent?.businessNumber !== undefined && (typeof site.agent.businessNumber !== "string" || Array.from(site.agent.businessNumber).length > 80)) issues.push("agent.businessNumber는 80자 이내여야 합니다.");
   if (site.hero?.image !== undefined && typeof site.hero.image !== "string") issues.push("hero.image는 이미지 경로 문자열이어야 합니다.");
+  if (site.hero?.certificationBadgeImage !== undefined && typeof site.hero.certificationBadgeImage !== "string") issues.push("hero.certificationBadgeImage는 이미지 경로 문자열이어야 합니다.");
+  if (site.hero?.certificationBadgeAlt !== undefined && (typeof site.hero.certificationBadgeAlt !== "string" || !site.hero.certificationBadgeAlt.trim() || Array.from(site.hero.certificationBadgeAlt).length > 100)) issues.push("hero.certificationBadgeAlt는 100자 이내의 대체 텍스트여야 합니다.");
   return issues;
 }
 

@@ -58,7 +58,7 @@ export const clearHumanStyles = `
 .premium-page .direct-kakao:hover{background:var(--kakao-hover);color:var(--kakao-ink);border-color:var(--kakao-line)}
 .premium-page .direct-instagram{background:linear-gradient(135deg,#76596F 0%,#966278 48%,#AE6C76 72%,#BE7968 100%);color:#fff;border-color:#966278}
 .premium-page .direct-instagram:hover{background:linear-gradient(135deg,#684E62 0%,#85566A 48%,#9A6068 72%,#AA6B5C 100%);color:#fff;border-color:#85566A}
-.premium-page .brand-logo{width:80px;height:80px;object-fit:contain;flex:0 0 auto}
+.premium-page .brand-logo{width:96px;height:96px;object-fit:contain;flex:0 0 auto}
 .premium-page .site-footer .direct-phone{border-color:#B9C4CE;background:transparent;color:#fff}
 .premium-page .site-footer .direct-phone:hover{background:#243347;border-color:#B9C4CE}
 
@@ -648,7 +648,7 @@ export const clearHumanStyles = `
  .premium-page #main .contact-person{margin-top:20px}
  .premium-page #main .direct-contact-panel{padding:22px 18px}
  .premium-page #main .direct-contact-panel>.direct-contact-actions,.premium-page #main .direct-contact-panel>.direct-contact-actions:has(>a:nth-child(3)){grid-template-columns:minmax(0,1fr)}
- .premium-page .brand-logo{width:60px;height:60px}
+ .premium-page .brand-logo{width:72px;height:72px}
  .premium-page .footer-brand-end{align-items:flex-start}
  .premium-page .footer-brand-logo{width:76px;height:76px}
  .premium-page #main .direct-contact-details{grid-template-columns:minmax(0,1fr)}
