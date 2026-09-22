@@ -37,10 +37,21 @@ test('Kim Daekyung badge is a solid standalone image and the watermark cannot cr
   await page.setViewportSize({width:1265,height:1000});
   await page.goto('/?site=20260922-kimdaekyung');
   const badge=page.locator('.hero-certification-badge');
+  const badgeRow=page.locator('.hero-certification-badge-row');
   await expect(badge).toBeVisible();
+  await expect(badgeRow).toHaveCSS('position','absolute');
+  await expect(badgeRow).toHaveCSS('z-index','3');
   await expect(badge).toHaveCSS('position','static');
   await expect(badge).toHaveCSS('opacity','1');
   await expect(badge).toHaveCSS('filter','none');
+  const badgeBox=await badge.boundingBox();
+  expect(badgeBox).not.toBeNull();
+  for(const item of await page.locator('.hero-topics span,.hero-actions a,.hero-note').all()){
+    const box=await item.boundingBox();
+    if(!box) continue;
+    const overlaps=badgeBox.x<box.x+box.width&&badgeBox.x+badgeBox.width>box.x&&badgeBox.y<box.y+box.height&&badgeBox.y+badgeBox.height>box.y;
+    expect(overlaps).toBe(false);
+  }
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(1265);
 });
 

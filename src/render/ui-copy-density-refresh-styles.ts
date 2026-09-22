@@ -3,9 +3,12 @@ export const uiCopyDensityRefreshStyles = `
 
 .premium-page #main .hero-copy{position:relative}
 .premium-page #main .hero-certification-badge-row{
+ position:relative;
+ z-index:3;
  display:flex;
  justify-content:flex-end;
  margin:18px 0 10px;
+ pointer-events:none;
 }
 .premium-page #main .hero-certification-badge{
  display:block;
@@ -16,6 +19,15 @@ export const uiCopyDensityRefreshStyles = `
  opacity:1;
  filter:none;
  mix-blend-mode:normal;
+}
+@media(min-width:901px){
+ .premium-page #main .hero-certification-badge-row{
+  position:absolute;
+  right:0;
+  bottom:1.5rem;
+  width:auto;
+  margin:0;
+ }
 }
 @media(max-width:650px){
  .premium-page #main .hero-certification-badge-row{justify-content:center;margin:16px 0 10px}
