@@ -2,17 +2,27 @@ export const uiCopyDensityRefreshStyles = `
 /* UI copy-density refresh: calmer hierarchy, less dead space, and clearer grouping. */
 
 .premium-page #main .hero-copy{position:relative}
+.premium-page #main .hero-visual{position:relative}
+.premium-page #main .hero-visual .portrait-figure,
+.premium-page #main .hero-visual .hero-scene{position:relative}
 .premium-page #main .hero-certification-badge-row{
- position:relative;
+ position:absolute;
+ top:1rem;
+ right:auto;
+ left:1rem;
  z-index:3;
  display:flex;
- justify-content:flex-end;
- margin:18px 0 10px;
+ margin:0;
+ padding:.45rem;
+ border:1px solid rgba(20,75,61,.12);
+ border-radius:.75rem;
+ background:rgba(255,255,255,.92);
+ box-shadow:0 .4rem 1.25rem rgba(16,39,31,.12);
  pointer-events:none;
 }
-.premium-page #main .hero-certification-badge{
+.premium-page #main .hero-visual .hero-certification-badge{
  display:block;
- width:7.5rem;
+ width:6rem;
  height:auto;
  margin:0;
  object-fit:contain;
@@ -26,11 +36,7 @@ export const uiCopyDensityRefreshStyles = `
  }
  .premium-page #main .premium-hero:not(.hero-statement):has(.hero-certification-badge) .hero-copy-brand-watermark{
   padding-left:4rem;
-  overflow:visible;
- }
- .premium-page #main .hero-copy-brand-watermark:has(.hero-certification-badge) .hero-watermark-zone>.hero-brand-watermark{
-  right:calc((100vw - min(1120px, calc(100vw - 3rem))) / -2);
-  background-position:calc(50% - 1rem) 40%;
+  overflow:hidden;
  }
  .premium-page #main .premium-hero:not(.hero-statement):has(.hero-certification-badge) .portrait-figure{
   overflow:hidden;
@@ -39,27 +45,15 @@ export const uiCopyDensityRefreshStyles = `
   transform:scale(1.08);
   transform-origin:50% 35%;
  }
- .premium-page #main .hero-certification-badge-row{
-  position:absolute;
-  right:0;
-  bottom:1.5rem;
-  width:auto;
-  margin:0;
- }
 }
 @media(min-width:901px) and (max-width:1399px){
- .premium-page #main .hero-copy-brand-watermark:has(.hero-certification-badge) .hero-actions .button{
+ .premium-page #main .premium-hero:has(.hero-certification-badge) .hero-copy-brand-watermark .hero-actions .button{
   padding-inline:1.125rem;
- }
- .premium-page #main .hero-copy-brand-watermark:has(.hero-certification-badge) .hero-certification-badge-row{
-  right:.75rem;
-  bottom:2.5rem;
  }
 }
 @media(max-width:650px){
- .premium-page #main .hero-certification-badge-row{justify-content:center;margin:16px 0 10px}
- .premium-page #main .hero-certification-badge{
-  width:7rem;
+ .premium-page #main .hero-visual .hero-certification-badge{
+  width:5rem;
  }
 }
 
@@ -722,6 +716,9 @@ export const uiCopyDensityRefreshStyles = `
 }
 
 @media(min-width:801px){
+ .premium-page:has(.hero-certification-badge) #main .about-profile-values-with-career{
+  margin-left:-2.5rem;
+ }
  .premium-page #main .about-profile .about-profile-heading,
  .premium-page #main .about-profile-lead,
  .premium-page #main .about-profile-message{

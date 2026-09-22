@@ -33,35 +33,61 @@ test('Kim Daekyung template keeps the Kim Gyeonghyeon structure and changes only
   await expect(preview(page).locator('#recruit')).toBeVisible();
 });
 
-test('Kim Daekyung badge is a solid standalone image and the watermark cannot create horizontal overflow',async({page})=>{
-  await page.setViewportSize({width:1265,height:1000});
+test('Kim Daekyung badge stays inside the portrait while the watermark remains aligned',async({page})=>{
+  await page.setViewportSize({width:1046,height:866});
+  await page.goto('/?site=agent-kim');
+  const referenceWatermark=await page.locator('.hero-watermark-zone>.hero-brand-watermark').evaluate(element=>{
+    const style=getComputedStyle(element);
+    return {backgroundPosition:style.backgroundPosition,backgroundSize:style.backgroundSize,opacity:style.opacity,maskImage:style.maskImage};
+  });
   await page.goto('/?site=20260922-kimdaekyung');
   const badge=page.locator('.hero-certification-badge');
   const badgeRow=page.locator('.hero-certification-badge-row');
   const hero=page.locator('#home');
   const heroCopy=page.locator('#home .hero-copy');
+  const portraitFigure=page.locator('#home .portrait-figure');
   const portrait=page.locator('#home .portrait-figure>img');
   const watermark=page.locator('.hero-watermark-zone>.hero-brand-watermark');
+  const profileValues=page.locator('#about .about-profile-values-with-career');
   await expect(badge).toBeVisible();
   await expect(hero).toHaveCSS('column-gap','24px');
   await expect(heroCopy).toHaveCSS('padding-left','64px');
-  await expect(heroCopy).toHaveCSS('overflow','visible');
+  await expect(heroCopy).toHaveCSS('overflow','hidden');
   await expect(portrait).toHaveCSS('transform',/matrix\(1\.08, 0, 0, 1\.08,/);
-  await expect(watermark).toHaveCSS('background-position-x','calc(50% - 16px)');
+  const deployedWatermark=await watermark.evaluate(element=>{
+    const style=getComputedStyle(element);
+    return {backgroundPosition:style.backgroundPosition,backgroundSize:style.backgroundSize,opacity:style.opacity,maskImage:style.maskImage};
+  });
+  expect(deployedWatermark).toEqual(referenceWatermark);
+  await expect(profileValues).toHaveCSS('margin-left','-40px');
   await expect(badgeRow).toHaveCSS('position','absolute');
+  await expect(badgeRow).toHaveCSS('top','16px');
+  await expect(badgeRow).toHaveCSS('left','16px');
   await expect(badgeRow).toHaveCSS('z-index','3');
   await expect(badge).toHaveCSS('position','static');
+  await expect(badge).toHaveCSS('width','96px');
   await expect(badge).toHaveCSS('opacity','1');
   await expect(badge).toHaveCSS('filter','none');
   const badgeBox=await badge.boundingBox();
+  const portraitFigureBox=await portraitFigure.boundingBox();
+  const heroCopyBox=await heroCopy.boundingBox();
+  const watermarkBox=await watermark.boundingBox();
   expect(badgeBox).not.toBeNull();
+  expect(portraitFigureBox).not.toBeNull();
+  expect(heroCopyBox).not.toBeNull();
+  expect(watermarkBox).not.toBeNull();
+  expect(watermarkBox.y).toBeCloseTo((await page.locator('#home .hero-visual').boundingBox()).y,0);
+  expect(badgeBox.x).toBeGreaterThanOrEqual(portraitFigureBox.x);
+  expect(badgeBox.y).toBeGreaterThanOrEqual(portraitFigureBox.y);
+  expect(badgeBox.x+badgeBox.width).toBeLessThanOrEqual(portraitFigureBox.x+portraitFigureBox.width);
+  expect(badgeBox.y+badgeBox.height).toBeLessThanOrEqual(portraitFigureBox.y+portraitFigureBox.height);
   for(const item of await page.locator('.hero-topics span,.hero-actions a,.hero-note').all()){
     const box=await item.boundingBox();
     if(!box) continue;
     const overlaps=badgeBox.x<box.x+box.width&&badgeBox.x+badgeBox.width>box.x&&badgeBox.y<box.y+box.height&&badgeBox.y+badgeBox.height>box.y;
     expect(overlaps).toBe(false);
   }
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(1265);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(1046);
 });
 
 test('information settings update the fixed preview immediately',async({page})=>{
