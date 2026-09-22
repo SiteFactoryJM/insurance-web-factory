@@ -8,6 +8,7 @@
     "generate": "node scripts/generate-registry.mjs",
     "validate:sites": "node scripts/validate-sites.mjs",
     "intake:import": "node scripts/import-intake.mjs",
+    "basic:import": "node scripts/import-basic-intake.mjs",
     "intake:build": "node scripts/build-intake-workbook.mjs",
     "domains:generate": "node scripts/generate-wrangler-domains.mjs",
     "typecheck": "tsc --noEmit",

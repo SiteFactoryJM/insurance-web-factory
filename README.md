@@ -34,6 +34,19 @@ npm run test:e2e
 npm run preview
 ```
 
+## 기본정보 엑셀 일괄 등록
+
+`기본정보_작성양식.xlsx` 파일들을 한 폴더에 모으고, 각 양식의 `사진 파일명`과 같은 사진 파일들을 별도 폴더에 모읍니다. 사진 파일명에는 반드시 작성자 이름이 포함되어야 합니다.
+
+```bash
+npm run basic:import -- "D:\incoming\excel" "D:\incoming\photos" dry-run
+npm run basic:import -- "D:\incoming\excel" "D:\incoming\photos"
+```
+
+이름, 휴대폰 번호, 소속, 사진 파일명은 필수입니다. 팩스번호, 이메일, 상담시간, 인스타그램, 오픈카카오톡, 직함, 주소, 희망 도메인은 작성된 경우에만 반영합니다. 수정 요청사항과 가비아 아이디·비밀번호는 자동 등록에 사용하지 않습니다.
+
+등록된 사이트는 `draft`와 `noindex` 상태로 생성됩니다. 스크립트가 사진을 `public/sites/<id>/`로 복사하고 `sites/<id>/site.json`을 만든 뒤 사이트 레지스트리 생성과 설정 검증까지 실행합니다. 실제 공개는 문구와 준법 확인 후 별도로 진행합니다.
+
 `npm run check`는 사이트 레지스트리와 제작 화면 번들을 생성하고 설정·타입·단위 테스트를 실행합니다. `src/generated/sites.generated.ts`와 `public/assets/guided-studio.js`는 직접 수정하지 않습니다.
 
 제작 화면과 고객 페이지는 같은 `renderSitePage()`와 작업 파일 v2 형식을 사용합니다. v1 작업 파일은 불러올 때 v2로 옮기며, 오픈채팅 이외의 카카오 링크는 수정해야 합니다. 새 저장·가져오기는 게시 권한과 기존 심의번호를 초기화한 작업본입니다. 파일 내보내기는 브라우저 안에서만 처리되며 서버 업로드·자동 전송·자동 공개를 하지 않습니다.
