@@ -288,6 +288,18 @@ export const clearHumanStyles = `
  font-size:1.125rem;line-height:1.7;
 }
 @media(max-width:900px){
+ .premium-page #main .premium-hero:not(.hero-statement){
+  grid-template-columns:minmax(0,1fr);
+  justify-items:center;
+ }
+ .premium-page #main .premium-hero:not(.hero-statement) .hero-visual{
+  justify-self:center;
+  margin-inline:auto;
+ }
+ .premium-page #main .premium-hero:not(.hero-statement) .hero-copy{
+  width:100%;
+  max-width:42rem;
+ }
  .premium-page #main .promise-panel{padding:2.25rem 2rem}
  .premium-page #main .promise-grid{column-gap:2rem}
 }
