@@ -82,7 +82,7 @@ export const clearHumanStyles = `
 .premium-page #main .brand-panel-wave{position:absolute;z-index:1;pointer-events:none}
 .premium-page #main .hero-brand-soft-panel .brand-panel-wave{right:-68px;bottom:-118px;width:290px;height:290px;border:34px solid rgba(220,181,112,.10);border-radius:50%;box-shadow:0 0 0 34px rgba(220,181,112,.055),0 0 0 68px rgba(220,181,112,.035)}
 .premium-page #main .hero-brand-gold-wave .brand-panel-wave{left:-8%;right:-8%;bottom:-112px;height:175px;border-top:1px solid rgba(212,168,92,.45);border-radius:50% 50% 0 0 / 100% 100% 0 0;transform:rotate(-2deg);box-shadow:0 -18px 0 rgba(226,194,132,.075),0 -36px 0 rgba(226,194,132,.045)}
-.premium-page #main .hero-copy-brand-watermark{position:relative;isolation:isolate;overflow:visible;padding-inline:0}
+.premium-page #main .hero-copy-brand-watermark{position:relative;isolation:isolate;overflow:hidden;padding-inline:0}
 .premium-page #main .hero-watermark-zone{position:static;margin:0 0 4px;padding:42px 0 24px}
 .premium-page #main .hero-watermark-zone>.hero-brand-watermark{
  position:absolute;top:0;right:clamp(-8.5rem,-8vw,-3rem);bottom:-18px;left:clamp(-4.5rem,-5vw,-2rem);
@@ -606,7 +606,7 @@ export const clearHumanStyles = `
  .premium-page #main .brand-panel-copy span{margin-top:9px;font-size:.62rem;letter-spacing:.18em}
  .premium-page #main .hero-brand-soft-panel .brand-panel-wave{right:-100px;bottom:-155px}
  .premium-page #main .hero-brand-gold-wave .brand-panel-wave{bottom:-135px}
- .premium-page #main .hero-copy-brand-watermark{position:relative;overflow:visible;padding:0}
+ .premium-page #main .hero-copy-brand-watermark{position:relative;overflow:hidden;padding:0}
  .premium-page #main .hero-watermark-zone{margin-bottom:2px;padding:26px 0 18px}
  .premium-page #main .hero-watermark-zone>.hero-brand-watermark{
   top:-12px;right:-20px;bottom:auto;left:-20px;height:clamp(320px,105vw,430px);

@@ -11,15 +11,37 @@ async function start(page){
   await expect(preview(page).locator('body')).toHaveAttribute('data-layout','warm-care');
 }
 
-test('studio exposes only fixed-layout settings and keeps the current page structure',async({page})=>{
+test('studio exposes the reusable Kim templates and keeps their shared page structure',async({page})=>{
   await start(page);
-  await expect(page.locator('[data-template]')).toHaveCount(0);
+  await expect(page.locator('[data-custom-template]')).toHaveCount(1);
+  await expect(page.locator('[data-custom-template] option')).toHaveText(['김경현 템플릿','김대경 템플릿']);
   await expect(page.locator('[data-purpose]')).toHaveCount(0);
   await expect(page.locator('[name="copy-choice"]')).toHaveCount(0);
-  await expect(page.getByText('레이아웃: warm-care')).toBeVisible();
+  await expect(page.getByText(/공통 구조: warm-care/)).toBeVisible();
   await expect(preview(page).locator('body')).toHaveAttribute('data-heading-font','noto-sans-kr');
   await expect(preview(page).locator('.hero-brand-watermark')).toBeVisible();
   await expect(preview(page).locator('#recruit')).toBeVisible();
+});
+
+test('Kim Daekyung template keeps the Kim Gyeonghyeon structure and changes only the color preset',async({page})=>{
+  await start(page);
+  await page.locator('[data-custom-template]').selectOption('kim-daekyung');
+  await expect(page.locator('[data-field="palette"]')).toHaveValue('forest');
+  await expect(preview(page).locator('body')).toHaveAttribute('data-layout','warm-care');
+  await expect(preview(page).locator('body')).toHaveAttribute('data-palette','forest');
+  await expect(preview(page).locator('.brand')).toContainText('김경현');
+  await expect(preview(page).locator('#recruit')).toBeVisible();
+});
+
+test('Kim Daekyung badge is a solid standalone image and the watermark cannot create horizontal overflow',async({page})=>{
+  await page.setViewportSize({width:1265,height:1000});
+  await page.goto('/?site=20260922-kimdaekyung');
+  const badge=page.locator('.hero-certification-badge');
+  await expect(badge).toBeVisible();
+  await expect(badge).toHaveCSS('position','static');
+  await expect(badge).toHaveCSS('opacity','1');
+  await expect(badge).toHaveCSS('filter','none');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(1265);
 });
 
 test('information settings update the fixed preview immediately',async({page})=>{
@@ -71,6 +93,8 @@ test('site.json download contains edited values and fixed design contract',async
   expect(json.headingFont).toBe('noto-sans-kr');
   expect(json.hero.brandLayout).toBe('watermark');
   expect(json.sections.recruitment).toBe(true);
+  expect(json.footer.note).toBe('');
+  expect(json.footer.hideInstagram).toBe(true);
   expect(json.design).toBeUndefined();
 });
 

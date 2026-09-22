@@ -2,6 +2,7 @@ import type { SiteConfig } from '../types.js';
 import { jsonForHtml } from '../utils/html.js';
 import { fontStylesheetLinks } from './fonts.js';
 import { PALETTES } from './design-system.js';
+import { CUSTOM_STUDIO_TEMPLATES } from '../studio/custom-templates.js';
 
 export const guidedStyles = `
 :root{font-family:'Noto Sans KR','Pretendard Variable',Pretendard,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#172a3d;background:#f5f6f7;font-size:16px;line-height:1.6}
@@ -19,9 +20,13 @@ const paletteOptions = Object.entries(PALETTES)
   .map(([id, palette]) => `<option value="${id}">${palette.name}</option>`)
   .join('');
 
+const customTemplateOptions = Object.entries(CUSTOM_STUDIO_TEMPLATES)
+  .map(([id, template]) => `<option value="${id}">${template.name}</option>`)
+  .join('');
+
 export function renderGuidedStudioPage(site: SiteConfig): string {
-  return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><title>보험 페이지 설정</title>${fontStylesheetLinks(['noto-sans-kr'])}<style>${guidedStyles}</style></head><body><div class="s-app"><header class="s-top"><strong>보험 페이지 설정</strong><a href="/?site=${encodeURIComponent(site.id)}">현재 페이지 열기 ↗</a></header><main class="s-layout"><section class="s-editor"><div class="s-intro"><p class="kicker">FIXED LAYOUT</p><h1>색상과 정보만 바꾸는 설정 화면</h1><p>디자인·문구·레이아웃 선택은 제거했습니다. 현재 페이지 구조를 기준으로 값만 바꾸고 바로 미리봅니다.</p></div>
-<section class="s-section"><h2>고정 디자인</h2><div class="s-fixed">레이아웃: warm-care · 글꼴: Noto Sans KR · 워터마크: 해온 기본 · 리쿠르트 포함</div></section>
+  return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><title>보험 페이지 설정</title>${fontStylesheetLinks(['noto-sans-kr'])}<style>${guidedStyles}</style></head><body><div class="s-app"><header class="s-top"><strong>보험 페이지 설정</strong><a href="/?site=${encodeURIComponent(site.id)}">현재 페이지 열기 ↗</a></header><main class="s-layout"><section class="s-editor"><div class="s-intro"><p class="kicker">CUSTOM TEMPLATES</p><h1>검증된 제작본을 골라 쓰는 설정 화면</h1><p>김경현·김대경 템플릿을 선택하고 담당자 정보와 색상을 바꿔 바로 미리봅니다.</p></div>
+<section class="s-section"><h2>커스텀 템플릿</h2><label class="s-field"><span>기준 제작본</span><select data-custom-template>${customTemplateOptions}</select><small id="custom-template-description"></small></label><div class="s-fixed">공통 구조: warm-care · Noto Sans KR · 해온 워터마크 · 리쿠르트 포함</div></section>
 <section class="s-section"><h2>색상</h2><label class="s-field"><span>색상 팔레트</span><select data-field="palette">${paletteOptions}</select></label></section>
 <section class="s-section"><h2>담당자 정보</h2><div class="s-row"><label class="s-field"><span>이름</span><input data-field="agent.name" autocomplete="off"></label><label class="s-field"><span>직함</span><input data-field="agent.title" autocomplete="off"></label></div><label class="s-field"><span>소속</span><input data-field="agent.company" autocomplete="off"></label><label class="s-field"><span>프로필 사진</span><input type="file" accept="image/png,image/jpeg,image/webp" data-image="profile"><small>선택하면 미리보기에서만 바로 반영됩니다.</small></label></section>
 <section class="s-section"><h2>연락처</h2><div class="s-row"><label class="s-field"><span>전화번호</span><input data-field="contact.phone" autocomplete="off"></label><label class="s-field"><span>상담 시간</span><input data-field="contact.availableHours" autocomplete="off"></label></div><label class="s-field"><span>카카오톡 오픈채팅 URL</span><input data-field="contact.kakaoUrl" autocomplete="off"></label><label class="s-field"><span>인스타그램 URL</span><input data-field="contact.instagramUrl" autocomplete="off"></label><div class="s-row"><label class="s-field"><span>이메일</span><input data-field="contact.email" autocomplete="off"></label><label class="s-field"><span>팩스</span><input data-field="contact.fax" autocomplete="off"></label></div><label class="s-field"><span>주소</span><input data-field="contact.officeAddress" autocomplete="off"></label></section>

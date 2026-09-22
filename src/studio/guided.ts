@@ -1,26 +1,13 @@
 import { PALETTE_IDS, type PaletteId, type SiteConfig } from '../types.js';
 import { renderSitePage } from '../render/page.js';
+import { applyCustomStudioTemplate, CUSTOM_STUDIO_TEMPLATES, enforceCustomStudioStructure, inferCustomStudioTemplate, isCustomStudioTemplateId, type CustomStudioTemplateId } from './custom-templates.js';
 
 const bootstrap = document.getElementById('guided-bootstrap');
 if (!bootstrap?.textContent) throw new Error('설정 데이터를 찾지 못했습니다.');
 const original = JSON.parse(bootstrap.textContent) as SiteConfig;
 
-function clone<T>(value: T): T {
-  return typeof structuredClone === 'function' ? structuredClone(value) : JSON.parse(JSON.stringify(value)) as T;
-}
-
-function fixedSite(source: SiteConfig): SiteConfig {
-  const next = clone(source);
-  next.template = 'warm-care';
-  next.headingFont = 'noto-sans-kr';
-  next.design = undefined;
-  next.hero = { ...next.hero, brandLayout: 'watermark' };
-  next.sections = { ...next.sections, recruitment: true };
-  next.demo = { ...(next.demo || { enabled: true }), enabled: true, allowTemplateSwitch: false, submissionMode: 'discard' };
-  return next;
-}
-
-let site = fixedSite(original);
+let selectedCustomTemplate: CustomStudioTemplateId = inferCustomStudioTemplate(original);
+let site = applyCustomStudioTemplate(original, selectedCustomTemplate);
 let device: 'desktop' | 'mobile' = 'desktop';
 let renderTimer = 0;
 
@@ -53,6 +40,10 @@ function syncForm(): void {
     const value = path === 'palette' ? (site.palette || '') : getNested(site as unknown as Record<string, any>, path);
     input.value = value;
   });
+  const customTemplate = document.querySelector<HTMLSelectElement>('[data-custom-template]');
+  if (customTemplate) customTemplate.value = selectedCustomTemplate;
+  const customTemplateDescription = document.getElementById('custom-template-description');
+  if (customTemplateDescription) customTemplateDescription.textContent = CUSTOM_STUDIO_TEMPLATES[selectedCustomTemplate].description;
   document.querySelectorAll<HTMLInputElement>('input[type=file]').forEach((input) => { input.value = ''; });
 }
 
@@ -99,6 +90,16 @@ document.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-field]').
     }
     renderPreview();
   });
+});
+
+document.querySelector<HTMLSelectElement>('[data-custom-template]')?.addEventListener('input', (event) => {
+  const value = (event.currentTarget as HTMLSelectElement).value;
+  if (!isCustomStudioTemplateId(value)) return;
+  selectedCustomTemplate = value;
+  site = applyCustomStudioTemplate(site, selectedCustomTemplate);
+  syncForm();
+  scheduleStatus(`${CUSTOM_STUDIO_TEMPLATES[selectedCustomTemplate].name} 적용됨`);
+  renderPreview();
 });
 
 async function fileToDataUrl(file: File): Promise<string> {
@@ -150,19 +151,15 @@ document.querySelector<HTMLButtonElement>('[data-action=close]')?.addEventListen
 });
 
 document.querySelector<HTMLButtonElement>('[data-action=reset]')?.addEventListener('click', () => {
-  site = fixedSite(original);
+  selectedCustomTemplate = inferCustomStudioTemplate(original);
+  site = applyCustomStudioTemplate(original, selectedCustomTemplate);
   syncForm();
   scheduleStatus('원래 값으로 되돌렸습니다.');
   renderPreview();
 });
 
 document.querySelector<HTMLButtonElement>('[data-action=download]')?.addEventListener('click', () => {
-  const output = clone(site);
-  output.template = 'warm-care';
-  output.headingFont = 'noto-sans-kr';
-  output.design = undefined;
-  output.hero = { ...output.hero, brandLayout: 'watermark' };
-  output.sections = { ...output.sections, recruitment: true };
+  const output = enforceCustomStudioStructure(site);
   const blob = new Blob([JSON.stringify(output, null, 2) + '\n'], { type: 'application/json;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');

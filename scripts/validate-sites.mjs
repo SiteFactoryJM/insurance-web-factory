@@ -98,6 +98,10 @@ export function validateDesignConfiguration(site) {
   if (site.footer !== undefined) {
     if (!site.footer || typeof site.footer !== "object" || Array.isArray(site.footer)) issues.push("footer는 하단입력 설정 객체여야 합니다.");
     else for (const [key, value] of Object.entries(site.footer)) {
+      if (key === "hideInstagram") {
+        if (typeof value !== "boolean") issues.push("footer.hideInstagram: true 또는 false를 입력하세요.");
+        continue;
+      }
       const limit = key === "heading" ? 80 : key === "note" ? 400 : 0;
       if (!limit || typeof value !== "string" || Array.from(value).length > limit) issues.push(`footer.${key}: ${limit || "지원되는"}자 이내의 문구를 입력하세요.`);
     }

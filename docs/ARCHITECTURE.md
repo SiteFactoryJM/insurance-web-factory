@@ -23,14 +23,15 @@ site.json → generated registry → site resolver → renderSitePage
 
 `handleConsultation()`는 이전 API 주소를 안전하게 종료하는 호환 핸들러입니다. HTTP 410과 안내만 반환합니다. 기존 `Env.DB`, `CONSULTATION_WEBHOOK_URL` 선언 및 마이그레이션은 호환/이력으로 남지만 이 핸들러가 사용하지 않습니다. DB 삭제·보유자료 정리는 별도 운영 정책입니다.
 
-## 고정 디자인 설정 화면
+## 커스텀 템플릿 설정 화면
 
-- `src/render/guided-studio-page.ts`: 색상과 담당자/연락처/이미지 입력, PC·모바일 미리보기 UI.
-- `src/studio/guided.ts`: 입력값을 현재 `SiteConfig`에 반영하고 공통 `renderSitePage()`로 즉시 다시 렌더링합니다.
-- 디자인은 `warm-care`, 글꼴은 `noto-sans-kr`, 메인 브랜드 연출은 `watermark`, 리쿠르트 섹션은 활성 상태로 고정합니다.
+- `src/render/guided-studio-page.ts`: 커스텀 템플릿, 색상과 담당자/연락처/이미지 입력, PC·모바일 미리보기 UI.
+- `src/studio/custom-templates.ts`: 검증된 실제 제작본의 구조·색상을 재사용 가능한 프리셋으로 관리합니다. 담당자 개인정보와 자격 이미지는 복사하지 않습니다.
+- `src/studio/guided.ts`: 선택한 프리셋과 입력값을 현재 `SiteConfig`에 반영하고 공통 `renderSitePage()`로 즉시 다시 렌더링합니다.
+- 김경현 템플릿과 김대경 포레스트 템플릿은 모두 `warm-care`, `noto-sans-kr`, `watermark`, 리쿠르트 활성 구조를 공유합니다. 김대경 템플릿은 색상만 포레스트 그린으로 바꿉니다.
 - 좌상단 로고는 `agent.logoImage`, 푸터 로고는 `agent.logoMarkImage`를 사용합니다.
 - 해온 워터마크는 `/assets/haeon-watermark-wave.png`를 기본 자산으로 사용하며 설정 화면에서 교체하지 않습니다.
-- 저장은 현재 설정을 `site.json`으로 내려받는 단순 작업입니다. PDF/ZIP 인계, 목적별 추천 문구, 레이아웃 선택, 문구 라이브러리 편집은 설정 화면에서 제공하지 않습니다.
+- 저장은 현재 설정을 `site.json`으로 내려받는 단순 작업입니다. PDF/ZIP 인계, 목적별 추천 문구, 자유 레이아웃 편집, 문구 라이브러리 편집은 설정 화면에서 제공하지 않습니다.
 
 ## 편집 저장과 게시 경계
 

@@ -2,27 +2,25 @@ export const uiCopyDensityRefreshStyles = `
 /* UI copy-density refresh: calmer hierarchy, less dead space, and clearer grouping. */
 
 .premium-page #main .hero-copy{position:relative}
+.premium-page #main .hero-certification-badge-row{
+ display:flex;
+ justify-content:flex-end;
+ margin:18px 0 10px;
+}
 .premium-page #main .hero-certification-badge{
  display:block;
  width:7.5rem;
  height:auto;
- margin:16px 0 10px auto;
+ margin:0;
  object-fit:contain;
-}
-@media(min-width:1180px){
- .premium-page #main .hero-certification-badge{
-  position:absolute;
-  z-index:2;
-  right:-1.5rem;
-  bottom:2.5rem;
-  width:8.75rem;
-  margin:0;
- }
+ opacity:1;
+ filter:none;
+ mix-blend-mode:normal;
 }
 @media(max-width:650px){
+ .premium-page #main .hero-certification-badge-row{justify-content:center;margin:16px 0 10px}
  .premium-page #main .hero-certification-badge{
   width:7rem;
-  margin:16px auto 10px;
  }
 }
 

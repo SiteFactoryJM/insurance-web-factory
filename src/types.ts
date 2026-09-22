@@ -36,7 +36,7 @@ export interface SiteConfig {
   id: string; status: PublishStatus; domains: string[]; template: TemplateId; accentColor?: string; headingFont: HeadingFont;
   palette?: PaletteId;
   design?: SiteDesign;
-  footer?: { heading?: string; note?: string; };
+  footer?: { heading?: string; note?: string; hideInstagram?: boolean; };
   templateContent?: Partial<Record<TemplateId, TemplateContent>>;
   contentBrief?: { purpose?: string; targetAudience?: string; primaryAction?: string; };
   agent: { name: string; title: string; company: string; branch?: string; registrationNumber?: string; businessNumber?: string; careerYears?: number; regions: string[]; profileImage: string; logoImage?: string; logoMarkImage?: string; };

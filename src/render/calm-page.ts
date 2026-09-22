@@ -68,7 +68,7 @@ function hero(site: SiteConfig): string {
   const brandLayout = site.hero.brandLayout || 'soft-panel';
   const heroBrand = heroBrandFeature(site);
   const certificationBadge = site.hero.certificationBadgeImage?.trim()
-    ? `<img class="hero-certification-badge" src="${e(site.hero.certificationBadgeImage)}" alt="${e(site.hero.certificationBadgeAlt?.trim() || '우수인증설계사 인증 마크')}" width="224" height="216" loading="lazy">`
+    ? `<div class="hero-certification-badge-row"><img class="hero-certification-badge" src="${e(site.hero.certificationBadgeImage)}" alt="${e(site.hero.certificationBadgeAlt?.trim() || '우수인증설계사 인증 마크')}" width="224" height="216" loading="lazy"></div>`
     : '';
   const eyebrow = `<p class="eyebrow"><span class="small-line" aria-hidden="true"></span>${e(site.hero.eyebrow || '보험 상담 안내')}</p>`;
   const title = `<h1 id="hero-title">${copy(naturalHeading(site.hero.headline || '가입한 보험, 무엇부터 확인할까요?'), naturalHeading(site.hero.mobileHeadline))}</h1>`;
