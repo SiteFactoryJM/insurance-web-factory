@@ -23,6 +23,7 @@ export const uiCopyDensityRefreshStyles = `
  margin:10px auto 0;
  text-wrap:pretty;
 }
+.premium-page #main .cases-section{overflow:hidden}
 .premium-page #main .cases-carousel{
  --case-step:clamp(17.5rem,26vw,20.5rem);
  position:relative;
