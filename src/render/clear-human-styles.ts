@@ -596,7 +596,7 @@ export const clearHumanStyles = `
  .premium-page #main .section{padding-block:40px}
  .premium-page #main .section-heading{margin-bottom:22px}
  .premium-page #main .premium-hero:not(.hero-statement),.premium-page #main .hero-statement{grid-template-columns:minmax(0,1fr);gap:24px;padding-block:32px}
- .premium-page #main .hero-visual{max-width:none;justify-self:stretch}
+ .premium-page #main .premium-hero:not(.hero-statement) .hero-visual{width:100%;max-width:none;justify-self:stretch;margin-inline:0}
  .premium-page #main .hero-brand-feature{min-height:0;margin-bottom:20px}
  .premium-page #main .hero-brand-soft-panel,.premium-page #main .hero-brand-gold-wave{grid-template-columns:minmax(0,1fr);gap:14px;padding:20px 18px}
  .premium-page #main .brand-panel-logo img{width:min(100%,18rem);max-height:6.75rem}
