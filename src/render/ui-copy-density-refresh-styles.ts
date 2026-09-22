@@ -21,12 +21,39 @@ export const uiCopyDensityRefreshStyles = `
  mix-blend-mode:normal;
 }
 @media(min-width:901px){
+ .premium-page #main .premium-hero:not(.hero-statement):has(.hero-certification-badge){
+  gap:1.5rem;
+ }
+ .premium-page #main .premium-hero:not(.hero-statement):has(.hero-certification-badge) .hero-copy-brand-watermark{
+  padding-left:4rem;
+  overflow:visible;
+ }
+ .premium-page #main .hero-copy-brand-watermark:has(.hero-certification-badge) .hero-watermark-zone>.hero-brand-watermark{
+  right:calc((100vw - min(1120px, calc(100vw - 3rem))) / -2);
+  background-position:calc(50% - 1rem) 40%;
+ }
+ .premium-page #main .premium-hero:not(.hero-statement):has(.hero-certification-badge) .portrait-figure{
+  overflow:hidden;
+ }
+ .premium-page #main .premium-hero:not(.hero-statement):has(.hero-certification-badge) .portrait-figure>img{
+  transform:scale(1.08);
+  transform-origin:50% 35%;
+ }
  .premium-page #main .hero-certification-badge-row{
   position:absolute;
   right:0;
   bottom:1.5rem;
   width:auto;
   margin:0;
+ }
+}
+@media(min-width:901px) and (max-width:1399px){
+ .premium-page #main .hero-copy-brand-watermark:has(.hero-certification-badge) .hero-actions .button{
+  padding-inline:1.125rem;
+ }
+ .premium-page #main .hero-copy-brand-watermark:has(.hero-certification-badge) .hero-certification-badge-row{
+  right:.75rem;
+  bottom:2.5rem;
  }
 }
 @media(max-width:650px){

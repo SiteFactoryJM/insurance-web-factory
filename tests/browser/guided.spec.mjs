@@ -38,7 +38,16 @@ test('Kim Daekyung badge is a solid standalone image and the watermark cannot cr
   await page.goto('/?site=20260922-kimdaekyung');
   const badge=page.locator('.hero-certification-badge');
   const badgeRow=page.locator('.hero-certification-badge-row');
+  const hero=page.locator('#home');
+  const heroCopy=page.locator('#home .hero-copy');
+  const portrait=page.locator('#home .portrait-figure>img');
+  const watermark=page.locator('.hero-watermark-zone>.hero-brand-watermark');
   await expect(badge).toBeVisible();
+  await expect(hero).toHaveCSS('column-gap','24px');
+  await expect(heroCopy).toHaveCSS('padding-left','64px');
+  await expect(heroCopy).toHaveCSS('overflow','visible');
+  await expect(portrait).toHaveCSS('transform',/matrix\(1\.08, 0, 0, 1\.08,/);
+  await expect(watermark).toHaveCSS('background-position-x','calc(50% - 16px)');
   await expect(badgeRow).toHaveCSS('position','absolute');
   await expect(badgeRow).toHaveCSS('z-index','3');
   await expect(badge).toHaveCSS('position','static');
