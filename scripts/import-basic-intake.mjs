@@ -1,6 +1,6 @@
 import { constants as fsConstants } from "node:fs";
 import { createHash } from "node:crypto";
-import { access, copyFile, link, mkdir, readFile, readdir, realpath, stat, unlink, writeFile } from "node:fs/promises";
+import { access, copyFile, link, mkdir, readFile, readdir, realpath, rename, stat, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { domainToASCII, fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
@@ -69,18 +69,18 @@ export async function readBasicWorkbook(filePath) {
   if (!sheet) throw new Error("'기본정보' 시트를 찾을 수 없습니다.");
 
   const raw = {};
-  const ignored = [];
+  const ignored = new Set();
   sheet.eachRow(row => {
     const label = cleanLabel(row.getCell(1).value);
     if (!label) return;
     if (ignoredLabels.has(label)) {
-      if (text(row.getCell(2).value)) ignored.push(label);
+      if (text(row.getCell(2).value)) ignored.add(label);
       return;
     }
     const field = labelToField.get(label);
     if (field) raw[field] = cleanFieldValue(field, row.getCell(2).value);
   });
-  return { values: raw, ignored };
+  return { values: raw, ignored: [...ignored] };
 }
 
 const compactName = value => text(value).normalize("NFC").replace(/[\s_-]+/g, "").toLowerCase();
@@ -134,7 +134,7 @@ function validateBasicValues(values, sourceName) {
   if (!isKakaoUrl(values.kakaoUrl)) errors.push("오픈카카오톡주소는 https://open.kakao.com/o/초대코드 형식이어야 합니다.");
   const photoName = path.basename(text(values.photoFileName));
   if (values.photoFileName && photoName !== values.photoFileName) errors.push("사진 파일명에는 폴더 경로를 넣지 말고 파일명만 입력해 주세요.");
-  if (photoName && !imageExtensions.has(path.extname(photoName).toLowerCase())) errors.push("사진은 JPG, PNG 또는 WebP 파일만 사용할 수 있습니다.");
+  if (photoName && path.extname(photoName) && !imageExtensions.has(path.extname(photoName).toLowerCase())) errors.push("사진은 JPG, PNG 또는 WebP 파일만 사용할 수 있습니다.");
   if (values.name && photoName && !compactName(path.parse(photoName).name).includes(compactName(values.name))) errors.push("사진 파일명에는 반드시 본인 이름을 포함해 주세요.");
   if (errors.length) throw new Error(`${sourceName}\n- ${errors.join("\n- ")}`);
 }
@@ -234,12 +234,35 @@ async function existingDomainOwners(rootDir) {
   return owners;
 }
 
-export async function planBasicImport({ excelDir, photoDir, rootDir = repositoryRoot }) {
+const isSameOrWithin = (parent, candidate) => {
+  const relative = path.relative(parent, candidate);
+  return relative === "" || (!relative.startsWith(`..${path.sep}`) && relative !== ".." && !path.isAbsolute(relative));
+};
+
+async function assertMissing(file, label) {
+  try { await access(file); throw new Error(`${label}에 같은 이름의 파일이 이미 있습니다: ${file}`); }
+  catch (error) { if (error.code !== "ENOENT") throw error; }
+}
+
+function selectPhoto(values, photos, sourceName) {
+  const requested = text(values.photoFileName);
+  const exact = photos.get(requested.toLowerCase());
+  if (exact) return exact;
+  const nameKey = compactName(values.name);
+  const matches = [...photos.values()].filter(file => compactName(path.parse(file).name).includes(nameKey));
+  if (matches.length === 1) return matches[0];
+  if (!matches.length) throw new Error(`${sourceName}\n- 사진 폴더에서 본인 이름이 포함된 사진을 찾을 수 없습니다: ${values.name}`);
+  throw new Error(`${sourceName}\n- 본인 이름이 포함된 사진이 여러 개입니다. 사진 파일명 칸에 확장자를 포함한 정확한 파일명을 적어 주세요: ${matches.map(file => path.basename(file)).join(", ")}`);
+}
+
+export async function planBasicImport({ excelDir, photoDir, completedDir, rootDir = repositoryRoot }) {
   rootDir = await realpath(path.resolve(rootDir));
   excelDir = await realpath(path.resolve(excelDir));
   photoDir = await realpath(path.resolve(photoDir));
+  completedDir = completedDir ? path.resolve(completedDir) : "";
   if (!(await stat(excelDir)).isDirectory()) throw new Error("엑셀 경로는 폴더여야 합니다.");
   if (!(await stat(photoDir)).isDirectory()) throw new Error("사진 경로는 폴더여야 합니다.");
+  if (completedDir && (isSameOrWithin(excelDir, completedDir) || isSameOrWithin(photoDir, completedDir))) throw new Error("완료 폴더는 진행 전 엑셀/사진 폴더 밖에 지정해 주세요.");
 
   const excelFiles = await listFiles(excelDir, /\.xlsx$/i);
   if (!excelFiles.length) throw new Error("엑셀 폴더에 .xlsx 파일이 없습니다.");
@@ -265,8 +288,8 @@ export async function planBasicImport({ excelDir, photoDir, rootDir = repository
     try { await access(targetSite); throw new Error(`이미 등록된 사이트입니다: ${id} (${sourceName})`); }
     catch (error) { if (error.code !== "ENOENT") throw error; }
 
-    const photoSource = photos.get(values.photoFileName.toLowerCase());
-    if (!photoSource) throw new Error(`${sourceName}\n- 사진 폴더에서 파일을 찾을 수 없습니다: ${values.photoFileName}`);
+    const photoSource = selectPhoto(values, photos, sourceName);
+    if (!compactName(path.parse(photoSource).name).includes(compactName(values.name))) throw new Error(`${sourceName}\n- 실제 사진 파일명에는 반드시 본인 이름을 포함해 주세요: ${path.basename(photoSource)}`);
     await assertRasterImage(photoSource);
     const extension = path.extname(photoSource).toLowerCase() === ".jpeg" ? ".jpg" : path.extname(photoSource).toLowerCase();
     const profileImage = `/sites/${id}/profile${extension}`;
@@ -280,7 +303,11 @@ export async function planBasicImport({ excelDir, photoDir, rootDir = repository
     const site = createSite(values, id, profileImage, domains);
     const issues = [...validateDesignConfiguration(site), ...validateContentLengths(site), ...validateSectionContent(site)];
     if (issues.length) throw new Error(`${sourceName}\n- ${issues.join("\n- ")}`);
-    plans.push({ id, sourceName, excelFile, photoSource, targetSite, targetPhoto: path.join(rootDir, "public", profileImage.slice(1)), site, ignored });
+    const completedExcel = completedDir ? path.join(completedDir, "2. 양식", sourceName) : "";
+    const completedPhoto = completedDir ? path.join(completedDir, "1. 이미지", path.basename(photoSource)) : "";
+    if (completedExcel) await assertMissing(completedExcel, "완료 양식 폴더");
+    if (completedPhoto) await assertMissing(completedPhoto, "완료 이미지 폴더");
+    plans.push({ id, sourceName, excelFile, photoSource, targetSite, targetPhoto: path.join(rootDir, "public", profileImage.slice(1)), completedExcel, completedPhoto, site, ignored });
   }
   return plans;
 }
@@ -313,27 +340,62 @@ function runNodeScript(rootDir, script) {
   if (result.status !== 0) throw new Error(`${script} 실행에 실패했습니다.`);
 }
 
+export async function moveCompletedSources(plans, completedDir) {
+  if (!completedDir) return [];
+  const moves = [];
+  const seen = new Set();
+  for (const plan of plans) {
+    for (const [source, destination] of [[plan.excelFile, plan.completedExcel], [plan.photoSource, plan.completedPhoto]]) {
+      const key = path.resolve(source).toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      moves.push({ source, destination });
+    }
+  }
+  for (const move of moves) await assertMissing(move.destination, "완료 폴더");
+  await Promise.all([
+    mkdir(path.join(completedDir, "1. 이미지"), { recursive: true }),
+    mkdir(path.join(completedDir, "2. 양식"), { recursive: true }),
+  ]);
+  const completed = [];
+  try {
+    for (const move of moves) {
+      await rename(move.source, move.destination);
+      completed.push(move);
+    }
+  } catch (error) {
+    for (const move of completed.reverse()) await rename(move.destination, move.source).catch(() => {});
+    if (error?.code === "EXDEV") throw new Error("진행 전 폴더와 완료 폴더는 같은 드라이브에 두어야 합니다.");
+    throw error;
+  }
+  return moves;
+}
+
 export async function importBasicBatch(options) {
   const rootDir = options.rootDir ? await realpath(path.resolve(options.rootDir)) : repositoryRoot;
-  const plans = await planBasicImport({ ...options, rootDir });
+  const completedDir = options.completedDir ? path.resolve(options.completedDir) : "";
+  const plans = await planBasicImport({ ...options, rootDir, completedDir });
   if (!options.dryRun) {
     for (const plan of plans) await writePlan(plan);
     runNodeScript(rootDir, "generate-registry.mjs");
     runNodeScript(rootDir, "validate-sites.mjs");
+    await moveCompletedSources(plans, completedDir);
   }
   return plans;
 }
 
 function parseArgs(argv) {
-  const args = { excelDir: "", photoDir: "", dryRun: false };
+  const args = { excelDir: "", photoDir: "", completedDir: "", dryRun: false };
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
     if (["--excel-dir", "--xlsx-dir"].includes(value)) args.excelDir = argv[++index] ?? "";
     else if (["--photo-dir", "--image-dir"].includes(value)) args.photoDir = argv[++index] ?? "";
+    else if (["--completed-dir", "--done-dir"].includes(value)) args.completedDir = argv[++index] ?? "";
     else if (["--dry-run", "dry-run"].includes(value)) args.dryRun = true;
     else if (["--help", "-h"].includes(value)) args.help = true;
     else if (!value.startsWith("-") && !args.excelDir) args.excelDir = value;
     else if (!value.startsWith("-") && !args.photoDir) args.photoDir = value;
+    else if (!value.startsWith("-") && !args.completedDir) args.completedDir = value;
     else throw new Error(`알 수 없는 옵션입니다: ${value}`);
   }
   return args;
@@ -342,12 +404,16 @@ function parseArgs(argv) {
 async function main(argv) {
   const args = parseArgs(argv);
   if (args.help) {
-    console.log("npm run basic:import -- <엑셀 폴더> <사진 폴더> [dry-run]\nnode scripts/import-basic-intake.mjs --excel-dir <엑셀 폴더> --photo-dir <사진 폴더> [--dry-run]\n\n수정 요청사항과 가비아 계정 정보는 읽지 않습니다. 생성 사이트는 draft/noindex로 등록됩니다.");
+    console.log("npm run basic:import -- <엑셀 폴더> <사진 폴더> <완료 폴더> [dry-run]\nnode scripts/import-basic-intake.mjs --excel-dir <엑셀 폴더> --photo-dir <사진 폴더> --completed-dir <완료 폴더> [--dry-run]\n\n수정 요청사항과 가비아 계정 정보는 읽지 않습니다. 생성 사이트는 draft/noindex로 등록되며 성공한 원본은 완료 폴더의 1. 이미지/2. 양식으로 이동합니다.");
     return;
   }
-  if (!args.excelDir || !args.photoDir) throw new Error("--excel-dir와 --photo-dir를 모두 지정하세요.");
+  if (!args.excelDir || !args.photoDir || !args.completedDir) throw new Error("엑셀 폴더, 사진 폴더, 완료 폴더를 모두 지정하세요.");
   const plans = await importBasicBatch(args);
-  for (const plan of plans) console.log(`${args.dryRun ? "[DRY RUN] " : ""}${plan.sourceName} -> ${plan.id} (${path.basename(plan.photoSource)})`);
+  for (const plan of plans) {
+    console.log(`${args.dryRun ? "[DRY RUN] " : ""}${plan.sourceName} -> ${plan.id} (${path.basename(plan.photoSource)})`);
+    console.log(`  완료 양식: ${plan.completedExcel}`);
+    console.log(`  완료 사진: ${plan.completedPhoto}`);
+  }
   console.log(`${args.dryRun ? "검사" : "등록"} 완료: ${plans.length}개 사이트 · draft / noindex`);
   if (plans.some(plan => plan.ignored.length)) console.log("수정 요청사항과 가비아 계정 정보는 자동 등록에서 제외했습니다.");
 }

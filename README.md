@@ -39,13 +39,13 @@ npm run preview
 `기본정보_작성양식.xlsx` 파일들을 한 폴더에 모으고, 각 양식의 `사진 파일명`과 같은 사진 파일들을 별도 폴더에 모읍니다. 사진 파일명에는 반드시 작성자 이름이 포함되어야 합니다.
 
 ```bash
-npm run basic:import -- "D:\incoming\excel" "D:\incoming\photos" dry-run
-npm run basic:import -- "D:\incoming\excel" "D:\incoming\photos"
+npm run basic:import -- "D:\보험페이지 제작\1. 진행전\2. 양식" "D:\보험페이지 제작\1. 진행전\1. 이미지" "D:\보험페이지 제작\2. 완료" dry-run
+npm run basic:import -- "D:\보험페이지 제작\1. 진행전\2. 양식" "D:\보험페이지 제작\1. 진행전\1. 이미지" "D:\보험페이지 제작\2. 완료"
 ```
 
 이름, 휴대폰 번호, 소속, 사진 파일명은 필수입니다. 팩스번호, 이메일, 상담시간, 인스타그램, 오픈카카오톡, 직함, 주소, 희망 도메인은 작성된 경우에만 반영합니다. 수정 요청사항과 가비아 아이디·비밀번호는 자동 등록에 사용하지 않습니다.
 
-등록된 사이트는 `draft`와 `noindex` 상태로 생성됩니다. 스크립트가 사진을 `public/sites/<id>/`로 복사하고 `sites/<id>/site.json`을 만든 뒤 사이트 레지스트리 생성과 설정 검증까지 실행합니다. 실제 공개는 문구와 준법 확인 후 별도로 진행합니다.
+등록된 사이트는 `draft`와 `noindex` 상태로 생성됩니다. 스크립트가 사진을 `public/sites/<id>/`로 복사하고 `sites/<id>/site.json`을 만든 뒤 사이트 레지스트리 생성과 설정 검증까지 실행합니다. 모든 검증이 성공하면 사용한 사진은 완료 폴더의 `1. 이미지`, 엑셀은 `2. 양식`으로 이동합니다. `dry-run`에서는 검사와 이동 계획만 출력하고 파일을 만들거나 옮기지 않습니다. 실제 공개는 문구와 준법 확인 후 별도로 진행합니다.
 
 `npm run check`는 사이트 레지스트리와 제작 화면 번들을 생성하고 설정·타입·단위 테스트를 실행합니다. `src/generated/sites.generated.ts`와 `public/assets/guided-studio.js`는 직접 수정하지 않습니다.
 

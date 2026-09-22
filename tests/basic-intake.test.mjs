@@ -2,9 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import os from "node:os";
 import path from "node:path";
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import ExcelJS from "exceljs";
-import { normalizeRequestedDomain, planBasicImport, readBasicWorkbook, siteIdFor } from "../scripts/import-basic-intake.mjs";
+import { moveCompletedSources, normalizeRequestedDomain, planBasicImport, readBasicWorkbook, siteIdFor } from "../scripts/import-basic-intake.mjs";
 
 async function createWorkbook(file, values = {}) {
   const workbook = new ExcelJS.Workbook();
@@ -79,6 +79,42 @@ test("batch plan creates draft/noindex sites from basic information only", async
   assert.equal(plan.site.agent.profileImage, `/sites/${plan.id}/profile.png`);
   const serialized = JSON.stringify(plan.site);
   assert.doesNotMatch(serialized, /secret-id|secret-password|수정 요청사항/);
+});
+
+test("photo description without an extension matches the only image containing the person's name", async () => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), "basic-intake-photo-match-"));
+  const excelDir = path.join(directory, "excel");
+  const photoDir = path.join(directory, "photos");
+  const completedDir = path.join(directory, "completed");
+  const rootDir = path.join(directory, "repo");
+  await Promise.all([mkdir(excelDir), mkdir(photoDir), mkdir(path.join(rootDir, "sites"), { recursive: true })]);
+  await createWorkbook(path.join(excelDir, "김테스트.xlsx"), { photoFileName: "김테스트 프로필 사진", requestedDomain: "" });
+  await writeFile(path.join(photoDir, "1. 김테스트.jpg"), Buffer.from([0xff, 0xd8, 0xff]));
+
+  const [plan] = await planBasicImport({ excelDir, photoDir, completedDir, rootDir });
+  assert.equal(path.basename(plan.photoSource), "1. 김테스트.jpg");
+  assert.equal(plan.completedExcel, path.join(completedDir, "2. 양식", "김테스트.xlsx"));
+  assert.equal(plan.completedPhoto, path.join(completedDir, "1. 이미지", "1. 김테스트.jpg"));
+});
+
+test("completed sources move into separate image and workbook folders", async () => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), "basic-intake-completed-"));
+  const completedDir = path.join(directory, "completed");
+  const excelFile = path.join(directory, "person.xlsx");
+  const photoFile = path.join(directory, "person.jpg");
+  await writeFile(excelFile, "excel");
+  await writeFile(photoFile, "photo");
+  const plan = {
+    excelFile,
+    photoSource: photoFile,
+    completedExcel: path.join(completedDir, "2. 양식", "person.xlsx"),
+    completedPhoto: path.join(completedDir, "1. 이미지", "person.jpg"),
+  };
+  await moveCompletedSources([plan], completedDir);
+  await assert.rejects(() => access(excelFile), /ENOENT/);
+  await assert.rejects(() => access(photoFile), /ENOENT/);
+  assert.equal(await readFile(plan.completedExcel, "utf8"), "excel");
+  assert.equal(await readFile(plan.completedPhoto, "utf8"), "photo");
 });
 
 test("photo filename must include the person's name", async () => {
