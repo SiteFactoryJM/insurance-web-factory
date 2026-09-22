@@ -12,14 +12,14 @@
 - Current-run 김경현 comparison capture: `outputs/watermark-audit-20260922/01-kimgyeonghyeon-before.png`
 - Current local hero implementation: `outputs/watermark-audit-20260922/12-kimdaekyung-badge-photo-local.png`
 - Current local about implementation: `outputs/watermark-audit-20260922/09-kimdaekyung-about-values-left-local.png`
-- Current deployed implementation: `outputs/watermark-audit-20260922/13-kimdaekyung-badge-photo-deployed.png` (Cloudflare version `7c73bf7b-abe1-453b-898e-2b70a7fccbd0`)
+- Current deployed implementation: `outputs/watermark-audit-20260922/14-kimdaekyung-badge-opacity-deployed.png` (Cloudflare version `a88543a8-0edc-43fa-b866-7cc88d0dd4b9`)
 - Responsive viewports checked: 320 × 900, 360 × 900, 390 × 900, 768 × 900, 1440 × 1009
 
 ## Comparison result
 
 - The stacked HAEON logo is visible at the top-left and enlarged to remain legible beside the adviser identity.
 - The forest-green identity panel, adviser portrait, warm brand watermark, heading hierarchy, direct-contact buttons, and compact topic chips preserve the supplied visual direction.
-- The blue `명장 우수인증설계사` mark is a fully opaque 96px foreground badge in a white card, anchored 16px from the portrait's top-left corner. It now moves only with the portrait and cannot collide with the topic chips, contact actions, disclosure note, or gold watermark.
+- The blue `명장 우수인증설계사` mark is a fully opaque 96px foreground badge in a 72%-opaque white card, anchored 16px from the portrait's top-left corner. It now moves only with the portrait and cannot collide with the topic chips, contact actions, disclosure note, or gold watermark.
 - The desktop hero grid, copy rhythm, and adviser card were checked against the live 김경현 template at `https://김경현.kr`; both resolve to the same 1120px content container at the inspected desktop CSS viewport.
 - For the 김대경 variant, the 24px column gap and clipped hero-copy panel keep the gold treatment inside the main content area. The copy begins 64px inside that panel, matching the reference's visible inner-left breathing room without overlapping the adviser card.
 - The gold watermark now uses the live 김경현 site rules without a 김대경-specific scale or focal-point override. Direct production comparison returned identical values for both sites: `background-position: 50% 40%`, `background-size: cover`, `opacity: 0.82`, and the same radial mask.
@@ -49,6 +49,7 @@
 16. Removed the 김대경-specific watermark scale and position override. The deployed 김대경 watermark now matches the live 김경현 site across position, size, opacity, and mask values.
 17. Re-ran `npm run check` (224/224) and `npm run test:e2e` (29/29), including the 1046px regression width, the five required responsive widths, and 200% text enlargement.
 18. Verified Cloudflare version `7c73bf7b-abe1-453b-898e-2b70a7fccbd0`: badge width 96px, portrait inset 16px × 16px, no horizontal overflow, and exact 김경현 watermark-style parity.
+19. Reduced only the certification card's white background opacity from 92% to 72%, then verified Cloudflare version `a88543a8-0edc-43fa-b866-7cc88d0dd4b9` reports `rgba(255, 255, 255, 0.72)` while the badge stays inside the portrait.
 
 ## Final result
 

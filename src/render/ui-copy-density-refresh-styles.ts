@@ -16,7 +16,7 @@ export const uiCopyDensityRefreshStyles = `
  padding:.45rem;
  border:1px solid rgba(20,75,61,.12);
  border-radius:.75rem;
- background:rgba(255,255,255,.92);
+ background:rgba(255,255,255,.72);
  box-shadow:0 .4rem 1.25rem rgba(16,39,31,.12);
  pointer-events:none;
 }

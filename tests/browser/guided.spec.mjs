@@ -63,6 +63,7 @@ test('Kim Daekyung badge stays inside the portrait while the watermark remains a
   await expect(badgeRow).toHaveCSS('position','absolute');
   await expect(badgeRow).toHaveCSS('top','16px');
   await expect(badgeRow).toHaveCSS('left','16px');
+  await expect(badgeRow).toHaveCSS('background-color','rgba(255, 255, 255, 0.72)');
   await expect(badgeRow).toHaveCSS('z-index','3');
   await expect(badge).toHaveCSS('position','static');
   await expect(badge).toHaveCSS('width','96px');
